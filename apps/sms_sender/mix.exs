@@ -1,8 +1,8 @@
-defmodule SMSReceiver.Mixfile do
+defmodule SMSSender.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :sms_receiver,
+    [app: :sms_sender,
      version: "0.1.0",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
@@ -15,13 +15,10 @@ defmodule SMSReceiver.Mixfile do
   end
 
   def application do
-    [extra_applications: [:logger],
-     mod: {SMSReceiver, []}]
+    [extra_applications: [:logger]]
   end
 
   defp deps do
-    [{:sms_sender, in_umbrella: true},
-     {:cowboy, "~> 1.1"},
-     {:plug, "~> 1.3"}]
+    [{:httpoison, "~> 0.11.0"}]
   end
 end
