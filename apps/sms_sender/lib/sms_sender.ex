@@ -5,7 +5,7 @@ defmodule SMSSender do
       api_key: "1f55a721",
       api_secret: "02de69d6e2fb67cA",
       to: "16306326718",
-      from: "12672458439",
+      from: "16303200120",
       text: text]}
 
     HTTPoison.post!(url, body, [])
