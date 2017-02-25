@@ -2,7 +2,8 @@ use Mix.Config
 
 config :storage, Storage,
   adapter: Ecto.Adapters.Postgres,
-  username: "bspatafora",
+  username: "civically",
+  password: "***REMOVED***",
   hostname: "localhost"
 
 config :storage, ecto_repos: [Storage]
