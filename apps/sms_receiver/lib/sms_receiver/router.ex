@@ -8,7 +8,7 @@ defmodule SMSReceiver.Router do
     conn = fetch_query_params(conn, [])
     text = conn.query_params["text"]
 
-    SMSSender.send(text)
+    if text, do: SMSSender.send(text)
 
     send_resp(conn, 200, "")
   end
