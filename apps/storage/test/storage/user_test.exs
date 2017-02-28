@@ -12,7 +12,6 @@ defmodule Storage.UserTest do
     params = %{phone: "6306326718"}
     changeset = Storage.User.changeset(%Storage.User{}, params)
 
-    assert changeset.valid? == false
     assert length(changeset.errors) == 1
     assert changeset.errors[:name] == {"can't be blank", [validation: :required]}
   end
@@ -21,7 +20,6 @@ defmodule Storage.UserTest do
     params = %{name: "Ben Spatafora"}
     changeset = Storage.User.changeset(%Storage.User{}, params)
 
-    assert changeset.valid? == false
     assert length(changeset.errors) == 1
     assert changeset.errors[:phone] == {"can't be blank", [validation: :required]}
   end
@@ -30,7 +28,6 @@ defmodule Storage.UserTest do
     params = %{name: String.duplicate("a", 101), phone: "6306326718"}
     changeset = Storage.User.changeset(%Storage.User{}, params)
 
-    assert changeset.valid? == false
     assert length(changeset.errors) == 1
     assert changeset.errors[:name] == {"should be at most %{count} character(s)", [count: 100, validation: :length, max: 100]}
   end
@@ -39,7 +36,6 @@ defmodule Storage.UserTest do
     params = %{name: "Ben Spatafora", phone: "16306326718"}
     changeset = Storage.User.changeset(%Storage.User{}, params)
 
-    assert changeset.valid? == false
     assert length(changeset.errors) == 1
     assert changeset.errors[:phone] == {"has invalid format", [validation: :format]}
   end
