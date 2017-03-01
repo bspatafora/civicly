@@ -1,11 +1,11 @@
-defmodule Storage.UserTest do
+defmodule Storage.UserSchemaTest do
   use ExUnit.Case, async: true
 
   test "a valid user has a name and a phone number" do
     params = %{name: "Ben Spatafora", phone: "6306326718"}
     changeset = Storage.User.changeset(%Storage.User{}, params)
 
-    assert changeset.valid? == true
+    assert changeset.valid?
   end
 
   test "a user with no name is invalid" do
