@@ -10,7 +10,7 @@ defmodule Civically.Mixfile do
   end
 
   defp deps do
-    []
+    [{:logger_json_file_backend, "~> 0.1.4"}]
   end
 
   defp aliases do
