@@ -4,7 +4,7 @@ config :logger,
   backends: [{LoggerJSONFileBackend, :json}]
 
 config :logger, :json,
-  path: "app.log",
+  path: "/home/bspatafora/civically.log",
   level: :info,
   metadata_triming: false
 
