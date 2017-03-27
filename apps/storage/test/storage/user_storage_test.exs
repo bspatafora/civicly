@@ -8,8 +8,7 @@ defmodule Storage.UserStorageTest do
   end
 
   def changeset(params \\ %{}) do
-    phone = Integer.to_string(Enum.random(5550000000..5559999999))
-    defaults = %{name: "Test User", phone: phone}
+    defaults = %{name: "Test User", phone: Helpers.random_phone}
 
     Storage.User.changeset(%Storage.User{}, Map.merge(defaults, params))
   end

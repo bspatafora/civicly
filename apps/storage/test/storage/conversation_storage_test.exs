@@ -17,8 +17,7 @@ defmodule Storage.ConversationStorageTest do
   end
 
   def insert_user do
-    phone = Integer.to_string(Enum.random(5550000000..5559999999))
-    params = %{name: "Test User", phone: phone}
+    params = %{name: "Test User", phone: Helpers.random_phone}
 
     changeset = Storage.User.changeset(%Storage.User{}, params)
     {:ok, user} = Storage.insert(changeset)
