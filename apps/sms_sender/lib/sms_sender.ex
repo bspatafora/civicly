@@ -1,25 +1,13 @@
 defmodule SMSSender do
-  def send(text) do
+  def send(text, recipient, proxy_phone) do
     body = {:form, [
-      api_key: api_key(),
-      api_secret: api_secret(),
-      to: "16306326718",
-      from: "16303200120",
+      api_key: get_config(:api_key),
+      api_secret: get_config(:api_secret),
+      to: recipient,
+      from: proxy_phone,
       text: text]}
 
-    HTTPoison.post!(url(), body, [])
-  end
-
-  defp url do
-    get_config(:url)
-  end
-
-  defp api_key do
-    get_config(:api_key)
-  end
-
-  defp api_secret do
-    get_config(:api_secret)
+    HTTPoison.post!(get_config(:url), body, [])
   end
 
   defp get_config(key) do
