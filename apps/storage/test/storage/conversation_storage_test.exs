@@ -11,7 +11,7 @@ defmodule Storage.ConversationStorageTest do
     defaults =
       %{left_user_id: insert_user().id,
         right_user_id: insert_user().id,
-        proxy_phone: "5555555555",
+        proxy_phone: "15555555555",
         start: to_string(Ecto.DateTime.utc)}
     Storage.Conversation.changeset(%Storage.Conversation{}, Map.merge(defaults, params))
   end

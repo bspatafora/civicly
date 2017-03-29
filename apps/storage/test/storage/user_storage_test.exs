@@ -22,7 +22,7 @@ defmodule Storage.UserStorageTest do
   end
 
   test "a user's phone number must be unique" do
-    duplicate_phone = %{phone: "5555555555"}
+    duplicate_phone = %{phone: "15555555555"}
     Storage.insert!(changeset(duplicate_phone))
 
     assert {:error, changeset} = Storage.insert(changeset(duplicate_phone))

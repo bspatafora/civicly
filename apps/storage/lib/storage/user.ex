@@ -17,7 +17,7 @@ defmodule Storage.User do
     |> cast(params, [:name, :phone])
     |> validate_required([:name, :phone])
     |> validate_length(:name, max: 100)
-    |> validate_format(:phone, ~r/^\d{10}$/)
+    |> validate_format(:phone, ~r/^\d{11}$/)
     |> unique_constraint(:phone)
   end
 end
