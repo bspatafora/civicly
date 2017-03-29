@@ -6,6 +6,8 @@ defmodule SMSReceiver.Router do
   plug :dispatch
 
   get "/receive" do
+    send_resp(conn, 200, "")
+
     conn = fetch_query_params(conn, [])
     text = param(conn, "text")
     sender = param(conn, "msisdn")
@@ -20,8 +22,6 @@ defmodule SMSReceiver.Router do
 
     {recipient, proxy_phone} = fetch_recipient_and_proxy_phones(sender)
     SMSSender.send(text, recipient, proxy_phone)
-
-    send_resp(conn, 200, "")
   end
 
   defp param(conn, key) do
