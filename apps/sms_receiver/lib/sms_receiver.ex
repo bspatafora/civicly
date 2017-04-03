@@ -1,18 +1,23 @@
 defmodule SMSReceiver do
-  use Application
+  use Plug.Router
 
-  def start(_type, _args) do
-    import Supervisor.Spec, warn: false
+  plug :match
+  plug :dispatch
 
-    children = [
-      Plug.Adapters.Cowboy.child_spec(:http, SMSReceiver.Router, [], [port: port()])
-    ]
+  get "/receive" do
+    conn = fetch_query_params(conn, [])
 
-    opts = [strategy: :one_for_one, name: SMSReceiver.Supervisor]
-    Supervisor.start_link(children, opts)
+    message = %SMSMessage{
+      recipient: param(conn, "to"),
+      sender: param(conn, "msisdn"),
+      text: param(conn, "text")}
+
+    Core.Router.handle(message)
+
+    send_resp(conn, 200, "")
   end
 
-  defp port do
-    Application.fetch_env!(:sms_receiver, :port)
+  defp param(conn, key) do
+    conn.query_params[key]
   end
 end

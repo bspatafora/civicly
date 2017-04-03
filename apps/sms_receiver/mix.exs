@@ -16,11 +16,12 @@ defmodule SMSReceiver.Mixfile do
 
   def application do
     [extra_applications: [:logger],
-     mod: {SMSReceiver, []}]
+     mod: {SMSReceiver.Supervisor, []}]
   end
 
   defp deps do
-    [{:sms_sender, in_umbrella: true},
+    [{:core, in_umbrella: true},
+     {:sms_message, in_umbrella: true},
      {:cowboy, "~> 1.1"},
      {:plug, "~> 1.3"}]
   end

@@ -21,6 +21,8 @@ end
 release :civically do
   set version: "0.1.0"
   set applications: [
+    :core,
+    :sms_message,
     :sms_receiver,
     :sms_sender,
     :storage,

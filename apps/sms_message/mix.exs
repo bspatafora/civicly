@@ -1,8 +1,8 @@
-defmodule Storage.Mixfile do
+defmodule SMSMessage.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :storage,
+    [app: :sms_message,
      version: "0.1.0",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
@@ -15,12 +15,10 @@ defmodule Storage.Mixfile do
   end
 
   def application do
-    [extra_applications: [:logger],
-     mod: {Storage.Supervisor, []}]
+    [extra_applications: [:logger]]
   end
 
   defp deps do
-    [{:ecto, "~> 2.1"},
-     {:postgrex, "~> 0.13.1"}]
+    []
   end
 end

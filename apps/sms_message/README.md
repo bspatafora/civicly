@@ -1,0 +1,3 @@
+# SMSMessage
+
+SMSMessage type definition

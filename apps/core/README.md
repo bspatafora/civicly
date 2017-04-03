@@ -1,0 +1,3 @@
+# Core
+
+Civically core logic

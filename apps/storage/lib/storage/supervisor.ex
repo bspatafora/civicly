@@ -1,4 +1,4 @@
-defmodule Storage.Application do
+defmodule Storage.Supervisor do
   @moduledoc false
 
   use Application
