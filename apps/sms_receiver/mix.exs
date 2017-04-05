@@ -23,6 +23,7 @@ defmodule SMSReceiver.Mixfile do
     [{:core, in_umbrella: true},
      {:sms_message, in_umbrella: true},
      {:cowboy, "~> 1.1"},
-     {:plug, "~> 1.3"}]
+     {:plug, "~> 1.3"},
+     {:bypass, "~> 0.6", only: :test}]
   end
 end

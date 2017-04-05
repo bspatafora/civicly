@@ -5,19 +5,15 @@ defmodule SMSReceiver do
   plug :dispatch
 
   get "/receive" do
-    conn = fetch_query_params(conn, [])
+    conn = fetch_query_params(conn)
 
     message = %SMSMessage{
-      recipient: param(conn, "to"),
-      sender: param(conn, "msisdn"),
-      text: param(conn, "text")}
+      recipient: conn.params["to"],
+      sender: conn.params["msisdn"],
+      text: conn.params["text"]}
 
     Core.Router.handle(message)
 
     send_resp(conn, 200, "")
-  end
-
-  defp param(conn, key) do
-    conn.query_params[key]
   end
 end

@@ -8,10 +8,14 @@ defmodule SMSSender do
       from: message.sender,
       text: message.text]}
 
-    HTTPoison.post!(get_config(:url), body, [])
+    HTTPoison.post!(url(), body, [])
+  end
+
+  defp url() do
+    get_config(:origin) <> get_config(:path)
   end
 
   defp get_config(key) do
-    Application.fetch_env!(:sms_sender, key)
+    Application.get_env(:sms_sender, key)
   end
 end
