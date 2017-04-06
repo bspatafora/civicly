@@ -1,5 +1,8 @@
 defmodule Core.Router do
+  @moduledoc false
+
   require Logger
+
   @sms_sender Application.get_env(:core, :sms_sender)
   @storage_service Application.get_env(:core, :storage_service)
 

@@ -1,5 +1,9 @@
 defmodule Storage.Service do
+  @moduledoc false
+
   import Ecto.Query
+
+  alias Storage.{Conversation, User}
 
   def current_partner_and_proxy_phones(user_phone) do
     user_id = fetch_user_by_phone(user_phone).id
@@ -12,7 +16,7 @@ defmodule Storage.Service do
   end
 
   defp fetch_user_by_phone(phone) do
-    query = from Storage.User,
+    query = from User,
               where: [phone: ^phone],
               limit: 1
 
@@ -20,7 +24,7 @@ defmodule Storage.Service do
   end
 
   defp fetch_current_conversation(user_id) do
-    query = from Storage.Conversation,
+    query = from Conversation,
               where: [left_user_id: ^user_id],
               or_where: [right_user_id: ^user_id],
               order_by: [desc: :start],
@@ -35,6 +39,6 @@ defmodule Storage.Service do
   end
 
   defp fetch_user(user_id) do
-    Storage.get!(Storage.User, user_id)
+    Storage.get!(User, user_id)
   end
 end

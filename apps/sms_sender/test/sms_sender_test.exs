@@ -1,9 +1,11 @@
 defmodule SMSSenderTest do
   use ExUnit.Case, async: true
 
+  alias Plug.{Conn, Parsers}
+
   def parse_body_params(conn) do
-    opts = Plug.Parsers.init([parsers: [Plug.Parsers.URLENCODED]])
-    Plug.Parsers.call(conn, opts)
+    opts = Parsers.init([parsers: [Plug.Parsers.URLENCODED]])
+    Parsers.call(conn, opts)
   end
 
   def get_config(key) do
@@ -33,7 +35,7 @@ defmodule SMSSenderTest do
       assert outbound_sms_conn.params["from"] == proxy_phone
       assert outbound_sms_conn.params["text"] == text
 
-      Plug.Conn.resp(outbound_sms_conn, 200, "")
+      Conn.resp(outbound_sms_conn, 200, "")
     end
 
     message = %SMSMessage{

@@ -1,10 +1,14 @@
 defmodule Storage.Conversation do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Storage.User
+
   schema "conversations" do
-    belongs_to :left_user, Storage.User
-    belongs_to :right_user, Storage.User
+    belongs_to :left_user, User
+    belongs_to :right_user, User
 
     field :proxy_phone, :string
     field :start, :utc_datetime

@@ -1,16 +1,18 @@
 defmodule Storage.ServiceTest do
   use ExUnit.Case
 
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Storage)
+  alias Ecto.Adapters.SQL.Sandbox
+  alias Storage.{Conversation, Service, User}
 
-    Ecto.Adapters.SQL.Sandbox.mode(Storage, {:shared, self()})
+  setup do
+    :ok = Sandbox.checkout(Storage)
+    Sandbox.mode(Storage, {:shared, self()})
   end
 
   def insert_user do
     params = %{name: "Test User", phone: Helpers.random_phone}
 
-    changeset = Storage.User.changeset(%Storage.User{}, params)
+    changeset = User.changeset(%User{}, params)
     {:ok, user} = Storage.insert(changeset)
     user
   end
@@ -22,7 +24,7 @@ defmodule Storage.ServiceTest do
         proxy_phone: Helpers.random_phone,
         start: start}
 
-    changeset = Storage.Conversation.changeset(%Storage.Conversation{}, params)
+    changeset = Conversation.changeset(%Conversation{}, params)
     {:ok, conversation} = Storage.insert(changeset)
     conversation
   end
@@ -37,13 +39,13 @@ defmodule Storage.ServiceTest do
     current_conversation = insert_conversation(user1, user2, current_start)
 
     {partner_phone, proxy_phone} =
-      Storage.Service.current_partner_and_proxy_phones(user1.phone)
+      Service.current_partner_and_proxy_phones(user1.phone)
 
     assert partner_phone == user2.phone
     assert proxy_phone == current_conversation.proxy_phone
 
     {partner_phone, proxy_phone} =
-      Storage.Service.current_partner_and_proxy_phones(user2.phone)
+      Service.current_partner_and_proxy_phones(user2.phone)
 
     assert partner_phone == user1.phone
     assert proxy_phone == current_conversation.proxy_phone

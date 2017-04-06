@@ -2,33 +2,38 @@ defmodule SMSReceiverTest do
   use ExUnit.Case
   use Plug.Test
 
+  alias Ecto.Adapters.SQL.Sandbox
+  alias Ecto.DateTime
+  alias Plug.{Conn, Parsers}
+  alias Storage.{Conversation, User}
+
   def insert_users_and_conversation(left_user_phone, right_user_phone, proxy_phone) do
     params = %{
       left_user_id: insert_user(left_user_phone).id,
       right_user_id: insert_user(right_user_phone).id,
       proxy_phone: proxy_phone,
-      start: to_string(Ecto.DateTime.utc)}
-    changeset = Storage.Conversation.changeset(%Storage.Conversation{}, params)
+      start: to_string(DateTime.utc)}
+    changeset = Conversation.changeset(%Conversation{}, params)
 
     Storage.insert(changeset)
   end
 
   def insert_user(phone) do
     params = %{name: "Test User", phone: phone}
-    changeset = Storage.User.changeset(%Storage.User{}, params)
+    changeset = User.changeset(%User{}, params)
 
     {:ok, user} = Storage.insert(changeset)
     user
   end
 
   def parse_body_params(conn) do
-    opts = Plug.Parsers.init([parsers: [Plug.Parsers.URLENCODED]])
-    Plug.Parsers.call(conn, opts)
+    opts = Parsers.init([parsers: [Parsers.URLENCODED]])
+    Parsers.call(conn, opts)
   end
 
   setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Storage)
-    Ecto.Adapters.SQL.Sandbox.mode(Storage, {:shared, self()})
+    :ok = Sandbox.checkout(Storage)
+    Sandbox.mode(Storage, {:shared, self()})
 
     bypass = Bypass.open(port: 9002)
     {:ok, bypass: bypass}
@@ -49,7 +54,7 @@ defmodule SMSReceiverTest do
       assert outbound_sms_conn.params["from"] == proxy_phone
       assert outbound_sms_conn.params["text"] == text
 
-      Plug.Conn.resp(outbound_sms_conn, 200, "")
+      Conn.resp(outbound_sms_conn, 200, "")
     end
 
     inbound_sms_data = %{
@@ -59,9 +64,10 @@ defmodule SMSReceiverTest do
       "text": text,
       "type": "text",
       "message-timestamp": "2017-04-04+00:00:00"}
+    inbound_sms_conn = conn(:get, "/receive", inbound_sms_data)
+    opts = SMSReceiver.init([])
 
-    inbound_sms_conn= conn(:get, "/receive", inbound_sms_data)
-                          |> SMSReceiver.call(SMSReceiver.init([]))
+    inbound_sms_conn = SMSReceiver.call(inbound_sms_conn, opts)
 
     assert inbound_sms_conn.state == :sent
     assert inbound_sms_conn.status == 200

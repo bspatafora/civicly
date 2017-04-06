@@ -1,4 +1,6 @@
 defmodule SMSMessage do
+  @moduledoc false
+
   @type t :: %__MODULE__{
     recipient: String.t,
     sender: String.t,

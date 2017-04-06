@@ -1,5 +1,9 @@
 defmodule SMSReceiver do
+  @moduledoc false
+
   use Plug.Router
+
+  alias Core.Router
 
   plug :match
   plug :dispatch
@@ -12,7 +16,7 @@ defmodule SMSReceiver do
       sender: conn.params["msisdn"],
       text: conn.params["text"]}
 
-    Core.Router.handle(message)
+    Router.handle(message)
 
     send_resp(conn, 200, "")
   end

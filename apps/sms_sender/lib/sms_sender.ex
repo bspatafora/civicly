@@ -1,4 +1,6 @@
 defmodule SMSSender do
+  @moduledoc false
+
   @spec send(SMSMessage.t) :: no_return()
   def send(message) do
     body = {:form, [
@@ -11,7 +13,7 @@ defmodule SMSSender do
     HTTPoison.post!(url(), body, [])
   end
 
-  defp url() do
+  defp url do
     get_config(:origin) <> get_config(:path)
   end
 

@@ -1,16 +1,18 @@
 defmodule Storage.UserStorageTest do
   use ExUnit.Case
 
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Storage)
+  alias Ecto.Adapters.SQL.Sandbox
+  alias Storage.User
 
-    Ecto.Adapters.SQL.Sandbox.mode(Storage, {:shared, self()})
+  setup do
+    :ok = Sandbox.checkout(Storage)
+    Sandbox.mode(Storage, {:shared, self()})
   end
 
   def changeset(params \\ %{}) do
     defaults = %{name: "Test User", phone: Helpers.random_phone}
 
-    Storage.User.changeset(%Storage.User{}, Map.merge(defaults, params))
+    User.changeset(%User{}, Map.merge(defaults, params))
   end
 
   test "a user cannot have bogus parameters" do

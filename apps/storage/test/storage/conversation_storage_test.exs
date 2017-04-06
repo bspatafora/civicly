@@ -1,10 +1,13 @@
 defmodule Storage.ConversationStorageTest do
   use ExUnit.Case
 
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Storage)
+  alias Ecto.Adapters.SQL.Sandbox
+  alias Ecto.DateTime
+  alias Storage.{Conversation, User}
 
-    Ecto.Adapters.SQL.Sandbox.mode(Storage, {:shared, self()})
+  setup do
+    :ok = Sandbox.checkout(Storage)
+    Sandbox.mode(Storage, {:shared, self()})
   end
 
   def changeset(params \\ %{}) do
@@ -12,14 +15,14 @@ defmodule Storage.ConversationStorageTest do
       %{left_user_id: insert_user().id,
         right_user_id: insert_user().id,
         proxy_phone: "15555555555",
-        start: to_string(Ecto.DateTime.utc)}
-    Storage.Conversation.changeset(%Storage.Conversation{}, Map.merge(defaults, params))
+        start: to_string(DateTime.utc)}
+    Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
   end
 
   def insert_user do
     params = %{name: "Test User", phone: Helpers.random_phone}
 
-    changeset = Storage.User.changeset(%Storage.User{}, params)
+    changeset = User.changeset(%User{}, params)
     {:ok, user} = Storage.insert(changeset)
     user
   end
@@ -33,18 +36,20 @@ defmodule Storage.ConversationStorageTest do
   end
 
   test "a conversation's left user must exist" do
-    nonexistent_left_user = %{left_user_id: 99999}
+    nonexistent_left_user = %{left_user_id: 100_000}
 
-    assert {:error, changeset} = Storage.insert(changeset(nonexistent_left_user))
+    assert {:error, changeset} =
+      Storage.insert(changeset(nonexistent_left_user))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:left_user_id] == {"does not exist", []}
   end
 
   test "a conversation's right user must exist" do
-    nonexistent_right_user = %{right_user_id: 99999}
+    nonexistent_right_user = %{right_user_id: 100_000}
 
-    assert {:error, changeset} = Storage.insert(changeset(nonexistent_right_user))
+    assert {:error, changeset} =
+      Storage.insert(changeset(nonexistent_right_user))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:right_user_id] == {"does not exist", []}
@@ -64,14 +69,15 @@ defmodule Storage.ConversationStorageTest do
   end
 
   test "a conversation cannot share any of its users with another conversation with the same start time" do
-    time = to_string(Ecto.DateTime.utc)
+    time = to_string(DateTime.utc)
     {:ok, existing_conversation} = Storage.insert(changeset(%{start: time}))
 
     existing_users_and_time =
       %{left_user_id: existing_conversation.left_user_id,
         right_user_id: existing_conversation.right_user_id,
         start: time}
-    {:error, changeset} = Storage.insert(changeset(existing_users_and_time))
+    {:error, changeset} =
+      Storage.insert(changeset(existing_users_and_time))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
@@ -80,7 +86,8 @@ defmodule Storage.ConversationStorageTest do
       %{left_user_id: existing_conversation.right_user_id,
         right_user_id: existing_conversation.left_user_id,
         start: time}
-    {:error, changeset} = Storage.insert(changeset(existing_reversed_users_and_time))
+    {:error, changeset} =
+      Storage.insert(changeset(existing_reversed_users_and_time))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
@@ -89,7 +96,8 @@ defmodule Storage.ConversationStorageTest do
       %{left_user_id: insert_user().id,
         right_user_id: existing_conversation.right_user_id,
         start: time}
-    {:error, changeset} = Storage.insert(changeset(existing_right_user_and_time))
+    {:error, changeset} =
+      Storage.insert(changeset(existing_right_user_and_time))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
@@ -98,7 +106,8 @@ defmodule Storage.ConversationStorageTest do
       %{left_user_id: insert_user().id,
         right_user_id: existing_conversation.left_user_id,
         start: time}
-    {:error, changeset} = Storage.insert(changeset(existing_reversed_right_user_and_time))
+    {:error, changeset} =
+      Storage.insert(changeset(existing_reversed_right_user_and_time))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
@@ -107,7 +116,8 @@ defmodule Storage.ConversationStorageTest do
       %{left_user_id: existing_conversation.left_user_id,
         right_user_id: insert_user().id,
         start: time}
-    {:error, changeset} = Storage.insert(changeset(existing_left_user_and_time))
+    {:error, changeset} =
+      Storage.insert(changeset(existing_left_user_and_time))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
@@ -116,7 +126,8 @@ defmodule Storage.ConversationStorageTest do
       %{left_user_id: existing_conversation.right_user_id,
         right_user_id: insert_user().id,
         start: time}
-    {:error, changeset} = Storage.insert(changeset(existing_reversed_left_user_and_time))
+    {:error, changeset} =
+      Storage.insert(changeset(existing_reversed_left_user_and_time))
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
@@ -130,7 +141,8 @@ defmodule Storage.ConversationStorageTest do
         right_user_id: existing_conversation.right_user_id,
         start: "2017-03-06 00:00:00"}
 
-    assert {:ok, _} = Storage.insert(changeset(existing_users_but_different_time))
+    assert {:ok, _} =
+      Storage.insert(changeset(existing_users_but_different_time))
   end
 
   # Constraint temporarily removed for testing
