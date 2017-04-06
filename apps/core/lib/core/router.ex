@@ -1,23 +1,12 @@
 defmodule Core.Router do
   @moduledoc false
 
-  require Logger
-
   @sms_sender Application.get_env(:core, :sms_sender)
   @storage_service Application.get_env(:core, :storage_service)
 
   @spec handle(SMSMessage.t) :: no_return()
   def handle(message) do
-    log_receipt(message)
     relay_to_partner(message)
-  end
-
-  defp log_receipt(message) do
-    Logger.info("SMS received", [
-      name: "SMSReceived",
-      proxyPhone: message.recipient,
-      sender: message.sender,
-      text: message.text])
   end
 
   defp relay_to_partner(message) do
