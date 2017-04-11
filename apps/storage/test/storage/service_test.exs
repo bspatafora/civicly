@@ -29,7 +29,7 @@ defmodule Storage.ServiceTest do
     conversation
   end
 
-  test "provides the partner and proxy phone numbers of the user's current conversation" do
+  test "current_partner_and_proxy_phones/1 provides the partner and proxy phone numbers of the user's current conversation" do
     user1 = insert_user()
     user2 = insert_user()
     old_start = "2017-03-23 00:00:00"

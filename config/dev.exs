@@ -1,5 +1,5 @@
 use Mix.Config
 
-config :logger, :json,
-  path: "/home/bspatafora/civically_dev.log",
-  level: :debug
+config :logger,
+  backends: [:console],
+  level: :info

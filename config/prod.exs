@@ -1,5 +1,9 @@
 use Mix.Config
 
+config :logger,
+  backends: [{LoggerJSONFileBackend, :json}]
+
 config :logger, :json,
-  path: "/home/bspatafora/civically.log",
-  level: :info
+  level: :info,
+  metadata_triming: false,
+  path: "/home/bspatafora/civically.log"
