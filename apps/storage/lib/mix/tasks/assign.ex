@@ -1,4 +1,6 @@
 defmodule Mix.Tasks.Assign do
+  @moduledoc false
+
   use Mix.Task
 
   alias Storage.Assigner

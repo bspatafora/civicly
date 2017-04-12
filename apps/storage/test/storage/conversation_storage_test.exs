@@ -36,7 +36,7 @@ defmodule Storage.ConversationStorageTest do
   end
 
   test "a conversation's left user must exist" do
-    nonexistent_left_user = %{left_user_id: 100_000}
+    nonexistent_left_user = %{left_user_id: 1_000_000}
 
     assert {:error, changeset} =
       Storage.insert(changeset(nonexistent_left_user))
@@ -46,7 +46,7 @@ defmodule Storage.ConversationStorageTest do
   end
 
   test "a conversation's right user must exist" do
-    nonexistent_right_user = %{right_user_id: 100_000}
+    nonexistent_right_user = %{right_user_id: 1_000_000}
 
     assert {:error, changeset} =
       Storage.insert(changeset(nonexistent_right_user))
