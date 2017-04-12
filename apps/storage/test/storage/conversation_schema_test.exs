@@ -8,7 +8,7 @@ defmodule Storage.ConversationSchemaTest do
       %{left_user_id: 1,
         right_user_id: 2,
         proxy_phone: "15555555555",
-        start: "2017-03-01 00:00:00"}
+        start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert changeset.valid?
@@ -18,7 +18,7 @@ defmodule Storage.ConversationSchemaTest do
     params =
       %{right_user_id: 2,
         proxy_phone: "15555555555",
-        start: "2017-03-01 00:00:00"}
+        start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert length(changeset.errors) == 1
@@ -29,7 +29,7 @@ defmodule Storage.ConversationSchemaTest do
     params =
       %{left_user_id: 1,
         proxy_phone: "15555555555",
-        start: "2017-03-01 00:00:00"}
+        start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert length(changeset.errors) == 1
@@ -40,7 +40,7 @@ defmodule Storage.ConversationSchemaTest do
     params =
       %{left_user_id: 1,
         right_user_id: 2,
-        start: "2017-03-01 00:00:00"}
+        start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert length(changeset.errors) == 1
@@ -63,7 +63,7 @@ defmodule Storage.ConversationSchemaTest do
       %{left_user_id: 1,
         right_user_id: 2,
         proxy_phone: "5555555555",
-        start: "2017-03-01 00:00:00"}
+        start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert length(changeset.errors) == 1

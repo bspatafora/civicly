@@ -1,11 +1,10 @@
 defmodule Storage.Assigner do
   @moduledoc false
 
-  alias Ecto.DateTime
   alias Storage.{Conversation, User}
 
   def assign_all do
-    start = to_string(DateTime.utc)
+    start = DateTime.utc_now
 
     users = Storage.all(User)
     {leftover_user, users} = pop_ben(users)

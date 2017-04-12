@@ -40,7 +40,8 @@ defmodule SMSSenderTest do
     message = %SMSMessage{
       recipient: recipient_phone,
       sender: proxy_phone,
-      text: text}
+      text: text,
+      timestamp: DateTime.utc_now}
 
     SMSSender.send(message)
   end

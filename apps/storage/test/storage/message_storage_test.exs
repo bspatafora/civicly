@@ -2,7 +2,6 @@ defmodule Storage.MessageStorageTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Ecto.DateTime
   alias Storage.{Conversation, Message, User}
 
   setup do
@@ -16,7 +15,7 @@ defmodule Storage.MessageStorageTest do
       %{conversation_id: conversation.id,
         user_id: conversation.left_user_id,
         text: "Test message",
-        timestamp: to_string(DateTime.utc)}
+        timestamp: DateTime.utc_now}
 
     Message.changeset(%Message{}, Map.merge(defaults, params))
   end
@@ -26,7 +25,7 @@ defmodule Storage.MessageStorageTest do
       %{left_user_id: insert_user().id,
         right_user_id: insert_user().id,
         proxy_phone: "15555555555",
-        start: to_string(DateTime.utc)}
+        start: DateTime.utc_now}
 
     changeset = Conversation.changeset(%Conversation{}, params)
     {:ok, conversation} = Storage.insert(changeset)

@@ -4,8 +4,10 @@ defmodule SMSMessage do
   @type t :: %__MODULE__{
     recipient: String.t,
     sender: String.t,
-    text: String.t}
+    text: String.t,
+    timestamp: DateTime.t}
 
-  @enforce_keys [:recipient, :sender, :text]
-  defstruct [:recipient, :sender, :text]
+  all_keys = [:recipient, :sender, :text, :timestamp]
+  @enforce_keys all_keys
+  defstruct all_keys
 end

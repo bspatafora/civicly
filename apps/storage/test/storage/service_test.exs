@@ -32,8 +32,8 @@ defmodule Storage.ServiceTest do
   test "current_partner_and_proxy_phones/1 provides the partner and proxy phone numbers of the user's current conversation" do
     user1 = insert_user()
     user2 = insert_user()
-    old_start = "2017-03-23 00:00:00"
-    current_start = "2017-03-27 00:00:00"
+    {:ok, old_start, _} = DateTime.from_iso8601("2017-03-23 00:00:00Z")
+    {:ok, current_start, _} = DateTime.from_iso8601("2017-03-27 00:00:00Z")
 
     insert_conversation(user1, user2, old_start)
     current_conversation = insert_conversation(user1, user2, current_start)

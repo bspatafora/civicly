@@ -2,7 +2,6 @@ defmodule Storage.ConversationStorageTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Ecto.DateTime
   alias Storage.{Conversation, User}
 
   setup do
@@ -15,7 +14,7 @@ defmodule Storage.ConversationStorageTest do
       %{left_user_id: insert_user().id,
         right_user_id: insert_user().id,
         proxy_phone: "15555555555",
-        start: to_string(DateTime.utc)}
+        start: DateTime.utc_now}
     Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
   end
 
@@ -69,7 +68,7 @@ defmodule Storage.ConversationStorageTest do
   end
 
   test "a conversation cannot share any of its users with another conversation with the same start time" do
-    time = to_string(DateTime.utc)
+    time = DateTime.utc_now
     {:ok, existing_conversation} = Storage.insert(changeset(%{start: time}))
 
     existing_users_and_time =

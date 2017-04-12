@@ -8,7 +8,7 @@ defmodule Storage.MessageSchemaTest do
       %{conversation_id: 1,
         user_id: 1,
         text: "Test message",
-        timestamp: "2017-04-12 00:00:00"}
+        timestamp: DateTime.utc_now}
     changeset = Message.changeset(%Message{}, params)
 
     assert changeset.valid?
@@ -18,7 +18,7 @@ defmodule Storage.MessageSchemaTest do
     params =
       %{user_id: 1,
         text: "Test message",
-        timestamp: "2017-04-12 00:00:00"}
+        timestamp: DateTime.utc_now}
     changeset = Message.changeset(%Message{}, params)
 
     assert length(changeset.errors) == 1
@@ -29,7 +29,7 @@ defmodule Storage.MessageSchemaTest do
     params =
       %{conversation_id: 1,
         text: "Test message",
-        timestamp: "2017-04-12 00:00:00"}
+        timestamp: DateTime.utc_now}
     changeset = Message.changeset(%Message{}, params)
 
     assert length(changeset.errors) == 1
@@ -40,7 +40,7 @@ defmodule Storage.MessageSchemaTest do
     params =
       %{conversation_id: 1,
         user_id: 1,
-        timestamp: "2017-04-12 00:00:00"}
+        timestamp: DateTime.utc_now}
     changeset = Message.changeset(%Message{}, params)
 
     assert length(changeset.errors) == 1

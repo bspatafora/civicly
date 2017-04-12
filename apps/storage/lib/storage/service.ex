@@ -3,7 +3,7 @@ defmodule Storage.Service do
 
   import Ecto.Query
 
-  alias Storage.{Conversation, User}
+  alias Storage.{Conversation, Message, User}
 
   def current_partner_and_proxy_phones(user_phone) do
     user_id = fetch_user_by_phone(user_phone).id
@@ -13,6 +13,19 @@ defmodule Storage.Service do
     partner = fetch_user(partner_id)
 
     {partner.phone, conversation.proxy_phone}
+  end
+
+  def store_message(message) do
+    user_id = fetch_user_by_phone(message.sender).id
+    conversation_id = fetch_current_conversation(user_id).id
+
+    params =
+      %{conversation_id: conversation_id,
+        user_id: user_id,
+        text: message.text,
+        timestamp: message.timestamp}
+    changeset = Message.changeset(%Message{}, params)
+    Storage.insert(changeset)
   end
 
   defp fetch_user_by_phone(phone) do

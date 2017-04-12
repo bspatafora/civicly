@@ -3,19 +3,19 @@ defmodule SMSReceiverTest do
   use Plug.Test
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Ecto.DateTime
   alias Plug.{Conn, Parsers}
-  alias Storage.{Conversation, User}
+  alias Storage.{Conversation, Message, User}
 
-  def insert_users_and_conversation(left_user_phone, right_user_phone, proxy_phone) do
+  def insert_conversation(left_user, right_user, proxy_phone) do
     params = %{
-      left_user_id: insert_user(left_user_phone).id,
-      right_user_id: insert_user(right_user_phone).id,
+      left_user_id: left_user.id,
+      right_user_id: right_user.id,
       proxy_phone: proxy_phone,
-      start: to_string(DateTime.utc)}
+      start: to_string(DateTime.utc_now)}
     changeset = Conversation.changeset(%Conversation{}, params)
 
-    Storage.insert(changeset)
+    {:ok, conversation} = Storage.insert(changeset)
+    conversation
   end
 
   def insert_user(phone) do
@@ -39,13 +39,15 @@ defmodule SMSReceiverTest do
     {:ok, bypass: bypass}
   end
 
-  test "an inbound message is relayed to the sender's partner", %{bypass: bypass} do
+  test "an inbound message is stored and relayed to the sender's partner", %{bypass: bypass} do
     sender_phone = "15555555555"
     recipient_phone = "15555555556"
     proxy_phone = "15555555557"
     text = "Test message"
 
-    insert_users_and_conversation(sender_phone, recipient_phone, proxy_phone)
+    sender = insert_user(sender_phone)
+    recipient = insert_user(recipient_phone)
+    conversation = insert_conversation(sender, recipient, proxy_phone)
 
     Bypass.expect bypass, fn outbound_sms_conn ->
       outbound_sms_conn = parse_body_params(outbound_sms_conn)
@@ -63,11 +65,19 @@ defmodule SMSReceiverTest do
       "messageId": "000000FFFB0356D1",
       "text": text,
       "type": "text",
-      "message-timestamp": "2017-04-04+00:00:00"}
+      "message-timestamp": "2017-04-04 00:00:00"}
     inbound_sms_conn = conn(:get, "/receive", inbound_sms_data)
     opts = SMSReceiver.init([])
 
     inbound_sms_conn = SMSReceiver.call(inbound_sms_conn, opts)
+
+    messages = Storage.all(Message)
+    message = List.first(messages)
+    assert length(messages) == 1
+    assert message.conversation_id == conversation.id
+    assert message.user_id == sender.id
+    assert message.text == text
+    assert %DateTime{} = message.timestamp
 
     assert inbound_sms_conn.state == :sent
     assert inbound_sms_conn.status == 200
