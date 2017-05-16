@@ -13,7 +13,7 @@ defmodule Storage.ConversationStorageTest do
     defaults =
       %{left_user_id: insert_user().id,
         right_user_id: insert_user().id,
-        proxy_phone: "15555555555",
+        proxy_phone: "5555555555",
         start: DateTime.utc_now}
     Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
   end

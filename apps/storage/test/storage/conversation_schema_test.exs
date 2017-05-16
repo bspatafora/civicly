@@ -7,7 +7,7 @@ defmodule Storage.ConversationSchemaTest do
     params =
       %{left_user_id: 1,
         right_user_id: 2,
-        proxy_phone: "15555555555",
+        proxy_phone: "5555555555",
         start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
@@ -17,7 +17,7 @@ defmodule Storage.ConversationSchemaTest do
   test "a conversation with no left user is invalid" do
     params =
       %{right_user_id: 2,
-        proxy_phone: "15555555555",
+        proxy_phone: "5555555555",
         start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
@@ -28,7 +28,7 @@ defmodule Storage.ConversationSchemaTest do
   test "a conversation with no right user is invalid" do
     params =
       %{left_user_id: 1,
-        proxy_phone: "15555555555",
+        proxy_phone: "5555555555",
         start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 
@@ -51,7 +51,7 @@ defmodule Storage.ConversationSchemaTest do
     params =
       %{left_user_id: 1,
         right_user_id: 2,
-        proxy_phone: "15555555555"}
+        proxy_phone: "5555555555"}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert length(changeset.errors) == 1
@@ -62,7 +62,7 @@ defmodule Storage.ConversationSchemaTest do
     params =
       %{left_user_id: 1,
         right_user_id: 2,
-        proxy_phone: "5555555555",
+        proxy_phone: "15555555555",
         start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, params)
 

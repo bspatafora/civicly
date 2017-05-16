@@ -4,14 +4,14 @@ defmodule Storage.UserSchemaTest do
   alias Storage.User
 
   test "a valid user has a name and a phone number" do
-    params = %{name: "Ben Spatafora", phone: "16306326718"}
+    params = %{name: "Ben Spatafora", phone: "6306326718"}
     changeset = User.changeset(%User{}, params)
 
     assert changeset.valid?
   end
 
   test "a user with no name is invalid" do
-    params = %{phone: "16306326718"}
+    params = %{phone: "6306326718"}
     changeset = User.changeset(%User{}, params)
 
     assert length(changeset.errors) == 1
@@ -27,7 +27,7 @@ defmodule Storage.UserSchemaTest do
   end
 
   test "a user with too long a name is invalid" do
-    params = %{name: String.duplicate("a", 101), phone: "16306326718"}
+    params = %{name: String.duplicate("a", 101), phone: "6306326718"}
     changeset = User.changeset(%User{}, params)
 
     assert length(changeset.errors) == 1
@@ -36,7 +36,7 @@ defmodule Storage.UserSchemaTest do
   end
 
   test "a user with a malformed phone number is invalid" do
-    params = %{name: "Ben Spatafora", phone: "6306326718"}
+    params = %{name: "Ben Spatafora", phone: "16306326718"}
     changeset = User.changeset(%User{}, params)
 
     assert length(changeset.errors) == 1

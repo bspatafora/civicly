@@ -40,9 +40,9 @@ defmodule SMSReceiverTest do
   end
 
   test "an inbound message is stored and relayed to the sender's partner", %{bypass: bypass} do
-    sender_phone = "15555555555"
-    recipient_phone = "15555555556"
-    proxy_phone = "15555555557"
+    sender_phone = "5555555555"
+    recipient_phone = "5555555556"
+    proxy_phone = "5555555557"
     text = "Test message"
 
     sender = insert_user(sender_phone)

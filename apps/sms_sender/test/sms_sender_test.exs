@@ -17,8 +17,8 @@ defmodule SMSSenderTest do
   end
 
   test "send/1 sends a message correctly", %{bypass: bypass} do
-    recipient_phone = "15555555555"
-    proxy_phone = "15555555556"
+    recipient_phone = "5555555555"
+    proxy_phone = "5555555556"
     text = "Test message"
 
     Bypass.expect bypass, fn outbound_sms_conn ->

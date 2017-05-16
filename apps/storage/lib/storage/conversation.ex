@@ -24,7 +24,7 @@ defmodule Storage.Conversation do
     conversation
     |> cast(params, all_fields)
     |> validate_required(all_fields)
-    |> validate_format(:proxy_phone, ~r/^\d{11}$/)
+    |> validate_format(:proxy_phone, ~r/^\d{10}$/)
     |> foreign_key_constraint(:left_user_id)
     |> foreign_key_constraint(:right_user_id)
     |> exclusion_constraint(:one_per_user_per_time, [name: "one_per_user_per_time"])
