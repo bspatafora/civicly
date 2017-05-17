@@ -6,17 +6,20 @@ defmodule SMSReceiver do
 
   alias Core.Router
 
+  plug Plug.Parsers, parsers: [:urlencoded, :multipart]
   plug :match
   plug :dispatch
 
-  get "/receive" do
-    conn = fetch_query_params(conn)
+  post "/sms_relay_heartbeat" do
+    send_resp(conn, 200, "")
+  end
 
-    id = conn.params["messageId"]
-    recipient = conn.params["to"]
-    sender = conn.params["msisdn"]
+  post "/receive" do
+    id = conn.params["id"]
+    recipient = conn.params["recipient"]
+    sender = conn.params["sender"]
     text = conn.params["text"]
-    timestamp = to_datetime(conn.params["message-timestamp"])
+    timestamp = to_datetime(conn.params["timestamp"])
 
     log_receipt(id, recipient, sender, text, timestamp)
 
@@ -32,9 +35,7 @@ defmodule SMSReceiver do
   end
 
   defp to_datetime(string) do
-    string_with_timezone = string <> "Z"
-
-    {:ok, datetime, _} = DateTime.from_iso8601(string_with_timezone)
+    {:ok, datetime, _} = DateTime.from_iso8601(string)
     datetime
   end
 

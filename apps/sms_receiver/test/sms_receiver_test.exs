@@ -52,21 +52,19 @@ defmodule SMSReceiverTest do
     Bypass.expect bypass, fn outbound_sms_conn ->
       outbound_sms_conn = parse_body_params(outbound_sms_conn)
 
-      assert outbound_sms_conn.params["to"] == recipient_phone
-      assert outbound_sms_conn.params["from"] == proxy_phone
+      assert outbound_sms_conn.params["recipient"] == recipient_phone
       assert outbound_sms_conn.params["text"] == text
 
       Conn.resp(outbound_sms_conn, 200, "")
     end
 
     inbound_sms_data = %{
-      "msisdn": sender_phone,
-      "to": proxy_phone,
-      "messageId": "000000FFFB0356D1",
+      "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
+      "recipient": proxy_phone,
+      "sender": sender_phone,
       "text": text,
-      "type": "text",
-      "message-timestamp": "2017-04-04 00:00:00"}
-    inbound_sms_conn = conn(:get, "/receive", inbound_sms_data)
+      "timestamp": "2017-04-04T00:00:00.000Z"}
+    inbound_sms_conn = conn(:post, "/receive", inbound_sms_data)
     opts = SMSReceiver.init([])
 
     inbound_sms_conn = SMSReceiver.call(inbound_sms_conn, opts)

@@ -3,9 +3,6 @@ defmodule SMSSenderTest do
 
   alias Plug.{Conn, Parsers}
 
-  @api_key Application.get_env(:sms_sender, :api_key)
-  @api_secret Application.get_env(:sms_sender, :api_secret)
-
   def parse_body_params(conn) do
     opts = Parsers.init([parsers: [Plug.Parsers.URLENCODED]])
     Parsers.call(conn, opts)
@@ -24,14 +21,10 @@ defmodule SMSSenderTest do
     Bypass.expect bypass, fn outbound_sms_conn ->
       outbound_sms_conn = parse_body_params(outbound_sms_conn)
 
-      assert outbound_sms_conn.request_path == "/sms/json"
+      assert outbound_sms_conn.request_path == "/send"
       assert outbound_sms_conn.method == "POST"
 
-      assert outbound_sms_conn.params["api_key"] == @api_key
-      assert outbound_sms_conn.params["api_secret"] == @api_secret
-
-      assert outbound_sms_conn.params["to"] == recipient_phone
-      assert outbound_sms_conn.params["from"] == proxy_phone
+      assert outbound_sms_conn.params["recipient"] == recipient_phone
       assert outbound_sms_conn.params["text"] == text
 
       Conn.resp(outbound_sms_conn, 200, "")
