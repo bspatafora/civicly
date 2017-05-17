@@ -4,7 +4,7 @@ defmodule SMSSenderTest do
   alias Plug.{Conn, Parsers}
 
   def parse_body_params(conn) do
-    opts = Parsers.init([parsers: [Plug.Parsers.URLENCODED]])
+    opts = Parsers.init([parsers: [:json], json_decoder: Poison])
     Parsers.call(conn, opts)
   end
 

@@ -6,7 +6,7 @@ defmodule SMSReceiver do
 
   alias Core.Router
 
-  plug Plug.Parsers, parsers: [:urlencoded, :multipart]
+  plug Plug.Parsers, parsers: [:json], json_decoder: Poison
   plug :match
   plug :dispatch
 

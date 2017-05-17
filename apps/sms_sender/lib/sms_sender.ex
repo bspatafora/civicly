@@ -3,11 +3,12 @@ defmodule SMSSender do
 
   @spec send(SMSMessage.t) :: no_return()
   def send(message) do
-    body = {:form, [
+    body = Poison.encode!(%{
       recipient: message.recipient,
-      text: message.text]}
+      text: message.text})
 
-    HTTPoison.post!(url(), body)
+    headers = [{"Content-type", "application/json; charset=UTF-8"}]
+    HTTPoison.post!(url(), body, headers)
   end
 
   defp url do

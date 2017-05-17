@@ -27,7 +27,7 @@ defmodule SMSReceiverTest do
   end
 
   def parse_body_params(conn) do
-    opts = Parsers.init([parsers: [Parsers.URLENCODED]])
+    opts = Parsers.init([parsers: [:json], json_decoder: Poison])
     Parsers.call(conn, opts)
   end
 
@@ -65,6 +65,7 @@ defmodule SMSReceiverTest do
       "text": text,
       "timestamp": "2017-04-04T00:00:00.000Z"}
     inbound_sms_conn = conn(:post, "/receive", inbound_sms_data)
+    inbound_sms_conn = put_req_header(inbound_sms_conn, "content-type", "application/json")
     opts = SMSReceiver.init([])
 
     inbound_sms_conn = SMSReceiver.call(inbound_sms_conn, opts)

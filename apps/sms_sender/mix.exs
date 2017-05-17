@@ -20,6 +20,7 @@ defmodule SMSSender.Mixfile do
 
   defp deps do
     [{:sms_message, in_umbrella: true},
-     {:httpoison, "~> 0.11.0"}]
+     {:httpoison, "~> 0.11.0"},
+     {:poison, "~> 2.2"}]
   end
 end
