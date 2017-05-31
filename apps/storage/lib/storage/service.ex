@@ -28,6 +28,13 @@ defmodule Storage.Service do
     Storage.insert(changeset)
   end
 
+  def insert_user(name, phone) do
+    params = %{name: name, phone: phone}
+    changeset = User.changeset(%User{}, params)
+
+    Storage.insert(changeset)
+  end
+
   defp fetch_user_by_phone(phone) do
     query = from User,
               where: [phone: ^phone],

@@ -2,7 +2,7 @@ defmodule Storage.ConversationStorageTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Storage.{Conversation, User}
+  alias Storage.{Conversation, Helpers}
 
   setup do
     :ok = Sandbox.checkout(Storage)
@@ -11,19 +11,11 @@ defmodule Storage.ConversationStorageTest do
 
   def changeset(params \\ %{}) do
     defaults =
-      %{left_user_id: insert_user().id,
-        right_user_id: insert_user().id,
+      %{left_user_id: Helpers.insert_user().id,
+        right_user_id: Helpers.insert_user().id,
         proxy_phone: "5555555555",
         start: DateTime.utc_now}
     Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
-  end
-
-  def insert_user do
-    params = %{name: "Test User", phone: Helpers.random_phone}
-
-    changeset = User.changeset(%User{}, params)
-    {:ok, user} = Storage.insert(changeset)
-    user
   end
 
   test "a conversation cannot have bogus parameters" do
@@ -92,7 +84,7 @@ defmodule Storage.ConversationStorageTest do
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
 
     existing_right_user_and_time =
-      %{left_user_id: insert_user().id,
+      %{left_user_id: Helpers.insert_user().id,
         right_user_id: existing_conversation.right_user_id,
         start: time}
     {:error, changeset} =
@@ -102,7 +94,7 @@ defmodule Storage.ConversationStorageTest do
     assert changeset.errors[:one_per_user_per_time] == {"violates an exclusion constraint", []}
 
     existing_reversed_right_user_and_time =
-      %{left_user_id: insert_user().id,
+      %{left_user_id: Helpers.insert_user().id,
         right_user_id: existing_conversation.left_user_id,
         start: time}
     {:error, changeset} =
@@ -113,7 +105,7 @@ defmodule Storage.ConversationStorageTest do
 
     existing_left_user_and_time =
       %{left_user_id: existing_conversation.left_user_id,
-        right_user_id: insert_user().id,
+        right_user_id: Helpers.insert_user().id,
         start: time}
     {:error, changeset} =
       Storage.insert(changeset(existing_left_user_and_time))
@@ -123,7 +115,7 @@ defmodule Storage.ConversationStorageTest do
 
     existing_reversed_left_user_and_time =
       %{left_user_id: existing_conversation.right_user_id,
-        right_user_id: insert_user().id,
+        right_user_id: Helpers.insert_user().id,
         start: time}
     {:error, changeset} =
       Storage.insert(changeset(existing_reversed_left_user_and_time))
@@ -147,7 +139,7 @@ defmodule Storage.ConversationStorageTest do
   # Constraint temporarily removed for testing
   #
   # test "a conversation must have two different users" do
-  #   user = insert_user()
+  #   user = Helpers.insert_user()
   #   same_user = %{left_user_id: user.id, right_user_id: user.id}
 
   #   {:error, changeset} = Storage.insert(changeset(same_user))

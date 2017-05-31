@@ -2,7 +2,7 @@ defmodule Storage.MessageStorageTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Storage.{Conversation, Message, User}
+  alias Storage.{Helpers, Message}
 
   setup do
     :ok = Sandbox.checkout(Storage)
@@ -10,7 +10,7 @@ defmodule Storage.MessageStorageTest do
   end
 
   def changeset(params \\ %{}) do
-    conversation = insert_conversation()
+    conversation = Helpers.insert_conversation()
     defaults =
       %{conversation_id: conversation.id,
         user_id: conversation.left_user_id,
@@ -18,26 +18,6 @@ defmodule Storage.MessageStorageTest do
         timestamp: DateTime.utc_now}
 
     Message.changeset(%Message{}, Map.merge(defaults, params))
-  end
-
-  def insert_conversation do
-    params =
-      %{left_user_id: insert_user().id,
-        right_user_id: insert_user().id,
-        proxy_phone: "5555555555",
-        start: DateTime.utc_now}
-
-    changeset = Conversation.changeset(%Conversation{}, params)
-    {:ok, conversation} = Storage.insert(changeset)
-    conversation
-  end
-
-  def insert_user do
-    params = %{name: "Test User", phone: Helpers.random_phone}
-
-    changeset = User.changeset(%User{}, params)
-    {:ok, user} = Storage.insert(changeset)
-    user
   end
 
   test "a message cannot have bogus parameters" do

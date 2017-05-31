@@ -2,7 +2,7 @@ defmodule Storage.AssignerTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Storage.{Assigner, Conversation, User}
+  alias Storage.{Assigner, Conversation, Helpers}
 
   @ben_phone Application.get_env(:storage, :ben_phone)
   @proxy_phone Application.get_env(:storage, :proxy_phone)
@@ -12,20 +12,12 @@ defmodule Storage.AssignerTest do
     Sandbox.mode(Storage, {:shared, self()})
   end
 
-  def insert_user(phone \\ Helpers.random_phone) do
-    params = %{name: "Test User", phone: phone}
-
-    changeset = User.changeset(%User{}, params)
-    {:ok, user} = Storage.insert(changeset)
-    user
-  end
-
   test "assign_all/0 assigns all users to conversations" do
     user_ids = MapSet.new(
-      [insert_user(@ben_phone).id,
-       insert_user().id,
-       insert_user().id,
-       insert_user().id])
+      [Helpers.insert_user(@ben_phone).id,
+       Helpers.insert_user().id,
+       Helpers.insert_user().id,
+       Helpers.insert_user().id])
 
     Assigner.assign_all()
 
@@ -40,10 +32,10 @@ defmodule Storage.AssignerTest do
   end
 
   test "assign_all/0 leaves Ben out when there is an odd number of users" do
-    insert_user(@ben_phone)
+    Helpers.insert_user(@ben_phone)
     other_user_ids = MapSet.new(
-      [insert_user().id,
-       insert_user().id])
+      [Helpers.insert_user().id,
+       Helpers.insert_user().id])
 
     Assigner.assign_all()
 
@@ -58,8 +50,8 @@ defmodule Storage.AssignerTest do
   end
 
   test "assign_all/0 assigns all users the same start time" do
-    insert_user(@ben_phone)
-    insert_user()
+    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user()
 
     Assigner.assign_all()
 
@@ -73,8 +65,8 @@ defmodule Storage.AssignerTest do
   end
 
   test "assign_all/0 assigns all users the configured proxy phone" do
-    insert_user(@ben_phone)
-    insert_user()
+    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user()
 
     Assigner.assign_all()
 

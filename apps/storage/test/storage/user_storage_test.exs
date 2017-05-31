@@ -2,7 +2,7 @@ defmodule Storage.UserStorageTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Storage.User
+  alias Storage.{Helpers, User}
 
   setup do
     :ok = Sandbox.checkout(Storage)
