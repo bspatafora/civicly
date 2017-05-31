@@ -12,7 +12,7 @@ defmodule SMSSender do
   end
 
   defp url do
-    get_config(:origin) <> get_config(:path)
+    get_config(:host) <> ":" <> get_config(:port) <> get_config(:path)
   end
 
   defp get_config(key) do

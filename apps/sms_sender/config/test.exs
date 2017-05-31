@@ -1,3 +1,4 @@
 use Mix.Config
 
-config :sms_sender, :origin, "http://localhost:9002"
+config :sms_sender, :host, "localhost"
+config :sms_sender, :port, "9002"
