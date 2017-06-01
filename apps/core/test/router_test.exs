@@ -1,6 +1,8 @@
 defmodule RouterTest do
   use ExUnit.Case, async: true
 
+  @ben Application.get_env(:storage, :ben_phone)
+
   alias Core.Router
   alias Ecto.Adapters.SQL.Sandbox
   alias Plug.{Conn, Parsers}
@@ -84,14 +86,17 @@ defmodule RouterTest do
     Router.handle(message)
   end
 
-  test "an insert user command sent by Ben is parsed and executed" do
-    sender = Application.get_env(:storage, :ben_phone)
+  test "an add user command sent by Ben is parsed and executed", %{bypass: bypass} do
     text = ":add Test User 5555555555"
     message = %SMSMessage{
       recipient: Helpers.random_phone,
-      sender: sender,
+      sender: @ben,
       text: text,
       timestamp: DateTime.utc_now}
+
+    Bypass.expect bypass, fn conn ->
+      Conn.resp(conn, 200, "")
+    end
 
     Router.handle(message)
 
@@ -100,5 +105,71 @@ defmodule RouterTest do
     assert length(users) == 1
     assert user.name == "Test User"
     assert user.phone == "5555555555"
+  end
+
+  test "an add user command that succeeds notifies", %{bypass: bypass} do
+    text = ":add Test User 5555555555"
+    message = %SMSMessage{
+      recipient: Helpers.random_phone,
+      sender: @ben,
+      text: text,
+      timestamp: DateTime.utc_now}
+
+    Bypass.expect bypass, fn conn ->
+      conn = parse_body_params(conn)
+
+      assert conn.params["recipient"] == @ben
+      assert conn.params["text"] == "Added Test User"
+
+      Conn.resp(conn, 200, "")
+    end
+
+    Router.handle(message)
+  end
+
+  test "an invalid add user command chides", %{bypass: bypass} do
+    text = ":unknown Test User 5555555555"
+    message = %SMSMessage{
+      recipient: Helpers.random_phone,
+      sender: @ben,
+      text: text,
+      timestamp: DateTime.utc_now}
+
+    Bypass.expect bypass, fn conn ->
+      conn = parse_body_params(conn)
+
+      assert conn.params["recipient"] == @ben
+      assert conn.params["text"] == "Invalid command"
+
+      Conn.resp(conn, 200, "")
+    end
+
+    Router.handle(message)
+
+    users = Storage.all(User)
+    assert length(users) == 0
+  end
+
+  test "an add user command that fails notifies", %{bypass: bypass} do
+    text = ":add Test User 555555555"
+    message = %SMSMessage{
+      recipient: Helpers.random_phone,
+      sender: @ben,
+      text: text,
+      timestamp: DateTime.utc_now}
+
+    Bypass.expect bypass, fn conn ->
+      conn = parse_body_params(conn)
+
+      assert conn.params["recipient"] == @ben
+      assert conn.params["text"] == "Insert failed"
+
+      Conn.resp(conn, 200, "")
+    end
+
+    Router.handle(message)
+
+    users = Storage.all(User)
+    assert length(users) == 0
   end
 end
