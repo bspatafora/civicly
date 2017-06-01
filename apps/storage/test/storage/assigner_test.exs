@@ -5,7 +5,6 @@ defmodule Storage.AssignerTest do
   alias Storage.{Assigner, Conversation, Helpers}
 
   @ben_phone Application.get_env(:storage, :ben_phone)
-  @proxy_phone Application.get_env(:storage, :proxy_phone)
 
   setup do
     :ok = Sandbox.checkout(Storage)
@@ -13,6 +12,8 @@ defmodule Storage.AssignerTest do
   end
 
   test "assign_all/0 assigns all users to conversations" do
+    Helpers.insert_sms_relay()
+
     user_ids = MapSet.new(
       [Helpers.insert_user(@ben_phone).id,
        Helpers.insert_user().id,
@@ -32,6 +33,8 @@ defmodule Storage.AssignerTest do
   end
 
   test "assign_all/0 leaves Ben out when there is an odd number of users" do
+    Helpers.insert_sms_relay()
+
     Helpers.insert_user(@ben_phone)
     other_user_ids = MapSet.new(
       [Helpers.insert_user().id,
@@ -50,6 +53,8 @@ defmodule Storage.AssignerTest do
   end
 
   test "assign_all/0 assigns all users the same start time" do
+    Helpers.insert_sms_relay()
+
     Helpers.insert_user(@ben_phone)
     Helpers.insert_user()
 
@@ -64,16 +69,18 @@ defmodule Storage.AssignerTest do
     assert Enum.all?(start_times, fn(t) -> t == first_start_time end)
   end
 
-  test "assign_all/0 assigns all users the configured proxy phone" do
+  test "assign_all/0 assigns all users the first SMS relay in the database" do
+    sms_relay = Helpers.insert_sms_relay()
+
     Helpers.insert_user(@ben_phone)
     Helpers.insert_user()
 
     Assigner.assign_all()
 
     conversations = Storage.all(Conversation)
-    proxy_phones = conversations
-                   |> Enum.map(fn(c) -> c.proxy_phone end)
+    sms_relay_ids = conversations
+                    |> Enum.map(fn(c) -> c.sms_relay_id end)
 
-    assert Enum.all?(proxy_phones, fn(p) -> p == @proxy_phone end)
+    assert Enum.all?(sms_relay_ids, fn(p) -> p == sms_relay.id end)
   end
 end

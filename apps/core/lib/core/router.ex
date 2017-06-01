@@ -2,6 +2,7 @@ defmodule Core.Router do
   @moduledoc false
 
   alias Core.CommandParser
+  alias Storage.Service
 
   @ben Application.get_env(:storage, :ben_phone)
   @sms_sender Application.get_env(:core, :sms_sender)
@@ -10,11 +11,16 @@ defmodule Core.Router do
   @spec handle(SMSMessage.t) :: no_return()
   def handle(message) do
     if message.sender == @ben && String.starts_with?(message.text, ":") do
+      message = retrieve_sms_relay_ip(message)
       parse_command(message)
     else
       store(message)
       relay(message)
     end
+  end
+
+  defp retrieve_sms_relay_ip(message) do
+    Map.merge(message, %{sms_relay_ip: Service.first_sms_relay_ip()})
   end
 
   defp parse_command(message) do
@@ -36,11 +42,11 @@ defmodule Core.Router do
   end
 
   defp send_command_output(text, message) do
-    output_message = %SMSMessage{
+    output_params = %{
       recipient: message.sender,
       sender: message.recipient,
-      text: text,
-      timestamp: message.timestamp}
+      text: text}
+    output_message = Map.merge(message, output_params)
 
     @sms_sender.send(output_message)
   end
@@ -50,8 +56,14 @@ defmodule Core.Router do
   end
 
   defp relay(message) do
-    {partner, proxy_phone} = @storage_service.current_partner_and_proxy_phones(message.sender)
-    outbound_message = Map.merge(message, %{recipient: partner, sender: proxy_phone})
+    {partner_phone, sms_relay_ip, sms_relay_phone} =
+      @storage_service.current_conversation_details(message.sender)
+
+    outbound_params = %{
+      recipient: partner_phone,
+      sender: sms_relay_phone,
+      sms_relay_ip: sms_relay_ip}
+    outbound_message = Map.merge(message, outbound_params)
 
     @sms_sender.send(outbound_message)
   end

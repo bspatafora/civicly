@@ -9,6 +9,5 @@ config :storage, Storage,
 config :storage, ecto_repos: [Storage]
 
 config :storage, ben_phone: "***REMOVED***"
-config :storage, proxy_phone: "6303200120"
 
 import_config "#{Mix.env}.exs"

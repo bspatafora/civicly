@@ -9,7 +9,7 @@ defmodule Storage.ServiceTest do
     Sandbox.mode(Storage, {:shared, self()})
   end
 
-  test "current_partner_and_proxy_phones/1 provides the partner and proxy phone numbers of the user's current conversation" do
+  test "current_partner_phone_and_sms_relay_ip/1 provides the partner phone and SMS relay IP of the user's current conversation" do
     user1 = Helpers.insert_user()
     user2 = Helpers.insert_user()
 
@@ -24,18 +24,21 @@ defmodule Storage.ServiceTest do
         left_user_id: user1.id,
         right_user_id: user2.id,
         start: current_start})
+    current_conversation = Storage.preload(current_conversation, :sms_relay)
 
-    {partner_phone, proxy_phone} =
-      Service.current_partner_and_proxy_phones(user1.phone)
+    {partner_phone, sms_relay_ip, sms_relay_phone} =
+      Service.current_conversation_details(user1.phone)
 
     assert partner_phone == user2.phone
-    assert proxy_phone == current_conversation.proxy_phone
+    assert sms_relay_ip == current_conversation.sms_relay.ip
+    assert sms_relay_phone == current_conversation.sms_relay.phone
 
-    {partner_phone, proxy_phone} =
-      Service.current_partner_and_proxy_phones(user2.phone)
+    {partner_phone, sms_relay_ip, sms_relay_phone} =
+      Service.current_conversation_details(user2.phone)
 
     assert partner_phone == user1.phone
-    assert proxy_phone == current_conversation.proxy_phone
+    assert sms_relay_ip == current_conversation.sms_relay.ip
+    assert sms_relay_phone == current_conversation.sms_relay.phone
   end
 
   test "store_message/1 stores a message" do
@@ -61,6 +64,7 @@ defmodule Storage.ServiceTest do
     message = %SMSMessage{
       recipient: recipient_phone,
       sender: sender_phone,
+      sms_relay_ip: "localhost",
       text: text,
       timestamp: DateTime.utc_now}
 
@@ -87,5 +91,21 @@ defmodule Storage.ServiceTest do
     assert length(users) == 1
     assert user.name == name
     assert user.phone == phone
+  end
+
+  test "first_sms_relay_ip/0 returns the IP of the first SMS relay in the database" do
+    first_sms_relay = Helpers.insert_sms_relay(%{ip: "127.0.0.1"})
+    Helpers.insert_sms_relay(%{ip: "localhost"})
+
+    assert Service.first_sms_relay_ip == first_sms_relay.ip
+  end
+
+  test "update_first_sms_relay_ip/0 updates the IP of the first SMS relay in the database" do
+    Helpers.insert_sms_relay(%{ip: "127.0.0.1"})
+    Helpers.insert_sms_relay(%{ip: "localhost"})
+
+    Service.update_first_sms_relay_ip("127.0.0.2")
+
+    assert Service.first_sms_relay_ip == "127.0.0.2"
   end
 end

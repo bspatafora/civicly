@@ -1,18 +1,20 @@
 defmodule Storage.Service do
   @moduledoc false
 
+  import Ecto.Changeset
   import Ecto.Query
 
-  alias Storage.{Conversation, Message, User}
+  alias Storage.{Conversation, Message, SMSRelay, User}
 
-  def current_partner_and_proxy_phones(user_phone) do
+  def current_conversation_details(user_phone) do
     user_id = fetch_user_by_phone(user_phone).id
     conversation = fetch_current_conversation(user_id)
+    conversation = Storage.preload(conversation, :sms_relay)
 
     partner_id = partner_id(conversation, user_id)
     partner = fetch_user(partner_id)
 
-    {partner.phone, conversation.proxy_phone}
+    {partner.phone, conversation.sms_relay.ip, conversation.sms_relay.phone}
   end
 
   def store_message(message) do
@@ -33,6 +35,18 @@ defmodule Storage.Service do
     changeset = User.changeset(%User{}, params)
 
     Storage.insert(changeset)
+  end
+
+  def first_sms_relay_ip do
+    first_sms_relay().ip
+  end
+
+  def update_first_sms_relay_ip(ip) do
+    first_sms_relay() |> change(ip: ip) |> Storage.update!
+  end
+
+  defp first_sms_relay do
+    SMSRelay |> first |> Storage.one
   end
 
   defp fetch_user_by_phone(phone) do

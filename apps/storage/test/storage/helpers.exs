@@ -1,5 +1,5 @@
 defmodule Storage.Helpers do
-  alias Storage.{Conversation, User}
+  alias Storage.{Conversation, SMSRelay, User}
 
   def random_phone do
     Integer.to_string(Enum.random(5_550_000_000..5_559_999_999))
@@ -9,7 +9,7 @@ defmodule Storage.Helpers do
     defaults = %{
       left_user_id: insert_user().id,
       right_user_id: insert_user().id,
-      proxy_phone: random_phone(),
+      sms_relay_id: insert_sms_relay().id,
       start: DateTime.utc_now}
     changeset = Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
 
@@ -23,5 +23,15 @@ defmodule Storage.Helpers do
 
     {:ok, user} = Storage.insert(changeset)
     user
+  end
+
+  def insert_sms_relay(params \\ %{}) do
+    defaults = %{
+      ip: "localhost",
+      phone: random_phone()}
+    changeset = SMSRelay.changeset(%SMSRelay{}, Map.merge(defaults, params))
+
+    {:ok, sms_relay} = Storage.insert(changeset)
+    sms_relay
   end
 end

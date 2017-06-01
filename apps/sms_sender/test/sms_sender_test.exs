@@ -15,7 +15,6 @@ defmodule SMSSenderTest do
 
   test "send/1 sends a message correctly", %{bypass: bypass} do
     recipient_phone = "5555555555"
-    proxy_phone = "5555555556"
     text = "Test message"
 
     Bypass.expect bypass, fn outbound_sms_conn ->
@@ -32,7 +31,8 @@ defmodule SMSSenderTest do
 
     message = %SMSMessage{
       recipient: recipient_phone,
-      sender: proxy_phone,
+      sender: "5555555556",
+      sms_relay_ip: "localhost",
       text: text,
       timestamp: DateTime.utc_now}
 

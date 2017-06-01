@@ -8,11 +8,11 @@ defmodule SMSSender do
       text: message.text})
 
     headers = [{"Content-type", "application/json; charset=UTF-8"}]
-    HTTPoison.post!(url(), body, headers)
+    HTTPoison.post!(url(message.sms_relay_ip), body, headers)
   end
 
-  defp url do
-    get_config(:host) <> ":" <> get_config(:port) <> get_config(:path)
+  defp url(host) do
+    host <> ":" <> get_config(:port) <> get_config(:path)
   end
 
   defp get_config(key) do

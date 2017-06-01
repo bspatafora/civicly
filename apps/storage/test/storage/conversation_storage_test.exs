@@ -13,7 +13,7 @@ defmodule Storage.ConversationStorageTest do
     defaults =
       %{left_user_id: Helpers.insert_user().id,
         right_user_id: Helpers.insert_user().id,
-        proxy_phone: "5555555555",
+        sms_relay_id: Helpers.insert_sms_relay().id,
         start: DateTime.utc_now}
     Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
   end
@@ -44,6 +44,16 @@ defmodule Storage.ConversationStorageTest do
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:right_user_id] == {"does not exist", []}
+  end
+
+  test "a conversation's SMS relay must exist" do
+    nonexistent_sms_relay = %{sms_relay_id: 1_000_000}
+
+    assert {:error, changeset} =
+      Storage.insert(changeset(nonexistent_sms_relay))
+
+    assert length(changeset.errors) == 1
+    assert changeset.errors[:sms_relay_id] == {"does not exist", []}
   end
 
   test "a conversation is timestamped in UTC" do
