@@ -20,11 +20,10 @@ defmodule SMSReceiverTest do
   end
 
   test "an inbound message is relayed to the sender's partner", %{bypass: bypass} do
-    sender_phone = "5555555555"
     recipient_phone = "5555555556"
     text = "Test message"
 
-    sender = Helpers.insert_user(sender_phone)
+    sender = Helpers.insert_user()
     recipient = Helpers.insert_user(recipient_phone)
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     Helpers.insert_conversation(%{
@@ -44,7 +43,7 @@ defmodule SMSReceiverTest do
     inbound_sms_data = %{
       "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
       "recipient": sms_relay.phone,
-      "sender": sender_phone,
+      "sender": sender.phone,
       "text": text,
       "timestamp": "2017-04-04T00:00:00.000Z"}
     inbound_sms_conn = conn(:post, "/receive", inbound_sms_data)
@@ -59,6 +58,33 @@ defmodule SMSReceiverTest do
   test "heartbeat requests update the first SMS relay IP" do
     Helpers.insert_sms_relay()
     conn = conn(:post, "/sms_relay_heartbeat", %{})
+    conn = put_req_header(conn, "content-type", "application/json")
+    conn = %{conn | remote_ip: {0, 0, 0, 0}}
+
+    SMSReceiver.call(conn, SMSReceiver.init([]))
+
+    assert Service.first_sms_relay_ip == "0.0.0.0"
+  end
+
+  test "inbound message requests update the first SMS relay IP", %{bypass: bypass} do
+    Helpers.insert_sms_relay()
+    sender = Helpers.insert_user()
+    recipient = Helpers.insert_user()
+    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
+    Helpers.insert_conversation(%{
+      left_user_id: sender.id,
+      right_user_id: recipient.id,
+      sms_relay_id: sms_relay.id})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    data = %{
+      "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
+      "recipient": sms_relay.phone,
+      "sender": sender.phone,
+      "text": "Test message",
+      "timestamp": "2017-06-14T00:00:00.000Z"}
+    conn = conn(:post, "/receive", data)
     conn = put_req_header(conn, "content-type", "application/json")
     conn = %{conn | remote_ip: {0, 0, 0, 0}}
 

@@ -12,11 +12,13 @@ defmodule SMSReceiver do
   plug :dispatch
 
   post "/sms_relay_heartbeat" do
-    Service.update_first_sms_relay_ip(remote_ip(conn))
+    update_sms_relay_ip(conn)
     send_resp(conn, 200, "")
   end
 
   post "/receive" do
+    update_sms_relay_ip(conn)
+
     message = %SMSMessage{
       recipient: conn.params["recipient"],
       sender: conn.params["sender"],
@@ -30,6 +32,10 @@ defmodule SMSReceiver do
     Router.handle(message)
 
     send_resp(conn, 200, "")
+  end
+
+  defp update_sms_relay_ip(conn) do
+    Service.update_first_sms_relay_ip(remote_ip(conn))
   end
 
   defp remote_ip(conn) do
