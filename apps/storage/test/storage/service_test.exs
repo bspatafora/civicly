@@ -4,6 +4,18 @@ defmodule Storage.ServiceTest do
   alias Ecto.Adapters.SQL.Sandbox
   alias Storage.{Helpers, Message, Service, User}
 
+  def build_message(params) do
+    message = %SMSMessage{
+      recipient: Helpers.random_phone(),
+      sender: Helpers.random_phone(),
+      sms_relay_ip: "localhost",
+      text: "Test message",
+      timestamp: DateTime.utc_now(),
+      uuid: Helpers.uuid()}
+
+    Map.merge(message, params)
+  end
+
   setup do
     :ok = Sandbox.checkout(Storage)
     Sandbox.mode(Storage, {:shared, self()})
@@ -61,13 +73,10 @@ defmodule Storage.ServiceTest do
         right_user_id: recipient.id,
         start: current_start})
 
-    message = %SMSMessage{
+    message = build_message(%{
       recipient: recipient_phone,
       sender: sender_phone,
-      sms_relay_ip: "localhost",
-      text: text,
-      timestamp: DateTime.utc_now,
-      uuid: Helpers.uuid()}
+      text: text})
 
     Service.store_message(message)
 
@@ -101,12 +110,22 @@ defmodule Storage.ServiceTest do
     assert Service.first_sms_relay_ip == first_sms_relay.ip
   end
 
-  test "update_first_sms_relay_ip/0 updates the IP of the first SMS relay in the database" do
+  test "update_first_sms_relay_ip/1 updates the IP of the first SMS relay in the database" do
     Helpers.insert_sms_relay(%{ip: "127.0.0.1"})
     Helpers.insert_sms_relay(%{ip: "localhost"})
 
     Service.update_first_sms_relay_ip("127.0.0.2")
 
     assert Service.first_sms_relay_ip == "127.0.0.2"
+  end
+
+  test "refresh_sms_relay_ip/1 replaces the message's SMS relay IP with the IP of the first SMS relay in the database" do
+    first_sms_relay = Helpers.insert_sms_relay(%{ip: "127.0.0.1"})
+    Helpers.insert_sms_relay(%{ip: "localhost"})
+    message = build_message(%{sms_relay_ip: "localhost"})
+
+    message = Service.refresh_sms_relay_ip(message)
+
+    assert message.sms_relay_ip == first_sms_relay.ip
   end
 end

@@ -1,6 +1,7 @@
 defmodule SMSSenderTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
+  alias Ecto.Adapters.SQL.Sandbox
   alias Storage.Helpers
   alias Plug.{Conn, Parsers}
 
@@ -9,34 +10,61 @@ defmodule SMSSenderTest do
     Parsers.call(conn, opts)
   end
 
+  def build_message(params) do
+    message = %SMSMessage{
+      recipient: Helpers.random_phone(),
+      sender: Helpers.random_phone(),
+      sms_relay_ip: "localhost",
+      text: "Test message",
+      timestamp: DateTime.utc_now(),
+      uuid: Helpers.uuid()}
+
+    Map.merge(message, params)
+  end
+
   setup do
+    :ok = Sandbox.checkout(Storage)
+    Sandbox.mode(Storage, {:shared, self()})
+
     bypass = Bypass.open(port: 9002)
     {:ok, bypass: bypass}
   end
 
   test "send/1 sends a message correctly", %{bypass: bypass} do
+    Helpers.insert_sms_relay(%{ip: "localhost"})
     recipient_phone = "5555555555"
     text = "Test message"
 
-    Bypass.expect bypass, fn outbound_sms_conn ->
-      outbound_sms_conn = parse_body_params(outbound_sms_conn)
+    Bypass.expect bypass, fn conn ->
+      conn = parse_body_params(conn)
 
-      assert outbound_sms_conn.request_path == "/send"
-      assert outbound_sms_conn.method == "POST"
+      assert conn.request_path == "/send"
+      assert conn.method == "POST"
 
-      assert outbound_sms_conn.params["recipient"] == recipient_phone
-      assert outbound_sms_conn.params["text"] == text
+      assert conn.params["recipient"] == recipient_phone
+      assert conn.params["text"] == text
 
-      Conn.resp(outbound_sms_conn, 200, "")
+      Conn.resp(conn, 200, "")
     end
 
-    message = %SMSMessage{
+    message = build_message(%{
       recipient: recipient_phone,
-      sender: "5555555556",
       sms_relay_ip: "localhost",
-      text: text,
-      timestamp: DateTime.utc_now,
-      uuid: Helpers.uuid()}
+      text: text})
+
+    SMSSender.send(message)
+  end
+
+  test "send/1 refreshes the message's SMS relay IP", %{bypass: bypass} do
+    Helpers.insert_sms_relay(%{ip: "localhost"})
+    Helpers.insert_sms_relay(%{ip: "127.0.0.2"})
+    recipient_phone = "5555555555"
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    message = build_message(%{
+      recipient: recipient_phone,
+      sms_relay_ip: "127.0.0.2"})
 
     SMSSender.send(message)
   end

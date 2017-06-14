@@ -119,11 +119,10 @@ defmodule RouterTest do
       Conn.resp(conn, 200, "")
     end
 
-    different_relay_ip = "not-localhost"
     message = build_message(%{
       recipient: proxy_phone,
       sender: sender_phone,
-      sms_relay_ip: different_relay_ip,
+      sms_relay_ip: "not-localhost",
       text: text})
 
     Router.handle(message)
@@ -131,12 +130,11 @@ defmodule RouterTest do
 
   test "an add user command sent by Ben is parsed and executed", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
-    original_ip = "not-localhost"
 
     text = ":add Test User 5555555555"
     message = build_message(%{
       sender: @ben,
-      sms_relay_ip: original_ip,
+      sms_relay_ip: "not-localhost",
       text: text})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))

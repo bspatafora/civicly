@@ -46,6 +46,10 @@ defmodule Storage.Service do
     first_sms_relay() |> change(ip: ip) |> Storage.update!
   end
 
+  def refresh_sms_relay_ip(message) do
+    Map.merge(message, %{sms_relay_ip: first_sms_relay_ip()})
+  end
+
   defp first_sms_relay do
     SMSRelay |> first |> Storage.one
   end
