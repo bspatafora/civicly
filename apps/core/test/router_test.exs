@@ -13,6 +13,18 @@ defmodule RouterTest do
     Parsers.call(conn, opts)
   end
 
+  def build_message(params) do
+    message = %SMSMessage{
+      recipient: Helpers.random_phone(),
+      sender: Helpers.random_phone(),
+      sms_relay_ip: "localhost",
+      text: "Test message",
+      timestamp: DateTime.utc_now(),
+      uuid: Helpers.uuid()}
+
+    Map.merge(message, params)
+  end
+
   setup do
     :ok = Sandbox.checkout(Storage)
     Sandbox.mode(Storage, {:shared, self()})
@@ -35,16 +47,12 @@ defmodule RouterTest do
       right_user_id: recipient.id,
       sms_relay_id: sms_relay.id})
 
-    Bypass.expect bypass, fn conn ->
-      Conn.resp(conn, 200, "")
-    end
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
-    message = %SMSMessage{
+    message = build_message(%{
       recipient: proxy_phone,
       sender: sender_phone,
-      sms_relay_ip: "localhost",
-      text: text,
-      timestamp: DateTime.utc_now}
+      text: text})
 
     Router.handle(message)
 
@@ -80,12 +88,10 @@ defmodule RouterTest do
       Conn.resp(conn, 200, "")
     end
 
-    message = %SMSMessage{
+    message = build_message(%{
       recipient: proxy_phone,
       sender: sender_phone,
-      sms_relay_ip: "not-localhost",
-      text: text,
-      timestamp: DateTime.utc_now}
+      text: text})
 
     Router.handle(message)
   end
@@ -114,12 +120,11 @@ defmodule RouterTest do
     end
 
     different_relay_ip = "not-localhost"
-    message = %SMSMessage{
+    message = build_message(%{
       recipient: proxy_phone,
       sender: sender_phone,
       sms_relay_ip: different_relay_ip,
-      text: text,
-      timestamp: DateTime.utc_now}
+      text: text})
 
     Router.handle(message)
   end
@@ -129,16 +134,12 @@ defmodule RouterTest do
     original_ip = "not-localhost"
 
     text = ":add Test User 5555555555"
-    message = %SMSMessage{
-      recipient: Helpers.random_phone,
+    message = build_message(%{
       sender: @ben,
       sms_relay_ip: original_ip,
-      text: text,
-      timestamp: DateTime.utc_now}
+      text: text})
 
-    Bypass.expect bypass, fn conn ->
-      Conn.resp(conn, 200, "")
-    end
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
     Router.handle(message)
 
@@ -153,12 +154,9 @@ defmodule RouterTest do
     Helpers.insert_sms_relay(%{ip: "localhost"})
 
     text = ":add Test User 5555555555"
-    message = %SMSMessage{
-      recipient: Helpers.random_phone,
+    message = build_message(%{
       sender: @ben,
-      sms_relay_ip: "localhost",
-      text: text,
-      timestamp: DateTime.utc_now}
+      text: text})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
@@ -176,12 +174,9 @@ defmodule RouterTest do
     Helpers.insert_sms_relay(%{ip: "localhost"})
 
     text = ":unknown Test User 5555555555"
-    message = %SMSMessage{
-      recipient: Helpers.random_phone,
+    message = build_message(%{
       sender: @ben,
-      sms_relay_ip: "localhost",
-      text: text,
-      timestamp: DateTime.utc_now}
+      text: text})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
@@ -202,12 +197,9 @@ defmodule RouterTest do
     Helpers.insert_sms_relay(%{ip: "localhost"})
 
     text = ":add Test User 555555555"
-    message = %SMSMessage{
-      recipient: Helpers.random_phone,
+    message = build_message(%{
       sender: @ben,
-      sms_relay_ip: "localhost",
-      text: text,
-      timestamp: DateTime.utc_now}
+      text: text})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)

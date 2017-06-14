@@ -1,14 +1,15 @@
 defmodule Storage.MessageSchemaTest do
   use ExUnit.Case, async: true
 
-  alias Storage.Message
+  alias Storage.{Helpers, Message}
 
-  test "a valid message has a conversation, a user, text, and a timestamp" do
+  test "a valid message has a conversation, a user, text, a timestamp, and a UUID" do
     params =
       %{conversation_id: 1,
         user_id: 1,
         text: "Test message",
-        timestamp: DateTime.utc_now}
+        timestamp: DateTime.utc_now,
+        uuid: Helpers.uuid()}
     changeset = Message.changeset(%Message{}, params)
 
     assert changeset.valid?
@@ -18,7 +19,8 @@ defmodule Storage.MessageSchemaTest do
     params =
       %{user_id: 1,
         text: "Test message",
-        timestamp: DateTime.utc_now}
+        timestamp: DateTime.utc_now,
+        uuid: Helpers.uuid()}
     changeset = Message.changeset(%Message{}, params)
 
     assert length(changeset.errors) == 1
@@ -29,7 +31,8 @@ defmodule Storage.MessageSchemaTest do
     params =
       %{conversation_id: 1,
         text: "Test message",
-        timestamp: DateTime.utc_now}
+        timestamp: DateTime.utc_now,
+        uuid: Helpers.uuid()}
     changeset = Message.changeset(%Message{}, params)
 
     assert length(changeset.errors) == 1
@@ -40,7 +43,8 @@ defmodule Storage.MessageSchemaTest do
     params =
       %{conversation_id: 1,
         user_id: 1,
-        timestamp: DateTime.utc_now}
+        timestamp: DateTime.utc_now,
+        uuid: Helpers.uuid()}
     changeset = Message.changeset(%Message{}, params)
 
     assert length(changeset.errors) == 1
@@ -51,10 +55,23 @@ defmodule Storage.MessageSchemaTest do
     params =
       %{conversation_id: 1,
         user_id: 1,
-        text: "Test message"}
+        text: "Test message",
+        uuid: Helpers.uuid()}
     changeset = Message.changeset(%Message{}, params)
 
     assert length(changeset.errors) == 1
     assert changeset.errors[:timestamp] == {"can't be blank", [validation: :required]}
+  end
+
+  test "a message with no UUID is invalid" do
+    params =
+      %{conversation_id: 1,
+        user_id: 1,
+        text: "Test message",
+        timestamp: DateTime.utc_now}
+    changeset = Message.changeset(%Message{}, params)
+
+    assert length(changeset.errors) == 1
+    assert changeset.errors[:uuid] == {"can't be blank", [validation: :required]}
   end
 end

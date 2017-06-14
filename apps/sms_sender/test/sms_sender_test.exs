@@ -1,6 +1,7 @@
 defmodule SMSSenderTest do
   use ExUnit.Case, async: true
 
+  alias Storage.Helpers
   alias Plug.{Conn, Parsers}
 
   def parse_body_params(conn) do
@@ -34,7 +35,8 @@ defmodule SMSSenderTest do
       sender: "5555555556",
       sms_relay_ip: "localhost",
       text: text,
-      timestamp: DateTime.utc_now}
+      timestamp: DateTime.utc_now,
+      uuid: Helpers.uuid()}
 
     SMSSender.send(message)
   end

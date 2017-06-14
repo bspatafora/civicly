@@ -66,7 +66,8 @@ defmodule Storage.ServiceTest do
       sender: sender_phone,
       sms_relay_ip: "localhost",
       text: text,
-      timestamp: DateTime.utc_now}
+      timestamp: DateTime.utc_now,
+      uuid: Helpers.uuid()}
 
     Service.store_message(message)
 

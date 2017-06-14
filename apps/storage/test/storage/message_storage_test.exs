@@ -15,7 +15,8 @@ defmodule Storage.MessageStorageTest do
       %{conversation_id: conversation.id,
         user_id: conversation.left_user_id,
         text: "Test message",
-        timestamp: DateTime.utc_now}
+        timestamp: DateTime.utc_now,
+        uuid: Helpers.uuid()}
 
     Message.changeset(%Message{}, Map.merge(defaults, params))
   end

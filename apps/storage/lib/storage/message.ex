@@ -12,12 +12,13 @@ defmodule Storage.Message do
 
     field :text, :string
     field :timestamp, :utc_datetime
+    field :uuid, Ecto.UUID
 
     timestamps([type: :utc_datetime])
   end
 
   def changeset(message, params \\ %{}) do
-    all_fields = [:conversation_id, :user_id, :text, :timestamp]
+    all_fields = [:conversation_id, :user_id, :text, :timestamp, :uuid]
 
     message
     |> cast(params, all_fields)

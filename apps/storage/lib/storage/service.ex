@@ -25,7 +25,8 @@ defmodule Storage.Service do
       %{conversation_id: conversation_id,
         user_id: user_id,
         text: message.text,
-        timestamp: message.timestamp}
+        timestamp: message.timestamp,
+        uuid: message.uuid}
     changeset = Message.changeset(%Message{}, params)
     Storage.insert(changeset)
   end
