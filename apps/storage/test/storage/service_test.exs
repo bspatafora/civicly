@@ -103,20 +103,13 @@ defmodule Storage.ServiceTest do
     assert user.phone == phone
   end
 
-  test "first_sms_relay_ip/0 returns the IP of the first SMS relay in the database" do
-    first_sms_relay = Helpers.insert_sms_relay(%{ip: "127.0.0.1"})
-    Helpers.insert_sms_relay(%{ip: "localhost"})
-
-    assert Service.first_sms_relay_ip == first_sms_relay.ip
-  end
-
   test "update_first_sms_relay_ip/1 updates the IP of the first SMS relay in the database" do
     Helpers.insert_sms_relay(%{ip: "127.0.0.1"})
     Helpers.insert_sms_relay(%{ip: "localhost"})
 
     Service.update_first_sms_relay_ip("127.0.0.2")
 
-    assert Service.first_sms_relay_ip == "127.0.0.2"
+    assert Helpers.first_sms_relay_ip() == "127.0.0.2"
   end
 
   test "refresh_sms_relay_ip/1 replaces the message's SMS relay IP with the IP of the first SMS relay in the database" do

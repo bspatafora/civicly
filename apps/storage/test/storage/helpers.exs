@@ -1,4 +1,6 @@
 defmodule Storage.Helpers do
+  import Ecto.Query
+
   alias Ecto.UUID
   alias Storage.{Conversation, SMSRelay, User}
 
@@ -38,5 +40,10 @@ defmodule Storage.Helpers do
 
     {:ok, sms_relay} = Storage.insert(changeset)
     sms_relay
+  end
+
+  def first_sms_relay_ip do
+    sms_relay = SMSRelay |> first |> Storage.one
+    sms_relay.ip
   end
 end

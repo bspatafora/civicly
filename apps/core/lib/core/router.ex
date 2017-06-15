@@ -11,16 +11,12 @@ defmodule Core.Router do
   @spec handle(SMSMessage.t) :: no_return()
   def handle(message) do
     if message.sender == @ben && String.starts_with?(message.text, ":") do
-      message = retrieve_sms_relay_ip(message)
+      message = Service.refresh_sms_relay_ip(message)
       parse_command(message)
     else
       store(message)
       relay(message)
     end
-  end
-
-  defp retrieve_sms_relay_ip(message) do
-    Map.merge(message, %{sms_relay_ip: Service.first_sms_relay_ip()})
   end
 
   defp parse_command(message) do

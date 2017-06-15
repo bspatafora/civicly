@@ -38,16 +38,12 @@ defmodule Storage.Service do
     Storage.insert(changeset)
   end
 
-  def first_sms_relay_ip do
-    first_sms_relay().ip
-  end
-
   def update_first_sms_relay_ip(ip) do
     first_sms_relay() |> change(ip: ip) |> Storage.update!
   end
 
   def refresh_sms_relay_ip(message) do
-    Map.merge(message, %{sms_relay_ip: first_sms_relay_ip()})
+    Map.merge(message, %{sms_relay_ip: first_sms_relay().ip})
   end
 
   defp first_sms_relay do

@@ -4,7 +4,7 @@ defmodule SMSReceiverTest do
 
   alias Ecto.Adapters.SQL.Sandbox
   alias Plug.{Conn, Parsers}
-  alias Storage.{Helpers, Service}
+  alias Storage.Helpers
 
   def parse_body_params(conn) do
     opts = Parsers.init([parsers: [:json], json_decoder: Poison])
@@ -63,7 +63,7 @@ defmodule SMSReceiverTest do
 
     SMSReceiver.call(conn, SMSReceiver.init([]))
 
-    assert Service.first_sms_relay_ip == "0.0.0.0"
+    assert Helpers.first_sms_relay_ip == "0.0.0.0"
   end
 
   test "inbound message requests update the first SMS relay IP", %{bypass: bypass} do
@@ -90,6 +90,6 @@ defmodule SMSReceiverTest do
 
     SMSReceiver.call(conn, SMSReceiver.init([]))
 
-    assert Service.first_sms_relay_ip == "0.0.0.0"
+    assert Helpers.first_sms_relay_ip() == "0.0.0.0"
   end
 end
