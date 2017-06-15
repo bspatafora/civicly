@@ -2,17 +2,16 @@ defmodule Core.CommandParser do
   @moduledoc false
 
   def parse(text) do
-    try do
-      [command | rest] = String.split(text, " ", parts: 2)
-      data = List.first(rest)
+    [command | rest] = String.split(text, " ", parts: 2)
+    data = List.first(rest)
 
-      cond do
-        command == ":add" ->
-          parse_add(data)
-      end
-    rescue
-      _ -> {:invalid}
+    if command == ":add" do
+      parse_add(data)
+    else
+      {:invalid}
     end
+  rescue
+    _ -> {:invalid}
   end
 
   defp parse_add(data) do

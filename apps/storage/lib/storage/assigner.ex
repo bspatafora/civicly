@@ -15,7 +15,7 @@ defmodule Storage.Assigner do
     users
     |> Enum.shuffle
     |> Enum.chunk(2, 2, [leftover_user])
-    |> Enum.each(fn(pair) -> insert_conversation(pair, start, first_sms_relay.id) end)
+    |> Enum.each(&(insert_conversation(&1, start, first_sms_relay.id)))
   end
 
   defp pop_ben(users) do

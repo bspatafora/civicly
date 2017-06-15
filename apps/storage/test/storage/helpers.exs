@@ -18,7 +18,8 @@ defmodule Storage.Helpers do
       right_user_id: insert_user().id,
       sms_relay_id: insert_sms_relay().id,
       start: DateTime.utc_now}
-    changeset = Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
+    changeset =
+      Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
 
     {:ok, conversation} = Storage.insert(changeset)
     conversation
