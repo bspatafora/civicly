@@ -93,9 +93,8 @@ defmodule Storage.ServiceTest do
     name = "Test User"
     phone = "5555555555"
 
-    {:ok, user} = Service.insert_user(name, phone)
+    {:ok, _} = Service.insert_user(name, phone)
 
-    assert user
     users = Storage.all(User)
     user = List.first(users)
     assert length(users) == 1
@@ -120,5 +119,13 @@ defmodule Storage.ServiceTest do
     message = Service.refresh_sms_relay_ip(message)
 
     assert message.sms_relay_ip == first_sms_relay.ip
+  end
+
+  test "delete_user/1 deletes the user with the given phone" do
+    {:ok, user} = Service.insert_user("Test User", "5555555555")
+
+    Service.delete_user(user.phone)
+
+    assert length(Storage.all(User)) == 0
   end
 end

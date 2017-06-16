@@ -6,7 +6,7 @@ defmodule RouterTest do
   alias Core.Router
   alias Ecto.Adapters.SQL.Sandbox
   alias Plug.{Conn, Parsers}
-  alias Storage.{Helpers, Message, User}
+  alias Storage.{Helpers, Message, Service, User}
 
   def parse_body_params(conn) do
     opts = Parsers.init([parsers: [:json], json_decoder: Poison])
@@ -212,5 +212,42 @@ defmodule RouterTest do
 
     users = Storage.all(User)
     assert length(users) == 0
+  end
+
+  test "a STOP message deletes the user", %{bypass: bypass} do
+    Helpers.insert_sms_relay(%{ip: "localhost"})
+
+    {:ok, user} = Service.insert_user("Test User", "5555555555")
+
+    message = build_message(%{
+      sender: user.phone,
+      text: "STOP"})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    Router.handle(message)
+
+    assert length(Storage.all(User)) == 0
+  end
+
+  test "a STOP message notifies the user", %{bypass: bypass} do
+    Helpers.insert_sms_relay(%{ip: "localhost"})
+
+    {:ok, user} = Service.insert_user("Test User", "5555555555")
+
+    message = build_message(%{
+      sender: user.phone,
+      text: "STOP"})
+
+    Bypass.expect bypass, fn conn ->
+      conn = parse_body_params(conn)
+
+      assert conn.params["recipient"] == user.phone
+      assert conn.params["text"] == "You have been deleted"
+
+      Conn.resp(conn, 200, "")
+    end
+
+    Router.handle(message)
   end
 end

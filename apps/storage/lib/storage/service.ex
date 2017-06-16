@@ -46,6 +46,11 @@ defmodule Storage.Service do
     Map.merge(message, %{sms_relay_ip: first_sms_relay().ip})
   end
 
+  def delete_user(phone) do
+    user = Storage.get_by!(User, phone: phone)
+    Storage.delete!(user)
+  end
+
   defp first_sms_relay do
     SMSRelay |> first |> Storage.one
   end

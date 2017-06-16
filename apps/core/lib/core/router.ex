@@ -10,13 +10,20 @@ defmodule Core.Router do
 
   @spec handle(SMSMessage.t) :: no_return()
   def handle(message) do
-    if message.sender == @ben && String.starts_with?(message.text, ":") do
-      message = Service.refresh_sms_relay_ip(message)
-      parse_command(message)
-    else
-      store(message)
-      relay(message)
+    cond do
+      command?(message) ->
+        parse_command(message)
+      stop?(message) ->
+        delete_user(message)
+        send_command_output("You have been deleted", message)
+      true ->
+        store(message)
+        relay(message)
     end
+  end
+
+  defp command?(message) do
+    message.sender == @ben && String.starts_with?(message.text, ":")
   end
 
   defp parse_command(message) do
@@ -38,6 +45,7 @@ defmodule Core.Router do
   end
 
   defp send_command_output(text, message) do
+    message = Service.refresh_sms_relay_ip(message)
     output_params = %{
       recipient: message.sender,
       sender: message.recipient,
@@ -45,6 +53,14 @@ defmodule Core.Router do
     output_message = Map.merge(message, output_params)
 
     @sms_sender.send(output_message)
+  end
+
+  defp stop?(message) do
+    String.downcase(message.text) == "stop"
+  end
+
+  defp delete_user(message) do
+    Service.delete_user(message.sender)
   end
 
   defp store(message) do
