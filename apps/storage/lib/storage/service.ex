@@ -4,26 +4,23 @@ defmodule Storage.Service do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias Storage.{Conversation, Message, SMSRelay, User}
+  alias Storage.{Message, SMSRelay, User}
 
-  def current_conversation_details(user_phone) do
-    user_id = fetch_user_by_phone(user_phone).id
-    conversation = fetch_current_conversation(user_id)
-    conversation = Storage.preload(conversation, :sms_relay)
+  def partner_phones(user_phone) do
+    user = fetch_user_by_phone(user_phone)
+    conversation = fetch_current_conversation(user)
+    conversation = Storage.preload(conversation, :users)
 
-    partner_id = partner_id(conversation, user_id)
-    partner = fetch_user(partner_id)
-
-    {partner.phone, conversation.sms_relay.ip, conversation.sms_relay.phone}
+    partner_phones(conversation, user.id)
   end
 
   def store_message(message) do
-    user_id = fetch_user_by_phone(message.sender).id
-    conversation_id = fetch_current_conversation(user_id).id
+    user = fetch_user_by_phone(message.sender)
+    conversation_id = fetch_current_conversation(user).id
 
     params =
       %{conversation_id: conversation_id,
-        user_id: user_id,
+        user_id: user.id,
         text: message.text,
         timestamp: message.timestamp,
         uuid: message.uuid}
@@ -43,7 +40,7 @@ defmodule Storage.Service do
   end
 
   def refresh_sms_relay_ip(message) do
-    Map.merge(message, %{sms_relay_ip: first_sms_relay().ip})
+    Map.put(message, :sms_relay_ip, first_sms_relay().ip)
   end
 
   def delete_user(phone) do
@@ -58,27 +55,19 @@ defmodule Storage.Service do
   defp fetch_user_by_phone(phone) do
     query = from User,
               where: [phone: ^phone],
-              limit: 1
+              limit: 1,
+              preload: [:conversations]
 
     Storage.one!(query)
   end
 
-  defp fetch_current_conversation(user_id) do
-    query = from Conversation,
-              where: [left_user_id: ^user_id],
-              or_where: [right_user_id: ^user_id],
-              order_by: [desc: :start],
-              limit: 1
-
-    Storage.one!(query)
+  defp fetch_current_conversation(user) do
+    Enum.max_by(user.conversations, &(&1.iteration))
   end
 
-  defp partner_id(conversation, user_id) do
-    user_ids = [conversation.left_user_id, conversation.right_user_id]
-    user_ids |> List.delete(user_id) |> List.first
-  end
-
-  defp fetch_user(user_id) do
-    Storage.get!(User, user_id)
+  defp partner_phones(conversation, user_id) do
+    conversation.users
+      |> Enum.reject(&(&1.id == user_id))
+      |> Enum.map(&(&1.phone))
   end
 end

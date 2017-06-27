@@ -7,11 +7,9 @@ defmodule Storage.Conversation do
   alias Storage.{Message, SMSRelay, User}
 
   schema "conversations" do
-    belongs_to :left_user, User
-    belongs_to :right_user, User
+    field :iteration, :integer
     belongs_to :sms_relay, SMSRelay
-
-    field :start, :utc_datetime
+    many_to_many :users, User, join_through: "conversations_users"
 
     has_many :messages, Message
 
@@ -19,15 +17,25 @@ defmodule Storage.Conversation do
   end
 
   def changeset(conversation, params \\ %{}) do
-    all_fields = [:left_user_id, :right_user_id, :sms_relay_id, :start]
+    users = fetch_users(params)
+
+    fields = [:iteration, :sms_relay_id]
 
     conversation
-    |> cast(params, all_fields)
-    |> validate_required(all_fields)
-    |> foreign_key_constraint(:left_user_id)
-    |> foreign_key_constraint(:right_user_id)
+    |> Storage.preload(:users)
+    |> cast(params, fields)
+    |> validate_required(fields)
+    |> validate_number(:iteration, greater_than: 0)
     |> foreign_key_constraint(:sms_relay_id)
-    |> exclusion_constraint(:one_per_user_per_time, [name: "one_per_user_per_time"])
-    |> check_constraint(:different_user_ids, [name: "different_user_ids"])
+    |> put_assoc(:users, users)
+    |> validate_length(:users, min: 2)
+  end
+
+  defp fetch_users(params) do
+    params = Map.merge(%{users: []}, params)
+
+    params.users
+    |> Enum.map(&(Storage.get(User, &1)))
+    |> Enum.reject(&(&1 == nil))
   end
 end

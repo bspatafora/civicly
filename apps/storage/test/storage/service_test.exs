@@ -21,61 +21,45 @@ defmodule Storage.ServiceTest do
     Sandbox.mode(Storage, {:shared, self()})
   end
 
-  test "current_partner_phone_and_sms_relay_ip/1 provides the partner phone and SMS relay IP of the user's current conversation" do
+  test "partner_phones/1 provides the partner phones for a user's current conversation" do
     user1 = Helpers.insert_user()
     user2 = Helpers.insert_user()
-
-    {:ok, old_start, _} = DateTime.from_iso8601("2017-03-23 00:00:00Z")
+    user3 = Helpers.insert_user()
+    user4 = Helpers.insert_user()
+    user5 = Helpers.insert_user()
+    sms_relay = Helpers.insert_sms_relay()
     Helpers.insert_conversation(%{
-      left_user_id: user1.id,
-      right_user_id: user2.id,
-      start: old_start})
+      iteration: 1,
+      sms_relay_id: sms_relay.id,
+      users: [user1.id, user2.id, user3.id]})
+    Helpers.insert_conversation(%{
+      iteration: 2,
+      sms_relay_id: sms_relay.id,
+      users: [user1.id, user4.id, user5.id]})
 
-    {:ok, current_start, _} = DateTime.from_iso8601("2017-03-27 00:00:00Z")
-    current_conversation = Helpers.insert_conversation(%{
-        left_user_id: user1.id,
-        right_user_id: user2.id,
-        start: current_start})
-    current_conversation = Storage.preload(current_conversation, :sms_relay)
+    partner_phones = Service.partner_phones(user1.phone)
 
-    {partner_phone, sms_relay_ip, sms_relay_phone} =
-      Service.current_conversation_details(user1.phone)
-
-    assert partner_phone == user2.phone
-    assert sms_relay_ip == current_conversation.sms_relay.ip
-    assert sms_relay_phone == current_conversation.sms_relay.phone
-
-    {partner_phone, sms_relay_ip, sms_relay_phone} =
-      Service.current_conversation_details(user2.phone)
-
-    assert partner_phone == user1.phone
-    assert sms_relay_ip == current_conversation.sms_relay.ip
-    assert sms_relay_phone == current_conversation.sms_relay.phone
+    assert length(partner_phones) == 2
+    assert Enum.member?(partner_phones, user4.phone)
+    assert Enum.member?(partner_phones, user5.phone)
   end
 
   test "store_message/1 stores a message" do
-    sender_phone = "5555555555"
-    recipient_phone = "5555555556"
+    sender = Helpers.insert_user()
+    recipient = Helpers.insert_user()
     text = "Test message"
 
-    sender = Helpers.insert_user(sender_phone)
-    recipient = Helpers.insert_user(recipient_phone)
-
-    {:ok, old_start, _} = DateTime.from_iso8601("2017-05-27 00:00:00Z")
     Helpers.insert_conversation(%{
-      left_user_id: sender.id,
-      right_user_id: recipient.id,
-      start: old_start})
+      iteration: 1,
+      users: [sender.id, recipient.id]})
 
-    {:ok, current_start, _} = DateTime.from_iso8601("2017-05-31 00:00:00Z")
     current_conversation = Helpers.insert_conversation(%{
-        left_user_id: sender.id,
-        right_user_id: recipient.id,
-        start: current_start})
+      iteration: 2,
+      users: [sender.id, recipient.id]})
 
     message = build_message(%{
-      recipient: recipient_phone,
-      sender: sender_phone,
+      recipient: recipient.phone,
+      sender: sender.phone,
       text: text})
 
     Service.store_message(message)

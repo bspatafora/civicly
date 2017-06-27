@@ -6,7 +6,7 @@ defmodule RouterTest do
   alias Core.Router
   alias Ecto.Adapters.SQL.Sandbox
   alias Plug.{Conn, Parsers}
-  alias Storage.{Helpers, Message, Service, User}
+  alias Storage.{Helpers, Message, User}
 
   def parse_body_params(conn) do
     opts = Parsers.init([parsers: [:json], json_decoder: Poison])
@@ -34,25 +34,18 @@ defmodule RouterTest do
   end
 
   test "an inbound message is stored", %{bypass: bypass} do
-    sender_phone = "5555555555"
-    recipient_phone = "5555555556"
-    proxy_phone = "5555555557"
-    text = "Test message"
-
-    sender = Helpers.insert_user(sender_phone)
-    recipient = Helpers.insert_user(recipient_phone)
+    user = Helpers.insert_user()
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     conversation = Helpers.insert_conversation(%{
-      left_user_id: sender.id,
-      right_user_id: recipient.id,
-      sms_relay_id: sms_relay.id})
+      sms_relay_id: sms_relay.id,
+      users: [user.id, Helpers.insert_user().id]})
+    text = "Test message"
+    message = build_message(%{
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: text})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
-
-    message = build_message(%{
-      recipient: proxy_phone,
-      sender: sender_phone,
-      text: text})
 
     Router.handle(message)
 
@@ -60,82 +53,46 @@ defmodule RouterTest do
     message = List.first(messages)
     assert length(messages) == 1
     assert message.conversation_id == conversation.id
-    assert message.user_id == sender.id
+    assert message.user_id == user.id
     assert message.text == text
     assert %DateTime{} = message.timestamp
   end
 
-  test "an inbound message is relayed to the sender's partner", %{bypass: bypass} do
-    sender_phone = "5555555555"
-    recipient_phone = "5555555556"
-    proxy_phone = "5555555557"
-    text = "Test message"
-
-    sender = Helpers.insert_user(sender_phone)
-    recipient = Helpers.insert_user(recipient_phone)
+  test "an inbound message is relayed to all of the sender's partners", %{bypass: bypass} do
+    user = Helpers.insert_user()
+    partner1 = Helpers.insert_user()
+    partner2 = Helpers.insert_user()
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     Helpers.insert_conversation(%{
-      left_user_id: sender.id,
-      right_user_id: recipient.id,
-      sms_relay_id: sms_relay.id})
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner1.id, partner2.id]})
+    text = "Test message"
+    message = build_message(%{
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: text})
 
+    {:ok, recipients} = Agent.start_link(fn -> [] end)
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-
-      assert conn.params["recipient"] == recipient_phone
       assert conn.params["text"] == text
+
+      Agent.update(recipients, &([conn.params["recipient"] | &1]))
 
       Conn.resp(conn, 200, "")
     end
 
-    message = build_message(%{
-      recipient: proxy_phone,
-      sender: sender_phone,
-      text: text})
-
     Router.handle(message)
-  end
 
-  test "partners can use different SMS relays", %{bypass: bypass} do
-    sender_phone = "5555555555"
-    recipient_phone = "5555555556"
-    proxy_phone = "5555555557"
-    text = "Test message"
-
-    sender = Helpers.insert_user(sender_phone)
-    recipient = Helpers.insert_user(recipient_phone)
-    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
-    Helpers.insert_conversation(%{
-      left_user_id: sender.id,
-      right_user_id: recipient.id,
-      sms_relay_id: sms_relay.id})
-
-    Bypass.expect bypass, fn conn ->
-      conn = parse_body_params(conn)
-
-      assert conn.params["recipient"] == recipient_phone
-      assert conn.params["text"] == text
-
-      Conn.resp(conn, 200, "")
-    end
-
-    message = build_message(%{
-      recipient: proxy_phone,
-      sender: sender_phone,
-      sms_relay_ip: "not-localhost",
-      text: text})
-
-    Router.handle(message)
+    partner_phones = [partner1.phone, partner2.phone]
+    assert partner_phones -- Agent.get(recipients, &(&1)) == []
   end
 
   test "an add user command sent by Ben is parsed and executed", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
-
-    text = ":add Test User 5555555555"
     message = build_message(%{
       sender: @ben,
-      sms_relay_ip: "not-localhost",
-      text: text})
+      text: ":add Test User 5555555555"})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
@@ -150,18 +107,14 @@ defmodule RouterTest do
 
   test "an add user command that succeeds notifies", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
-
-    text = ":add Test User 5555555555"
     message = build_message(%{
       sender: @ben,
-      text: text})
+      text: ":add Test User 5555555555"})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-
       assert conn.params["recipient"] == @ben
       assert conn.params["text"] == "Added Test User"
-
       Conn.resp(conn, 200, "")
     end
 
@@ -170,55 +123,43 @@ defmodule RouterTest do
 
   test "an invalid add user command chides", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
-
-    text = ":unknown Test User 5555555555"
     message = build_message(%{
       sender: @ben,
-      text: text})
+      text: ":unknown Test User 5555555555"})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-
       assert conn.params["recipient"] == @ben
       assert conn.params["text"] == "Invalid command"
-
       Conn.resp(conn, 200, "")
     end
 
     Router.handle(message)
 
-    users = Storage.all(User)
-    assert length(users) == 0
+    assert length(Storage.all(User)) == 0
   end
 
   test "an add user command that fails notifies", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
-
-    text = ":add Test User 555555555"
     message = build_message(%{
       sender: @ben,
-      text: text})
+      text: ":add Test User 555555555"})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-
       assert conn.params["recipient"] == @ben
       assert conn.params["text"] == "Insert failed"
-
       Conn.resp(conn, 200, "")
     end
 
     Router.handle(message)
 
-    users = Storage.all(User)
-    assert length(users) == 0
+    assert length(Storage.all(User)) == 0
   end
 
   test "a STOP message deletes the user", %{bypass: bypass} do
+    user = Helpers.insert_user()
     Helpers.insert_sms_relay(%{ip: "localhost"})
-
-    {:ok, user} = Service.insert_user("Test User", "5555555555")
-
     message = build_message(%{
       sender: user.phone,
       text: "STOP"})
@@ -231,20 +172,16 @@ defmodule RouterTest do
   end
 
   test "a STOP message notifies the user", %{bypass: bypass} do
+    user = Helpers.insert_user()
     Helpers.insert_sms_relay(%{ip: "localhost"})
-
-    {:ok, user} = Service.insert_user("Test User", "5555555555")
-
     message = build_message(%{
       sender: user.phone,
       text: "STOP"})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-
       assert conn.params["recipient"] == user.phone
       assert conn.params["text"] == "You have been deleted"
-
       Conn.resp(conn, 200, "")
     end
 

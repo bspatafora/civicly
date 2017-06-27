@@ -2,7 +2,6 @@ defmodule Core.Router do
   @moduledoc false
 
   alias Core.CommandParser
-  alias Storage.Service
 
   @ben Application.get_env(:storage, :ben_phone)
   @sms_sender Application.get_env(:core, :sms_sender)
@@ -45,7 +44,6 @@ defmodule Core.Router do
   end
 
   defp send_command_output(text, message) do
-    message = Service.refresh_sms_relay_ip(message)
     output_params = %{
       recipient: message.sender,
       sender: message.recipient,
@@ -60,7 +58,7 @@ defmodule Core.Router do
   end
 
   defp delete_user(message) do
-    Service.delete_user(message.sender)
+    @storage_service.delete_user(message.sender)
   end
 
   defp store(message) do
@@ -68,15 +66,11 @@ defmodule Core.Router do
   end
 
   defp relay(message) do
-    {partner_phone, sms_relay_ip, sms_relay_phone} =
-      @storage_service.current_conversation_details(message.sender)
+    partner_phones = @storage_service.partner_phones(message.sender)
+    outbound_message = Map.put(message, :sender, message.recipient)
 
-    outbound_params = %{
-      recipient: partner_phone,
-      sender: sms_relay_phone,
-      sms_relay_ip: sms_relay_ip}
-    outbound_message = Map.merge(message, outbound_params)
-
-    @sms_sender.send(outbound_message)
+    partner_phones
+    |> Enum.map(&(Map.put(outbound_message, :recipient, &1)))
+    |> Enum.each(&(@sms_sender.send(&1)))
   end
 end

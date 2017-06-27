@@ -14,10 +14,9 @@ defmodule Storage.Helpers do
 
   def insert_conversation(params \\ %{}) do
     defaults = %{
-      left_user_id: insert_user().id,
-      right_user_id: insert_user().id,
       sms_relay_id: insert_sms_relay().id,
-      start: DateTime.utc_now}
+      iteration: 1,
+      users: [insert_user().id, insert_user().id]}
     changeset =
       Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
 

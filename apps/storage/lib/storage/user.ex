@@ -10,19 +10,18 @@ defmodule Storage.User do
     field :name, :string
     field :phone, :string
 
-    has_many :left_conversations, Conversation, foreign_key: :left_user_id
-    has_many :right_conversations, Conversation, foreign_key: :right_user_id
+    many_to_many :conversations, Conversation, join_through: "conversations_users"
     has_many :messages, Message
 
     timestamps([type: :utc_datetime])
   end
 
   def changeset(user, params \\ %{}) do
-    all_fields = [:name, :phone]
+    fields = [:name, :phone]
 
     user
-    |> cast(params, all_fields)
-    |> validate_required(all_fields)
+    |> cast(params, fields)
+    |> validate_required(fields)
     |> validate_length(:name, max: 100)
     |> validate_format(:phone, ~r/^\d{10}$/)
     |> unique_constraint(:phone)
