@@ -13,10 +13,11 @@ defmodule Storage.Helpers do
   end
 
   def insert_conversation(params \\ %{}) do
-    defaults = %{
-      sms_relay_id: insert_sms_relay().id,
-      iteration: 1,
-      users: [insert_user().id, insert_user().id]}
+    defaults =
+      %{iteration: 1,
+        sms_relay_id: insert_sms_relay().id,
+        users: [insert_user().id, insert_user().id]}
+
     changeset =
       Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
 
@@ -33,9 +34,9 @@ defmodule Storage.Helpers do
   end
 
   def insert_sms_relay(params \\ %{}) do
-    defaults = %{
-      ip: "localhost",
-      phone: random_phone()}
+    defaults =
+      %{ip: "localhost",
+        phone: random_phone()}
     changeset = SMSRelay.changeset(%SMSRelay{}, Map.merge(defaults, params))
 
     {:ok, sms_relay} = Storage.insert(changeset)

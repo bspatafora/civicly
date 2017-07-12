@@ -6,7 +6,7 @@ defmodule RouterTest do
   alias Core.Router
   alias Ecto.Adapters.SQL.Sandbox
   alias Plug.{Conn, Parsers}
-  alias Storage.{Helpers, Message, User}
+  alias Storage.{Helpers, Message, Service, User}
 
   def parse_body_params(conn) do
     opts = Parsers.init([parsers: [:json], json_decoder: Poison])
@@ -159,7 +159,11 @@ defmodule RouterTest do
 
   test "a STOP message deletes the user", %{bypass: bypass} do
     user = Helpers.insert_user()
-    Helpers.insert_sms_relay(%{ip: "localhost"})
+    partner = Helpers.insert_user()
+    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
+    Helpers.insert_conversation(%{
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
     message = build_message(%{
       sender: user.phone,
       text: "STOP"})
@@ -168,23 +172,54 @@ defmodule RouterTest do
 
     Router.handle(message)
 
-    assert length(Storage.all(User)) == 0
+    assert Storage.get(User, user.id) == nil
   end
 
-  test "a STOP message notifies the user", %{bypass: bypass} do
+  test "a STOP message notifies the user and their partners", %{bypass: bypass} do
     user = Helpers.insert_user()
-    Helpers.insert_sms_relay(%{ip: "localhost"})
+    partner1 = Helpers.insert_user()
+    partner2 = Helpers.insert_user()
+    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
+    Helpers.insert_conversation(%{
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner1.id, partner2.id]})
     message = build_message(%{
       sender: user.phone,
       text: "STOP"})
 
+    {:ok, messages} = Agent.start_link(fn -> [] end)
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-      assert conn.params["recipient"] == user.phone
-      assert conn.params["text"] == "You have been deleted"
+      recipient = conn.params["recipient"]
+      text = conn.params["text"]
+      Agent.update(messages, &([%{recipient: recipient, text: text} | &1]))
       Conn.resp(conn, 200, "")
     end
 
+    Router.handle(message)
+
+    messages = Agent.get(messages, &(&1))
+    assert Enum.member?(messages, %{recipient: user.phone, text: "You have been deleted"})
+    assert Enum.member?(messages, %{recipient: partner1.phone, text: "#{user.name} has quit"})
+    assert Enum.member?(messages, %{recipient: partner2.phone, text: "#{user.name} has quit"})
+  end
+
+  test "if all of a user's partners have been deleted, an inbound message is relayed to no one" do
+    user = Helpers.insert_user()
+    partner = Helpers.insert_user()
+    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
+    Helpers.insert_conversation(%{
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+    message = build_message(%{
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: "Test message"})
+
+    Service.delete_user(partner.phone)
+
+    # Will fail with a "Bypass got an HTTP request but wasn't
+    # expecting one" error if any message is relayed
     Router.handle(message)
   end
 end

@@ -10,31 +10,28 @@ defmodule Storage.ConversationTest do
   end
 
   defp changeset(params \\ %{}) do
-    defaults = %{
-      sms_relay_id: Helpers.insert_sms_relay().id,
+    defaults =
+      %{sms_relay_id: Helpers.insert_sms_relay().id,
       iteration: 1,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]
-    }
+      users: [Helpers.insert_user().id, Helpers.insert_user().id]}
 
     Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
   end
 
   test "a valid conversation has an SMS relay, an iteration, and at least two users" do
-    params = %{
-      sms_relay_id: Helpers.insert_sms_relay().id,
-      iteration: 1,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]
-    }
+    params =
+      %{sms_relay_id: Helpers.insert_sms_relay().id,
+        iteration: 1,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert {:ok, _} = Storage.insert(changeset)
   end
 
   test "a conversation with no SMS relay is invalid" do
-    params = %{
-      iteration: 1,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]
-    }
+    params =
+      %{iteration: 1,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert {:error, changeset} = Storage.insert(changeset)
@@ -43,10 +40,9 @@ defmodule Storage.ConversationTest do
   end
 
   test "a conversation with no iteration is invalid" do
-    params = %{
-      sms_relay_id: Helpers.insert_sms_relay().id,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]
-    }
+    params =
+      %{sms_relay_id: Helpers.insert_sms_relay().id,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert {:error, changeset} = Storage.insert(changeset)
@@ -55,10 +51,9 @@ defmodule Storage.ConversationTest do
   end
 
   test "a conversation with no users is invalid" do
-    params = %{
-      sms_relay_id: Helpers.insert_sms_relay().id,
-      iteration: 1
-    }
+    params =
+      %{sms_relay_id: Helpers.insert_sms_relay().id,
+        iteration: 1}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert {:error, changeset} = Storage.insert(changeset)

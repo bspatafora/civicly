@@ -13,8 +13,8 @@ defmodule Storage.Migrations.CreateConversationsUsers do
     end
 
     create table(:conversations_users, primary_key: false) do
-      add :conversation_id, references(:conversations), null: false
-      add :user_id, references(:users), null: false
+      add :conversation_id, references(:conversations)
+      add :user_id, references(:users, on_delete: :delete_all)
     end
   end
 end
