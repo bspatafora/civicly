@@ -39,7 +39,7 @@ defmodule SMSReceiverTest do
     Bypass.expect bypass, fn outbound_sms_conn ->
       outbound_sms_conn = parse_body_params(outbound_sms_conn)
       assert outbound_sms_conn.params["recipient"] == partner.phone
-      assert outbound_sms_conn.params["text"] == text
+      assert outbound_sms_conn.params["text"] == "#{user.name}: #{text}"
       Conn.resp(outbound_sms_conn, 200, "")
     end
 

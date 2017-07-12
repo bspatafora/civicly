@@ -63,7 +63,13 @@ defmodule Core.Router do
 
   defp relay(message) do
     partner_phones = @storage_service.partner_phones(message.sender)
-    send_sms(message.text, partner_phones, message)
+    text = prepend_name_to_text(message)
+    send_sms(text, partner_phones, message)
+  end
+
+  defp prepend_name_to_text(message) do
+    name = @storage_service.fetch_name(message.sender)
+    "#{name}: #{message.text}"
   end
 
   defp send_sms(text, recipients, message) do

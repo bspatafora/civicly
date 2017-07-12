@@ -25,6 +25,20 @@ defmodule RouterTest do
     Map.merge(message, params)
   end
 
+  defmodule MessageSpy do
+    def new do
+      Agent.start_link(fn -> [] end)
+    end
+
+    def record(agent, recipient, text) do
+      Agent.update(agent, &([%{recipient: recipient, text: text} | &1]))
+    end
+
+    def get(agent) do
+      Agent.get(agent, &(&1))
+    end
+  end
+
   setup do
     :ok = Sandbox.checkout(Storage)
     Sandbox.mode(Storage, {:shared, self()})
@@ -72,20 +86,19 @@ defmodule RouterTest do
       sender: user.phone,
       text: text})
 
-    {:ok, recipients} = Agent.start_link(fn -> [] end)
+    {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-      assert conn.params["text"] == text
-
-      Agent.update(recipients, &([conn.params["recipient"] | &1]))
-
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
       Conn.resp(conn, 200, "")
     end
 
     Router.handle(message)
 
-    partner_phones = [partner1.phone, partner2.phone]
-    assert partner_phones -- Agent.get(recipients, &(&1)) == []
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 2
+    assert Enum.member?(messages, %{recipient: partner1.phone, text: "#{user.name}: #{text}"})
+    assert Enum.member?(messages, %{recipient: partner2.phone, text: "#{user.name}: #{text}"})
   end
 
   test "an add user command sent by Ben is parsed and executed", %{bypass: bypass} do
@@ -187,18 +200,17 @@ defmodule RouterTest do
       sender: user.phone,
       text: "STOP"})
 
-    {:ok, messages} = Agent.start_link(fn -> [] end)
+    {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
-      recipient = conn.params["recipient"]
-      text = conn.params["text"]
-      Agent.update(messages, &([%{recipient: recipient, text: text} | &1]))
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
       Conn.resp(conn, 200, "")
     end
 
     Router.handle(message)
 
-    messages = Agent.get(messages, &(&1))
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 3
     assert Enum.member?(messages, %{recipient: user.phone, text: "You have been deleted"})
     assert Enum.member?(messages, %{recipient: partner1.phone, text: "#{user.name} has quit"})
     assert Enum.member?(messages, %{recipient: partner2.phone, text: "#{user.name} has quit"})

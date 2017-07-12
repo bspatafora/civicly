@@ -7,19 +7,21 @@ defmodule Storage.Service do
   alias Storage.{Message, SMSRelay, User}
 
   def partner_phones(user_phone) do
-    user = fetch_user_by_phone(user_phone)
-    conversation = fetch_current_conversation(user)
+    user = fetch_user(user_phone)
+    user = Storage.preload(user, :conversations)
+    conversation = current_conversation(user)
     conversation = Storage.preload(conversation, :users)
 
     partner_phones(conversation, user.id)
   end
 
   def store_message(message) do
-    user = fetch_user_by_phone(message.sender)
-    conversation_id = fetch_current_conversation(user).id
+    user = fetch_user(message.sender)
+    user = Storage.preload(user, :conversations)
+    conversation = current_conversation(user)
 
     params =
-      %{conversation_id: conversation_id,
+      %{conversation_id: conversation.id,
         user_id: user.id,
         text: message.text,
         timestamp: message.timestamp,
@@ -48,20 +50,23 @@ defmodule Storage.Service do
     Storage.delete!(user)
   end
 
+  def fetch_name(phone) do
+    fetch_user(phone).name
+  end
+
   defp first_sms_relay do
     SMSRelay |> first |> Storage.one
   end
 
-  defp fetch_user_by_phone(phone) do
+  defp fetch_user(phone) do
     query = from User,
               where: [phone: ^phone],
-              limit: 1,
-              preload: [:conversations]
+              limit: 1
 
     Storage.one!(query)
   end
 
-  defp fetch_current_conversation(user) do
+  defp current_conversation(user) do
     Enum.max_by(user.conversations, &(&1.iteration))
   end
 

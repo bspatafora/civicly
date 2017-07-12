@@ -106,10 +106,18 @@ defmodule Storage.ServiceTest do
   end
 
   test "delete_user/1 deletes the user with the given phone" do
-    {:ok, user} = Service.insert_user("Test User", "5555555555")
+    user = Helpers.insert_user()
 
     Service.delete_user(user.phone)
 
-    assert length(Storage.all(User)) == 0
+    assert Storage.get(User, user.id) == nil
+  end
+
+  test "fetch_name/1 fetches the name of the user by phone" do
+    user = Helpers.insert_user()
+
+    name = Service.fetch_name(user.phone)
+
+    assert name == user.name
   end
 end
