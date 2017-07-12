@@ -30,7 +30,7 @@ defmodule SMSSender do
           seconds_delay = round(:math.pow(attempt, 2))
           :timer.sleep(seconds_delay * 1000)
 
-          attempt_to_send(body, message, attempt + 1)
+          attempt_to_send(message, body, attempt + 1)
       end
     end
   end
