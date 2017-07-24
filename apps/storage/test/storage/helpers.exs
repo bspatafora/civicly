@@ -2,6 +2,7 @@ defmodule Storage.Helpers do
   import Ecto.Query
 
   alias Ecto.UUID
+
   alias Storage.{Conversation, SMSRelay, User}
 
   def uuid do

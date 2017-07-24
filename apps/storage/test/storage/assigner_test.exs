@@ -2,6 +2,7 @@ defmodule Storage.AssignerTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
+
   alias Storage.{Assigner, Conversation, Helpers}
 
   @ben_phone Application.get_env(:storage, :ben_phone)

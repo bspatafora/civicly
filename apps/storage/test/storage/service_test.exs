@@ -2,6 +2,7 @@ defmodule Storage.ServiceTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
+
   alias Storage.{Helpers, Message, Service, User}
 
   def build_message(params) do

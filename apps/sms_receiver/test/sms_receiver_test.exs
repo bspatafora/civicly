@@ -19,7 +19,7 @@ defmodule SMSReceiverTest do
     {:ok, bypass: bypass}
   end
 
-  test "an inbound message is relayed to the sender's partner", %{bypass: bypass} do
+  test "it relays an inbound message to the sender's partner", %{bypass: bypass} do
     user = Helpers.insert_user()
     partner = Helpers.insert_user()
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
@@ -46,7 +46,7 @@ defmodule SMSReceiverTest do
     SMSReceiver.call(inbound_sms_conn, SMSReceiver.init([]))
   end
 
-  test "heartbeat requests update the first SMS relay IP" do
+  test "it updates the first SMS relay IP on a heartbeat request" do
     Helpers.insert_sms_relay()
     conn = conn(:post, "/sms_relay_heartbeat", %{})
     conn = put_req_header(conn, "content-type", "application/json")
@@ -57,7 +57,7 @@ defmodule SMSReceiverTest do
     assert Helpers.first_sms_relay_ip == "0.0.0.0"
   end
 
-  test "inbound message requests update the first SMS relay IP", %{bypass: bypass} do
+  test "it updates the first SMS relay IP on an inbound message request", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
     second_sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     user = Helpers.insert_user()

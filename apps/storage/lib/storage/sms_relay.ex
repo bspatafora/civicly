@@ -1,8 +1,8 @@
 defmodule Storage.SMSRelay do
   @moduledoc false
 
-  use Ecto.Schema
   import Ecto.Changeset
+  use Ecto.Schema
 
   alias Storage.Conversation
 

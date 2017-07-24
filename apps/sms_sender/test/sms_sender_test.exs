@@ -2,8 +2,9 @@ defmodule SMSSenderTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
-  alias Storage.Helpers
   alias Plug.{Conn, Parsers}
+
+  alias Storage.Helpers
 
   def parse_body_params(conn) do
     opts = Parsers.init([parsers: [:json], json_decoder: Poison])
@@ -30,7 +31,7 @@ defmodule SMSSenderTest do
     {:ok, bypass: bypass}
   end
 
-  test "send/1 sends a message correctly", %{bypass: bypass} do
+  test "send/1 POSTS to the SMS relay's /send route with the recipient and text", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
     recipient_phone = "5555555555"
     text = "Test message"
@@ -55,7 +56,7 @@ defmodule SMSSenderTest do
     SMSSender.send(message)
   end
 
-  test "send/1 refreshes the message's SMS relay IP", %{bypass: bypass} do
+  test "send/1 refreshes the message's SMS relay IP before sending", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
     Helpers.insert_sms_relay(%{ip: "127.0.0.2"})
     recipient_phone = "5555555555"

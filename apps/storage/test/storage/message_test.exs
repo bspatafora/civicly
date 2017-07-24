@@ -2,6 +2,7 @@ defmodule Storage.MessageTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
+
   alias Storage.{Helpers, Message}
 
   setup do

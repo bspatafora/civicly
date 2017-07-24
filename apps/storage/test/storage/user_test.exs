@@ -2,6 +2,7 @@ defmodule Storage.UserTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
+
   alias Storage.{Helpers, User}
 
   setup do

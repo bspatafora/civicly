@@ -2,6 +2,7 @@ defmodule Storage.SMSRelayTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
+
   alias Storage.{Helpers, SMSRelay}
 
   setup do
