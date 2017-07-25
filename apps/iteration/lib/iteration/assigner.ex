@@ -1,9 +1,7 @@
-defmodule Storage.Assigner do
+defmodule Iteration.Assigner do
   @moduledoc false
 
-  import Ecto.Query
-
-  alias Storage.{Conversation, SMSRelay, User}
+  alias Storage.{Conversation, Service, User}
 
   def group_by_threes do
     group(&by_threes/2)
@@ -14,7 +12,7 @@ defmodule Storage.Assigner do
   end
 
   defp group(group_strategy) do
-    iteration = current_iteration()
+    iteration = next_iteration()
     sms_relay_id = sms_relay_id()
     {flexible_user, users} = pop_ben(Storage.all(User))
 
@@ -24,19 +22,15 @@ defmodule Storage.Assigner do
     |> Enum.each(&(insert_conversation(iteration, sms_relay_id, &1)))
   end
 
-  defp current_iteration do
-    query = from c in Conversation, select: max(c.iteration)
-    last_iteration = Storage.one(query)
-
-    case last_iteration do
+  defp next_iteration do
+    case Service.current_iteration() do
       nil -> 1
       iteration -> iteration + 1
     end
   end
 
   defp sms_relay_id do
-    first_sms_relay = SMSRelay |> first |> Storage.one
-    first_sms_relay.id
+    Service.first_sms_relay.id
   end
 
   defp pop_ben(users) do

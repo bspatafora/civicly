@@ -23,12 +23,14 @@ defmodule Storage.Helpers do
       Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
 
     {:ok, conversation} = Storage.insert(changeset)
-    conversation
+    Storage.preload(conversation, :sms_relay)
   end
 
-  def insert_user(phone \\ random_phone()) do
-    params = %{name: "Test User", phone: phone}
-    changeset = User.changeset(%User{}, params)
+  def insert_user(params \\ %{}) do
+    defaults =
+      %{name: "Test User",
+        phone: random_phone()}
+    changeset = User.changeset(%User{}, Map.merge(defaults, params))
 
     {:ok, user} = Storage.insert(changeset)
     user

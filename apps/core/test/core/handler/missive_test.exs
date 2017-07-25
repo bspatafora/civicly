@@ -6,6 +6,7 @@ defmodule Core.Handler.MissiveTest do
 
   alias Core.Handler.Missive
   alias Core.Helpers
+  alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
   alias Storage.{Message, Service}
 
@@ -54,16 +55,16 @@ defmodule Core.Handler.MissiveTest do
       sender: user.phone,
       text: text})
 
-    {:ok, messages} = Helpers.MessageSpy.new()
+    {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
-      Helpers.MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
       Conn.resp(conn, 200, "")
     end
 
     Missive.handle(message)
 
-    messages = Helpers.MessageSpy.get(messages)
+    messages = MessageSpy.get(messages)
     assert length(messages) == 2
     assert Enum.member?(messages, %{recipient: partner1.phone, text: "#{user.name}: #{text}"})
     assert Enum.member?(messages, %{recipient: partner2.phone, text: "#{user.name}: #{text}"})

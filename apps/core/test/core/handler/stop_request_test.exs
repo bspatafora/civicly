@@ -6,6 +6,7 @@ defmodule Core.Handler.StopRequestTest do
 
   alias Core.Handler.StopRequest
   alias Core.Helpers
+  alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
   alias Storage.User
 
@@ -47,16 +48,16 @@ defmodule Core.Handler.StopRequestTest do
       sender: user.phone,
       text: "STOP"})
 
-    {:ok, messages} = Helpers.MessageSpy.new()
+    {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
-      Helpers.MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
       Conn.resp(conn, 200, "")
     end
 
     StopRequest.handle(message)
 
-    messages = Helpers.MessageSpy.get(messages)
+    messages = MessageSpy.get(messages)
     assert length(messages) == 3
     assert Enum.member?(messages, %{recipient: user.phone, text: "You have been deleted"})
     assert Enum.member?(messages, %{recipient: partner1.phone, text: "#{user.name} has quit"})

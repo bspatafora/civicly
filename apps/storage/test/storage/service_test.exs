@@ -114,11 +114,49 @@ defmodule Storage.ServiceTest do
     assert Storage.get(User, user.id) == nil
   end
 
-  test "fetch_name/1 fetches the name of the user by phone" do
+  test "name/1 fetches the name of the user by phone" do
     user = Helpers.insert_user()
 
-    name = Service.fetch_name(user.phone)
+    name = Service.name(user.phone)
 
     assert name == user.name
+  end
+
+  test "first_sms_relay/0 fetches the first SMS relay" do
+    Helpers.insert_sms_relay(%{ip: "0.0.0.0"})
+    Helpers.insert_sms_relay(%{ip: "localhost"})
+
+    sms_relay = Service.first_sms_relay()
+
+    assert sms_relay.ip == "0.0.0.0"
+  end
+
+  test "current_conversations/0 fetches the conversations for the current iteration" do
+    Helpers.insert_conversation(%{iteration: 1})
+    conversation1 = Helpers.insert_conversation(%{iteration: 2})
+    conversation2 = Helpers.insert_conversation(%{iteration: 2})
+
+    conversations = Service.current_conversations()
+
+    assert Enum.member?(conversations, conversation1)
+    assert Enum.member?(conversations, conversation2)
+  end
+
+  test "current_conversations/0 preloads each conversation's users and SMS relay" do
+    conversation = Helpers.insert_conversation()
+
+    conversations = Service.current_conversations()
+
+    fetched_conversation = List.first(conversations)
+    assert fetched_conversation.users == conversation.users
+    assert fetched_conversation.sms_relay == conversation.sms_relay
+  end
+
+  test "current_iteration/0 fetches the current iteration" do
+    assert Service.current_iteration() == nil
+
+    Helpers.insert_conversation(%{iteration: 1})
+
+    assert Service.current_iteration() == 1
   end
 end

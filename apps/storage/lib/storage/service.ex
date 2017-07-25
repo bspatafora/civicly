@@ -4,10 +4,10 @@ defmodule Storage.Service do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias Storage.{Message, SMSRelay, User}
+  alias Storage.{Conversation, Message, SMSRelay, User}
 
   def partner_phones(user_phone) do
-    user = fetch_user(user_phone)
+    user = user(user_phone)
     user = Storage.preload(user, :conversations)
     conversation = current_conversation(user)
     conversation = Storage.preload(conversation, :users)
@@ -16,7 +16,7 @@ defmodule Storage.Service do
   end
 
   def store_message(message) do
-    user = fetch_user(message.sender)
+    user = user(message.sender)
     user = Storage.preload(user, :conversations)
     conversation = current_conversation(user)
 
@@ -50,15 +50,27 @@ defmodule Storage.Service do
     Storage.delete!(user)
   end
 
-  def fetch_name(phone) do
-    fetch_user(phone).name
+  def name(phone) do
+    user(phone).name
   end
 
-  defp first_sms_relay do
+  def first_sms_relay do
     SMSRelay |> first |> Storage.one
   end
 
-  defp fetch_user(phone) do
+  def current_conversations do
+    query = from Conversation,
+              where: [iteration: ^current_iteration()],
+              preload: [:sms_relay, :users]
+    Storage.all(query)
+  end
+
+  def current_iteration do
+    query = from c in Conversation, select: max(c.iteration)
+    Storage.one(query)
+  end
+
+  defp user(phone) do
     query = from User,
               where: [phone: ^phone],
               limit: 1

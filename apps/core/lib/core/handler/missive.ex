@@ -14,7 +14,7 @@ defmodule Core.Handler.Missive do
   end
 
   defp prepend_name_to_text(message) do
-    name = @storage.fetch_name(message.sender)
+    name = @storage.name(message.sender)
     "#{name}: #{message.text}"
   end
 end

@@ -1,9 +1,10 @@
-defmodule Storage.AssignerTest do
+defmodule Iteration.AssignerTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
 
-  alias Storage.{Assigner, Conversation, Helpers}
+  alias Iteration.Assigner
+  alias Storage.{Conversation, Helpers}
 
   @ben_phone Application.get_env(:storage, :ben_phone)
 
@@ -15,7 +16,7 @@ defmodule Storage.AssignerTest do
   test "group_by_twos/0 assigns all users to conversations" do
     Helpers.insert_sms_relay()
     user_ids =
-      [Helpers.insert_user(@ben_phone).id,
+      [Helpers.insert_user(%{phone: @ben_phone}).id,
        Helpers.insert_user().id,
        Helpers.insert_user().id,
        Helpers.insert_user().id]
@@ -34,7 +35,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_twos/0 leaves Ben out when there is an odd number of users" do
     Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     other_user_ids = [Helpers.insert_user().id, Helpers.insert_user().id]
 
     Assigner.group_by_twos()
@@ -51,7 +52,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_twos/0 assigns all users the same iteration" do
     Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     Helpers.insert_user()
     Helpers.insert_user()
     Helpers.insert_user()
@@ -67,7 +68,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_twos/0 increments the iteration on each run" do
     Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     Helpers.insert_user()
 
     Assigner.group_by_twos()
@@ -83,7 +84,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_twos/0 assigns all users the first SMS relay in the database" do
     sms_relay = Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     Helpers.insert_user()
     Helpers.insert_user()
     Helpers.insert_user()
@@ -100,7 +101,7 @@ defmodule Storage.AssignerTest do
   test "group_by_threes/0 assigns all users to conversations" do
     Helpers.insert_sms_relay()
     user_ids =
-      [Helpers.insert_user(@ben_phone).id,
+      [Helpers.insert_user(%{phone: @ben_phone}).id,
        Helpers.insert_user().id,
        Helpers.insert_user().id,
        Helpers.insert_user().id,
@@ -121,7 +122,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_threes/0 leaves Ben out when there is one leftover user" do
     Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     other_user_ids =
       [Helpers.insert_user().id,
        Helpers.insert_user().id,
@@ -141,7 +142,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_threes/0 includes Ben in two conversations when there are two leftover users" do
     Helpers.insert_sms_relay()
-    ben = Helpers.insert_user(@ben_phone)
+    ben = Helpers.insert_user(%{phone: @ben_phone})
     ben_id = ben.id
     other_user_ids =
       [Helpers.insert_user().id,
@@ -165,7 +166,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_threes/0 assigns all users the same iteration" do
     Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     Helpers.insert_user()
     Helpers.insert_user()
     Helpers.insert_user()
@@ -183,7 +184,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_threes/0 increments the iteration on each run" do
     Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     Helpers.insert_user()
     Helpers.insert_user()
 
@@ -200,7 +201,7 @@ defmodule Storage.AssignerTest do
 
   test "group_by_threes/0 assigns all users the first SMS relay in the database" do
     sms_relay = Helpers.insert_sms_relay()
-    Helpers.insert_user(@ben_phone)
+    Helpers.insert_user(%{phone: @ben_phone})
     Helpers.insert_user()
     Helpers.insert_user()
     Helpers.insert_user()
