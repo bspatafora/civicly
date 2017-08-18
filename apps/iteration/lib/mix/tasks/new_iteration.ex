@@ -9,7 +9,7 @@ defmodule Mix.Tasks.NewIteration do
   def run(_) do
     Application.ensure_all_started(:storage)
 
-    Assigner.group_by_threes()
+    Assigner.group_by_twos()
     Notifier.notify()
   end
 end
