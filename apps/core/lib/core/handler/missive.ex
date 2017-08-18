@@ -2,6 +2,7 @@ defmodule Core.Handler.Missive do
   @moduledoc false
 
   alias Core.Sender
+  alias Strings, as: S
 
   @storage Application.get_env(:core, :storage)
 
@@ -15,6 +16,6 @@ defmodule Core.Handler.Missive do
 
   defp prepend_name_to_text(message) do
     name = @storage.name(message.sender)
-    "#{name}: #{message.text}"
+    S.prepend_name(name, message.text)
   end
 end

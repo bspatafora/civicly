@@ -7,6 +7,7 @@ defmodule Core.RouterTest do
   alias Core.{Helpers, Router}
   alias Storage.Helpers, as: StorageHelpers
   alias Storage.{Message, User}
+  alias Strings, as: S
 
   @ben Application.get_env(:storage, :ben_phone)
 
@@ -22,7 +23,7 @@ defmodule Core.RouterTest do
     StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     message = Helpers.build_message(%{
       sender: @ben,
-      text: ":add Test User 5555555555"})
+      text: "#{S.add_command()} Test User 5555555555"})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
@@ -40,7 +41,7 @@ defmodule Core.RouterTest do
       users: [user.id, partner.id]})
     message = Helpers.build_message(%{
       sender: user.phone,
-      text: "STOP"})
+      text: S.stop_request()})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 

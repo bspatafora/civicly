@@ -3,6 +3,8 @@ defmodule Iteration.Notifier do
 
   alias Ecto.UUID
 
+  alias Strings, as: S
+
   @sender Application.get_env(:iteration, :sender)
   @storage Application.get_env(:iteration, :storage)
 
@@ -25,7 +27,7 @@ defmodule Iteration.Notifier do
   end
 
   defp build_message(shared_params, user, users) do
-    text = "Say hello to #{partner_names(user, users)}!"
+    text = S.iteration_start(partner_names(user, users))
     params = Map.merge(shared_params, %{recipient: user.phone, text: text})
 
     struct!(SMSMessage, params)
@@ -35,6 +37,5 @@ defmodule Iteration.Notifier do
     users
       |> Enum.reject(&(&1.id == user.id))
       |> Enum.map(&(&1.name))
-      |> Enum.join(" and ")
   end
 end

@@ -9,6 +9,7 @@ defmodule Core.Handler.StopRequestTest do
   alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
   alias Storage.User
+  alias Strings, as: S
 
   setup do
     :ok = Sandbox.checkout(Storage)
@@ -59,8 +60,8 @@ defmodule Core.Handler.StopRequestTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 3
-    assert Enum.member?(messages, %{recipient: user.phone, text: "You have been deleted"})
-    assert Enum.member?(messages, %{recipient: partner1.phone, text: "#{user.name} has quit"})
-    assert Enum.member?(messages, %{recipient: partner2.phone, text: "#{user.name} has quit"})
+    assert Enum.member?(messages, %{recipient: user.phone, text: S.user_deletion()})
+    assert Enum.member?(messages, %{recipient: partner1.phone, text: S.partner_deletion(user.name)})
+    assert Enum.member?(messages, %{recipient: partner2.phone, text: S.partner_deletion(user.name)})
   end
 end

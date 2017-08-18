@@ -1,11 +1,13 @@
 defmodule Core.CommandParser do
   @moduledoc false
 
+  alias Strings, as: S
+
   def parse(text) do
     [command | rest] = String.split(text, " ", parts: 2)
     data = List.first(rest)
 
-    if command == ":add" do
+    if command == S.add_command() do
       parse_add(data)
     else
       {:invalid}

@@ -2,6 +2,7 @@ defmodule Core.Router do
   @moduledoc false
 
   alias Core.Handler.{Command, Missive, StopRequest}
+  alias Strings, as: S
 
   @ben Application.get_env(:storage, :ben_phone)
 
@@ -19,12 +20,12 @@ defmodule Core.Router do
 
   defp command?(message) do
     from_ben? = message.sender == @ben
-    command? = String.starts_with?(message.text, ":")
+    command? = String.starts_with?(message.text, S.command_prefix())
 
     from_ben? && command?
   end
 
   defp stop_request?(message) do
-    String.downcase(message.text) == "stop"
+    String.downcase(message.text) == S.stop_request()
   end
 end

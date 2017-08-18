@@ -1,0 +1,3 @@
+# Strings
+
+Centralizes the strings

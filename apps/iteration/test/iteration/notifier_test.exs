@@ -7,6 +7,7 @@ defmodule Iteration.NotifierTest do
 
   alias Iteration.Notifier
   alias Storage.Helpers
+  alias Strings, as: S
 
   defmodule MessageSpy do
     def new do
@@ -62,9 +63,9 @@ defmodule Iteration.NotifierTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 3
-    assert Enum.member?(messages, %{recipient: user1.phone, text: "Say hello to User 2 and User 3!"})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: "Say hello to User 1 and User 3!"})
-    assert Enum.member?(messages, %{recipient: user3.phone, text: "Say hello to User 1 and User 2!"})
+    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start(["User 2", "User 3"])})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start(["User 1", "User 3"])})
+    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start(["User 1", "User 2"])})
   end
 
   test "notify/0 notifies every user", %{bypass: bypass} do
@@ -95,9 +96,9 @@ defmodule Iteration.NotifierTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 4
-    assert Enum.member?(messages, %{recipient: user1.phone, text: "Say hello to User 2!"})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: "Say hello to User 1!"})
-    assert Enum.member?(messages, %{recipient: user3.phone, text: "Say hello to User 4!"})
-    assert Enum.member?(messages, %{recipient: user4.phone, text: "Say hello to User 3!"})
+    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start(["User 2"])})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start(["User 1"])})
+    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start(["User 4"])})
+    assert Enum.member?(messages, %{recipient: user4.phone, text: S.iteration_start(["User 3"])})
   end
 end

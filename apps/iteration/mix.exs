@@ -22,6 +22,7 @@ defmodule Iteration.Mixfile do
     [{:sms_message, in_umbrella: true},
      {:sms_sender, in_umbrella: true},
      {:storage, in_umbrella: true},
+     {:strings, in_umbrella: true},
      {:bypass, "~> 0.6", only: :test}]
   end
 end
