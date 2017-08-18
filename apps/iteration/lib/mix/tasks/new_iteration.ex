@@ -6,10 +6,10 @@ defmodule Mix.Tasks.NewIteration do
   alias Iteration.Assigner
   alias Iteration.Notifier
 
-  def run(_) do
+  def run(question) do
     Application.ensure_all_started(:storage)
 
     Assigner.group_by_twos()
-    Notifier.notify()
+    Notifier.notify(question)
   end
 end

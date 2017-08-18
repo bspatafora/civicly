@@ -1,7 +1,19 @@
 defmodule Strings do
-  def iteration_start(partner_names) do
-    partner_names = Enum.join(partner_names, " and ")
-    "Say hello to #{partner_names}!"
+  def reminders do
+    """
+    Remember:
+    1. Attacking evokes defensiveness—better to ask, listen, offer
+    2. We can’t get better if we’re shut
+    3. Fortune favors the bold (and curious)
+    """
+  end
+
+  def iteration_start(question) do
+    """
+    Welcome to the new iteration! You’re connected to another American.
+
+    Question for you: #{question}
+    """
   end
 
   def stop_request do

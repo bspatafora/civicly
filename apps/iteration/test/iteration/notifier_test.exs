@@ -36,10 +36,10 @@ defmodule Iteration.NotifierTest do
     {:ok, bypass: bypass}
   end
 
-  test "notify/0 notifies a user of the names of their partner(s) for the new iteration", %{bypass: bypass} do
-    user1 = Helpers.insert_user(%{name: "User 1"})
-    user2 = Helpers.insert_user(%{name: "User 2"})
-    user3 = Helpers.insert_user(%{name: "User 3"})
+  test "notify/0 sends each user dialog reminders and a notification that a new iteration has started", %{bypass: bypass} do
+    user1 = Helpers.insert_user()
+    user2 = Helpers.insert_user()
+    user3 = Helpers.insert_user()
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     old_conversation_params =
       %{iteration: 1,
@@ -59,20 +59,25 @@ defmodule Iteration.NotifierTest do
       Conn.resp(conn, 200, "")
     end
 
-    Notifier.notify
+    Notifier.notify("Question?")
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 3
-    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start(["User 2", "User 3"])})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start(["User 1", "User 3"])})
-    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start(["User 1", "User 2"])})
+    assert length(messages) == 6
+
+    assert Enum.member?(messages, %{recipient: user1.phone, text: S.reminders()})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: S.reminders()})
+    assert Enum.member?(messages, %{recipient: user3.phone, text: S.reminders()})
+
+    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start("Question?")})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start("Question?")})
+    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start("Question?")})
   end
 
   test "notify/0 notifies every user", %{bypass: bypass} do
-    user1 = Helpers.insert_user(%{name: "User 1"})
-    user2 = Helpers.insert_user(%{name: "User 2"})
-    user3 = Helpers.insert_user(%{name: "User 3"})
-    user4 = Helpers.insert_user(%{name: "User 4"})
+    user1 = Helpers.insert_user()
+    user2 = Helpers.insert_user()
+    user3 = Helpers.insert_user()
+    user4 = Helpers.insert_user()
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     params1 =
       %{iteration: 1,
@@ -92,13 +97,12 @@ defmodule Iteration.NotifierTest do
       Conn.resp(conn, 200, "")
     end
 
-    Notifier.notify
+    Notifier.notify("Question?")
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 4
-    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start(["User 2"])})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start(["User 1"])})
-    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start(["User 4"])})
-    assert Enum.member?(messages, %{recipient: user4.phone, text: S.iteration_start(["User 3"])})
+    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start("Question?")})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start("Question?")})
+    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start("Question?")})
+    assert Enum.member?(messages, %{recipient: user4.phone, text: S.iteration_start("Question?")})
   end
 end
