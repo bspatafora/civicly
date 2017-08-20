@@ -8,11 +8,11 @@ defmodule Strings do
     """
   end
 
-  def iteration_start(partners, question) do
+  def iteration_start(partners, question, year) do
     partners = Enum.join(partners, " and ")
 
     """
-    Welcome to the new iteration! You're connected to #{partners}.
+    Welcome to iteration #{year}! You're connected to #{partners}.
 
     Question for you: #{question}
     """

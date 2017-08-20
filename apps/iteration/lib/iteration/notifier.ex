@@ -8,13 +8,13 @@ defmodule Iteration.Notifier do
   @sender Application.get_env(:iteration, :sender)
   @storage Application.get_env(:iteration, :storage)
 
-  def notify(question) do
+  def notify(question, year) do
     conversations = @storage.current_conversations()
 
-    conversations |> Enum.each(&(notify_users(&1, question)))
+    conversations |> Enum.each(&(notify_users(&1, question, year)))
   end
 
-  defp notify_users(conversation, question) do
+  defp notify_users(conversation, question, year) do
     shared_params =
       %{sender: conversation.sms_relay.phone,
         sms_relay_ip: conversation.sms_relay.ip,
@@ -25,7 +25,7 @@ defmodule Iteration.Notifier do
       |> Enum.each(&(send_message(shared_params, S.reminders(), &1)))
 
     conversation.users
-      |> Enum.each(&(send_message(shared_params, S.iteration_start(partner_names(&1, conversation.users), question), &1)))
+      |> Enum.each(&(send_message(shared_params, S.iteration_start(partner_names(&1, conversation.users), question, year), &1)))
   end
 
   defp send_message(shared_params, text, user) do
