@@ -25,7 +25,7 @@ defmodule Iteration.Notifier do
       |> Enum.each(&(send_message(shared_params, S.reminders(), &1)))
 
     conversation.users
-      |> Enum.each(&(send_message(shared_params, S.iteration_start(question), &1)))
+      |> Enum.each(&(send_message(shared_params, S.iteration_start(partner_names(&1, conversation.users), question), &1)))
   end
 
   defp send_message(shared_params, text, user) do
@@ -33,5 +33,11 @@ defmodule Iteration.Notifier do
     message = struct!(SMSMessage, params)
 
     @sender.send(message)
+  end
+
+  defp partner_names(user, users) do
+    users
+    |> Enum.reject(&(&1.id == user.id))
+    |> Enum.map(&(&1.name))
   end
 end
