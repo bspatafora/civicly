@@ -1,4 +1,6 @@
 defmodule Strings do
+  @moduledoc false
+
   def reminders do
     """
     Remember:

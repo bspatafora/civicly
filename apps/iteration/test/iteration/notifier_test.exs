@@ -64,13 +64,25 @@ defmodule Iteration.NotifierTest do
     messages = MessageSpy.get(messages)
     assert length(messages) == 6
 
-    assert Enum.member?(messages, %{recipient: user1.phone, text: S.reminders()})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: S.reminders()})
-    assert Enum.member?(messages, %{recipient: user3.phone, text: S.reminders()})
+    assert Enum.member?(messages,
+                        %{recipient: user1.phone,
+                          text: S.reminders()})
+    assert Enum.member?(messages,
+                        %{recipient: user2.phone,
+                          text: S.reminders()})
+    assert Enum.member?(messages,
+                        %{recipient: user3.phone,
+                          text: S.reminders()})
 
-    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start(["User 2", "User 3"], "Question?", "1776")})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start(["User 1", "User 3"], "Question?", "1776")})
-    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start(["User 1", "User 2"], "Question?", "1776")})
+    assert Enum.member?(messages,
+                        %{recipient: user1.phone,
+                          text: S.iteration_start(["User 2", "User 3"], "Question?", "1776")})
+    assert Enum.member?(messages,
+                        %{recipient: user2.phone,
+                          text: S.iteration_start(["User 1", "User 3"], "Question?", "1776")})
+    assert Enum.member?(messages,
+                        %{recipient: user3.phone,
+                          text: S.iteration_start(["User 1", "User 2"], "Question?", "1776")})
   end
 
   test "notify/0 notifies every user", %{bypass: bypass} do
@@ -100,9 +112,17 @@ defmodule Iteration.NotifierTest do
     Notifier.notify("Question?", "1776")
 
     messages = MessageSpy.get(messages)
-    assert Enum.member?(messages, %{recipient: user1.phone, text: S.iteration_start(["User 2"], "Question?", "1776")})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: S.iteration_start(["User 1"], "Question?", "1776")})
-    assert Enum.member?(messages, %{recipient: user3.phone, text: S.iteration_start(["User 4"], "Question?", "1776")})
-    assert Enum.member?(messages, %{recipient: user4.phone, text: S.iteration_start(["User 3"], "Question?", "1776")})
+    assert Enum.member?(messages,
+                        %{recipient: user1.phone,
+                          text: S.iteration_start(["User 2"], "Question?", "1776")})
+    assert Enum.member?(messages,
+                        %{recipient: user2.phone,
+                          text: S.iteration_start(["User 1"], "Question?", "1776")})
+    assert Enum.member?(messages,
+                        %{recipient: user3.phone,
+                          text: S.iteration_start(["User 4"], "Question?", "1776")})
+    assert Enum.member?(messages,
+                        %{recipient: user4.phone,
+                          text: S.iteration_start(["User 3"], "Question?", "1776")})
   end
 end

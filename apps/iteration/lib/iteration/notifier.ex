@@ -10,8 +10,7 @@ defmodule Iteration.Notifier do
 
   def notify(question, year) do
     conversations = @storage.current_conversations()
-
-    conversations |> Enum.each(&(notify_users(&1, question, year)))
+    Enum.each(conversations, &(notify_users(&1, question, year)))
   end
 
   defp notify_users(conversation, question, year) do
@@ -21,11 +20,19 @@ defmodule Iteration.Notifier do
         timestamp: DateTime.utc_now(),
         uuid: UUID.generate()}
 
-    conversation.users
-      |> Enum.each(&(send_message(shared_params, S.reminders(), &1)))
+    users = conversation.users
+    Enum.each(users, &(send_reminders(shared_params, &1)))
+    Enum.each(users, &(send_start(shared_params, &1, users, question, year)))
+  end
 
-    conversation.users
-      |> Enum.each(&(send_message(shared_params, S.iteration_start(partner_names(&1, conversation.users), question, year), &1)))
+  defp send_reminders(shared_params, user) do
+    send_message(shared_params, S.reminders(), user)
+  end
+
+  defp send_start(shared_params, user, users, question, year) do
+    partner_names = partner_names(user, users)
+    message = S.iteration_start(partner_names, question, year)
+    send_message(shared_params, message, user)
   end
 
   defp send_message(shared_params, text, user) do
