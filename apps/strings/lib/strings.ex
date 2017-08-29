@@ -20,8 +20,18 @@ defmodule Strings do
     """
   end
 
+  def help do
+    """
+    Have a question? Email me at ben@civicly.us
+    """
+  end
+
   def stop_request do
     "stop"
+  end
+
+  def help_request do
+    "help"
   end
 
   def command_prefix do

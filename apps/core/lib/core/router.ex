@@ -1,7 +1,7 @@
 defmodule Core.Router do
   @moduledoc false
 
-  alias Core.Handler.{Command, Missive, StopRequest}
+  alias Core.Handler.{Command, HelpRequest, Missive, StopRequest}
   alias Strings, as: S
 
   @ben Application.get_env(:storage, :ben_phone)
@@ -13,6 +13,8 @@ defmodule Core.Router do
         Command.handle(message)
       stop_request?(message) ->
         StopRequest.handle(message)
+      help_request?(message) ->
+        HelpRequest.handle(message)
       true ->
         Missive.handle(message)
     end
@@ -26,6 +28,14 @@ defmodule Core.Router do
   end
 
   defp stop_request?(message) do
-    String.downcase(message.text) == S.stop_request()
+    case_insensitive_match(message.text, S.stop_request())
+  end
+
+  defp help_request?(message) do
+    case_insensitive_match(message.text, S.help_request())
+  end
+
+  defp case_insensitive_match(text, test) do
+    String.downcase(text) == test
   end
 end
