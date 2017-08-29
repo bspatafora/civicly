@@ -21,6 +21,7 @@ defmodule Core.Handler.Command do
     case @storage.insert_user(name, phone) do
       {:ok, user} ->
         Sender.send_command_output(S.user_added(user.name), message)
+        Sender.send_message(S.welcome(), [phone], message)
       {:error, _} ->
         Sender.send_command_output(S.insert_failed(), message)
     end

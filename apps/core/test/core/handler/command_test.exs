@@ -6,6 +6,7 @@ defmodule Core.Handler.CommandTest do
 
   alias Core.Handler.Command
   alias Core.Helpers
+  alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
   alias Storage.User
   alias Strings, as: S
@@ -35,23 +36,50 @@ defmodule Core.Handler.CommandTest do
     assert user.phone == "5555555555"
   end
 
-  test "it notifies the user when an :add command is successful", %{bypass: bypass} do
+  test "it notifies the admin when an :add command is successful", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     message = Helpers.build_message(%{
       sender: @ben,
       text: "#{S.add_command()} Test User 5555555555"})
 
+    {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
-      assert conn.params["recipient"] == @ben
-      assert conn.params["text"] == S.user_added("Test User")
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
       Conn.resp(conn, 200, "")
     end
 
     Command.handle(message)
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 2
+    assert Enum.member?(messages, %{recipient: @ben, text: S.user_added("Test User")})
   end
 
-  test "it notifies the user when an :add command fails", %{bypass: bypass} do
+  test "it welcomes the user when an :add command is successful", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    new_user_phone = "5555555555"
+    message = Helpers.build_message(%{
+      sender: @ben,
+      text: "#{S.add_command()} Test User #{new_user_phone}"})
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    Command.handle(message)
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 2
+    assert Enum.member?(messages,
+                        %{recipient: new_user_phone,
+                          text: S.welcome()})
+  end
+
+  test "it notifies the admin when an :add command fails", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     name = "Test User"
     phone = "5555555555"
@@ -70,7 +98,7 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
   end
 
-  test "it notifies the user when a command is invalid", %{bypass: bypass} do
+  test "it notifies the admin when a command is invalid", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     message = Helpers.build_message(%{
       sender: @ben,

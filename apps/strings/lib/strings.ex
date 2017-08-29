@@ -1,12 +1,22 @@
 defmodule Strings do
   @moduledoc false
 
+  def welcome do
+    """
+    Thank you for joining civicly!
+
+    When the next round starts, you’ll be connected with another American.
+
+    Type HELP for help, or STOP to be removed
+    """
+  end
+
   def reminders do
     """
     Remember:
     1. Attacking evokes defensiveness; better to ask, listen, offer
     2. We can't get better if we're shut
-    3. Fortune favors the bold (and curious)
+    3. Fortune favors the bold and curious
     """
   end
 
@@ -22,7 +32,7 @@ defmodule Strings do
 
   def help do
     """
-    Have a question? Email me at ben@civicly.us
+    Have a question? Visit civicly.us or email me at ben@civicly.us
     """
   end
 
