@@ -67,6 +67,23 @@ defmodule Core.RouterTest do
     Router.handle(message)
   end
 
+  test "it routes a HELP request regardless of capitalization", %{bypass: bypass} do
+    phone = "5555555555"
+    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    message = Helpers.build_message(%{
+      sender: phone,
+      text: "Help"})
+
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      assert conn.params["recipient"] == phone
+      assert conn.params["text"] == S.help()
+      Conn.resp(conn, 200, "")
+    end
+
+    Router.handle(message)
+  end
+
   test "it routes a missive", %{bypass: bypass} do
     user = StorageHelpers.insert_user()
     sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})

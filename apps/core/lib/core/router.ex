@@ -28,14 +28,10 @@ defmodule Core.Router do
   end
 
   defp stop_request?(message) do
-    case_insensitive_match(message.text, S.stop_request())
+    message.text == S.stop_request()
   end
 
   defp help_request?(message) do
-    case_insensitive_match(message.text, S.help_request())
-  end
-
-  defp case_insensitive_match(text, test) do
-    String.downcase(text) == test
+    String.upcase(message.text) == S.help_request()
   end
 end

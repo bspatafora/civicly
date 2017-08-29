@@ -37,11 +37,11 @@ defmodule Strings do
   end
 
   def stop_request do
-    "stop"
+    "STOP"
   end
 
   def help_request do
-    "help"
+    "HELP"
   end
 
   def command_prefix do
