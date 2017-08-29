@@ -10,6 +10,8 @@ defmodule Core.Handler.Command do
     case CommandParser.parse(message.text) do
       {:add, name, phone} ->
         attempt_user_insert(name, phone, message)
+      {:msg, phone, text} ->
+        Sender.send_message(text, [phone], message)
       {:invalid} ->
         Sender.send_command_output(S.invalid_command(), message)
     end

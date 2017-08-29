@@ -42,6 +42,10 @@ defmodule Strings do
     command_prefix() <> "add"
   end
 
+  def msg_command do
+    command_prefix() <> "msg"
+  end
+
   def invalid_command do
     "Invalid command"
   end

@@ -53,9 +53,12 @@ defmodule Core.Handler.CommandTest do
 
   test "it notifies the user when an :add command fails", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    name = "Test User"
+    phone = "5555555555"
+    StorageHelpers.insert_user(%{name: name, phone: phone})
     message = Helpers.build_message(%{
       sender: @ben,
-      text: "#{S.add_command()} Test User 5555555"})
+      text: "#{S.add_command()} #{name} #{phone}"})
 
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
@@ -65,8 +68,6 @@ defmodule Core.Handler.CommandTest do
     end
 
     Command.handle(message)
-
-    assert length(Storage.all(User)) == 0
   end
 
   test "it notifies the user when a command is invalid", %{bypass: bypass} do
@@ -85,5 +86,23 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
 
     assert length(Storage.all(User)) == 0
+  end
+
+  test "it sends the text to the specified phone when a valid :msg command is received", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    phone = "5555555555"
+    text = "Test message"
+    message = Helpers.build_message(%{
+      sender: @ben,
+      text: "#{S.msg_command()} #{phone} #{text}"})
+
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      assert conn.params["recipient"] == phone
+      assert conn.params["text"] == text
+      Conn.resp(conn, 200, "")
+    end
+
+    Command.handle(message)
   end
 end
