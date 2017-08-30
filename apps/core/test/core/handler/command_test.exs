@@ -8,7 +8,7 @@ defmodule Core.Handler.CommandTest do
   alias Core.Helpers
   alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
-  alias Storage.User
+  alias Storage.{Conversation, User}
   alias Strings, as: S
 
   @ben Application.get_env(:storage, :ben_phone)
@@ -132,5 +132,28 @@ defmodule Core.Handler.CommandTest do
     end
 
     Command.handle(message)
+  end
+
+  test "it starts a new iteration when a valid :new command is received", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    StorageHelpers.insert_user(%{phone: @ben})
+    StorageHelpers.insert_user(%{name: "Test User"}).id
+    message = Helpers.build_message(%{
+      sender: @ben,
+      text: "#{S.new_command()} 1 Test question?"})
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    Command.handle(message)
+
+    assert length(Storage.all(Conversation)) == 1
+    iteration_start = S.iteration_start(["Test User"], "Test question?", "1")
+    messages = MessageSpy.get(messages)
+    assert Enum.member?(messages, %{recipient: @ben, text: iteration_start})
   end
 end

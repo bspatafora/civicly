@@ -101,4 +101,44 @@ defmodule Core.CommandParserTest do
 
     assert {:invalid} = CommandParser.parse(text)
   end
+
+  test "it returns the command name and data of a valid :new command" do
+    text = "#{S.new_command()} 123 Test question?"
+
+    {command, number, question} = CommandParser.parse(text)
+
+    assert command == :new
+    assert number == "123"
+    assert question == "Test question?"
+  end
+
+  test "it returns :invalid when a :new command contains no data" do
+    text = "#{S.new_command()}"
+
+    assert {:invalid} = CommandParser.parse(text)
+  end
+
+  test "it returns :invalid when a :new command contains no number" do
+    text = "#{S.new_command()} Test question?"
+
+    assert {:invalid} = CommandParser.parse(text)
+  end
+
+  test "it returns :invalid when a :new command contains no question" do
+    text = "#{S.new_command()} 123"
+
+    assert {:invalid} = CommandParser.parse(text)
+  end
+
+  test "it returns :invalid when a :new command's question has no question mark" do
+    text = "#{S.new_command()} 123 Test question"
+
+    assert {:invalid} = CommandParser.parse(text)
+  end
+
+  test "it returns :invalid when a :new command is reversed" do
+    text = "#{S.new_command()} Test question? 123"
+
+    assert {:invalid} = CommandParser.parse(text)
+  end
 end

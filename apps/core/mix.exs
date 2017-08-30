@@ -19,7 +19,8 @@ defmodule Core.Mixfile do
   end
 
   defp deps do
-    [{:sms_message, in_umbrella: true},
+    [{:iteration, in_umbrella: true},
+     {:sms_message, in_umbrella: true},
      {:sms_sender, in_umbrella: true},
      {:storage, in_umbrella: true},
      {:strings, in_umbrella: true},

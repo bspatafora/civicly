@@ -2,6 +2,7 @@ defmodule Core.Handler.Command do
   @moduledoc false
 
   alias Core.{CommandParser, Sender}
+  alias Iteration.{Assigner, Notifier}
   alias Strings, as: S
 
   @storage Application.get_env(:core, :storage)
@@ -12,6 +13,9 @@ defmodule Core.Handler.Command do
         attempt_user_insert(name, phone, message)
       {:msg, phone, text} ->
         Sender.send_message(text, [phone], message)
+      {:new, number, question} ->
+        Assigner.group_by_twos
+        Notifier.notify(question, number)
       {:invalid} ->
         Sender.send_command_output(S.invalid_command(), message)
     end

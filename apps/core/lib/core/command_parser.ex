@@ -12,6 +12,8 @@ defmodule Core.CommandParser do
         parse_add(data)
       command == S.msg_command() ->
         parse_msg(data)
+      command == S.new_command() ->
+        parse_new(data)
       true ->
         {:invalid}
     end
@@ -38,6 +40,18 @@ defmodule Core.CommandParser do
       text = String.trim_leading(text)
 
       {:msg, phone, text}
+    else
+      {:invalid}
+    end
+  end
+
+  defp parse_new(data) do
+    number_space_question = ~r/^\d+ .+\?$/
+    if String.match?(data, number_space_question) do
+      [number | rest] = String.split(data, " ", parts: 2)
+      question = List.first(rest)
+
+      {:new, number, question}
     else
       {:invalid}
     end
