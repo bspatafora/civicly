@@ -198,17 +198,45 @@ defmodule Storage.ServiceTest do
 
   test "activate/1 sets the conversation's status to active" do
     sms_relay = Helpers.insert_sms_relay()
-    user = Helpers.insert_user()
-    partner = Helpers.insert_user()
     conversation = Helpers.insert_conversation(%{
       active?: false,
       iteration: 1,
       sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
+      users: [Helpers.insert_user().id, Helpers.insert_user().id]})
 
     Service.activate(conversation)
 
     conversation = Storage.get(Conversation, conversation.id)
     assert conversation.active? == true
+  end
+
+  test "inactivate_all_conversations/0 sets the status of all conversations to inactive" do
+    sms_relay = Helpers.insert_sms_relay()
+    conversation1 = Helpers.insert_conversation(%{
+      active?: true,
+      iteration: 1,
+      sms_relay_id: sms_relay.id,
+      users: [Helpers.insert_user().id, Helpers.insert_user().id]})
+    conversation2 = Helpers.insert_conversation(%{
+      active?: true,
+      iteration: 2,
+      sms_relay_id: sms_relay.id,
+      users: [Helpers.insert_user().id, Helpers.insert_user().id]})
+
+    Service.inactivate_all_conversations()
+
+    [conversation1, conversation2]
+      |> Enum.each(&(Storage.get(Conversation, &1.id).active? == false))
+  end
+
+  test "all_phones/0 returns every user phone" do
+    user1 = Helpers.insert_user()
+    user2 = Helpers.insert_user()
+
+    all_phones = Service.all_phones()
+
+    assert length(all_phones) == 2
+    assert Enum.member?(all_phones, user1.phone)
+    assert Enum.member?(all_phones, user2.phone)
   end
 end

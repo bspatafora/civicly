@@ -21,9 +21,7 @@ defmodule Core.CommandParserTest do
   end
 
   test "it returns :invalid when an :add command contains no data" do
-    text = "#{S.add_command()}"
-
-    assert {:invalid} = CommandParser.parse(text)
+    assert {:invalid} = CommandParser.parse(S.add_command())
   end
 
   test "it returns :invalid when an :add command contains no name" do
@@ -67,9 +65,7 @@ defmodule Core.CommandParserTest do
   end
 
   test "it returns :invalid when a :msg command contains no data" do
-    text = "#{S.msg_command()}"
-
-    assert {:invalid} = CommandParser.parse(text)
+    assert {:invalid} = CommandParser.parse(S.msg_command())
   end
 
   test "it returns :invalid when a :msg command contains no phone" do
@@ -113,9 +109,7 @@ defmodule Core.CommandParserTest do
   end
 
   test "it returns :invalid when a :new command contains no data" do
-    text = "#{S.new_command()}"
-
-    assert {:invalid} = CommandParser.parse(text)
+    assert {:invalid} = CommandParser.parse(S.new_command())
   end
 
   test "it returns :invalid when a :new command contains no number" do
@@ -140,5 +134,9 @@ defmodule Core.CommandParserTest do
     text = "#{S.new_command()} Test question? 123"
 
     assert {:invalid} = CommandParser.parse(text)
+  end
+
+  test "it returns the command name of a valid :end command" do
+    assert CommandParser.parse(S.end_command()) == :end
   end
 end

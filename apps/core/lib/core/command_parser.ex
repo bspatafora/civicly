@@ -14,6 +14,8 @@ defmodule Core.CommandParser do
         parse_msg(data)
       command == S.new_command() ->
         parse_new(data)
+      command == S.end_command() ->
+        :end
       true ->
         {:invalid}
     end

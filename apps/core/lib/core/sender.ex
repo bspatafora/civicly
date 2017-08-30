@@ -1,10 +1,16 @@
 defmodule Core.Sender do
   @moduledoc false
 
+  alias Storage.Service
+
   @sender Application.get_env(:core, :sender)
 
   def send_command_output(text, message) do
     send_message(text, [message.sender], message)
+  end
+
+  def send_to_all(text, message) do
+    send_message(text, Service.all_phones(), message)
   end
 
   def send_message(text, recipients, message) do

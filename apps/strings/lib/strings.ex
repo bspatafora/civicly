@@ -30,6 +30,12 @@ defmodule Strings do
     """
   end
 
+  def iteration_end do
+    """
+    The current round has ended. You'll be notified when the next one starts.
+    """
+  end
+
   def between_iterations do
     """
     We're between rounds right now. You'll be notified when the next one starts.
@@ -68,6 +74,10 @@ defmodule Strings do
 
   def new_command do
     command_prefix() <> "new"
+  end
+
+  def end_command do
+    command_prefix() <> "end"
   end
 
   def invalid_command do

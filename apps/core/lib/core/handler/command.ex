@@ -3,6 +3,7 @@ defmodule Core.Handler.Command do
 
   alias Core.{CommandParser, Sender}
   alias Iteration.{Assigner, Notifier}
+  alias Storage.Service
   alias Strings, as: S
 
   @storage Application.get_env(:core, :storage)
@@ -16,6 +17,9 @@ defmodule Core.Handler.Command do
       {:new, number, question} ->
         Assigner.group_by_twos
         Notifier.notify(question, number)
+      :end ->
+        Service.inactivate_all_conversations()
+        Sender.send_to_all(S.iteration_end(), message)
       {:invalid} ->
         Sender.send_command_output(S.invalid_command(), message)
     end

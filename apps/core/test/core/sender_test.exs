@@ -63,4 +63,30 @@ defmodule Core.SenderTest do
 
     Sender.send_command_output(text, message)
   end
+
+  test "send_to_all/2 sends a message with the provided text to every user", %{bypass: bypass} do
+    user1 = StorageHelpers.insert_user()
+    user2 = StorageHelpers.insert_user()
+    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    text = "Test message"
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    message = Helpers.build_message(%{
+      recipient: "5555555555",
+      sms_relay_ip: "localhost",
+      text: text})
+
+    Sender.send_to_all(text, message)
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 2
+    assert Enum.member?(messages, %{recipient: user1.phone, text: text})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: text})
+  end
 end

@@ -137,7 +137,7 @@ defmodule Core.Handler.CommandTest do
   test "it starts a new iteration when a valid :new command is received", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     StorageHelpers.insert_user(%{phone: @ben})
-    StorageHelpers.insert_user(%{name: "Test User"}).id
+    StorageHelpers.insert_user(%{name: "Test User"})
     message = Helpers.build_message(%{
       sender: @ben,
       text: "#{S.new_command()} 1 Test question?"})
@@ -152,8 +152,80 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
 
     assert length(Storage.all(Conversation)) == 1
-    iteration_start = S.iteration_start(["Test User"], "Test question?", "1")
     messages = MessageSpy.get(messages)
+    assert length(messages) == 4
+    iteration_start = S.iteration_start(["Test User"], "Test question?", "1")
     assert Enum.member?(messages, %{recipient: @ben, text: iteration_start})
+  end
+
+  test "it inactivates all conversations when a valid :end command is received", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    user1 = StorageHelpers.insert_user()
+    user2 = StorageHelpers.insert_user()
+    user3 = StorageHelpers.insert_user()
+    user4 = StorageHelpers.insert_user()
+    params1 =
+      %{active: true,
+        iteration: 1,
+        sms_relay: sms_relay,
+        users: [user1.id, user2.id]}
+    conversation1 = StorageHelpers.insert_conversation(params1)
+    params2 =
+      %{active: true,
+        iteration: 2,
+        sms_relay: sms_relay,
+        users: [user3.id, user4.id]}
+    conversation2 = StorageHelpers.insert_conversation(params2)
+    message = Helpers.build_message(%{
+      sender: @ben,
+      text: S.end_command()})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    Command.handle(message)
+
+    conversation1 = Storage.get(Conversation, conversation1.id)
+    assert conversation1.active? == false
+    conversation2 = Storage.get(Conversation, conversation2.id)
+    assert conversation2.active? == false
+  end
+
+  test "it sends an iteration end message to all users when a valid :end command is received", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    user1 = StorageHelpers.insert_user()
+    user2 = StorageHelpers.insert_user()
+    user3 = StorageHelpers.insert_user()
+    user4 = StorageHelpers.insert_user()
+    params1 =
+      %{active: true,
+        iteration: 1,
+        sms_relay: sms_relay,
+        users: [user1.id, user2.id]}
+    StorageHelpers.insert_conversation(params1)
+    params2 =
+      %{active: true,
+        iteration: 2,
+        sms_relay: sms_relay,
+        users: [user3.id, user4.id]}
+    StorageHelpers.insert_conversation(params2)
+    message = Helpers.build_message(%{
+      sender: @ben,
+      text: S.end_command()})
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    Command.handle(message)
+
+    messages = MessageSpy.get(messages)
+    assert_iteration_end = fn(user) ->
+      message = %{recipient: user.phone, text: S.iteration_end()}
+      assert Enum.member?(messages, message)
+    end
+    [user1, user2, user3, user4] |> Enum.each(assert_iteration_end)
   end
 end

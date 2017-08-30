@@ -86,6 +86,15 @@ defmodule Storage.Service do
       |> Storage.update!
   end
 
+  def inactivate_all_conversations do
+    Storage.update_all(Conversation, set: [active?: false])
+  end
+
+  def all_phones do
+    all_users = Storage.all(User)
+    Enum.map(all_users, &(&1.phone))
+  end
+
   defp user(phone) do
     query = from User,
               where: [phone: ^phone],
