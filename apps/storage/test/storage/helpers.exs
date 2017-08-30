@@ -15,7 +15,8 @@ defmodule Storage.Helpers do
 
   def insert_conversation(params \\ %{}) do
     defaults =
-      %{iteration: 1,
+      %{active?: false,
+        iteration: 1,
         sms_relay_id: insert_sms_relay().id,
         users: [insert_user().id, insert_user().id]}
 

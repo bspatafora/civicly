@@ -12,32 +12,45 @@ defmodule Storage.ConversationTest do
 
   defp changeset(params \\ %{}) do
     defaults =
-      %{sms_relay_id: Helpers.insert_sms_relay().id,
-      iteration: 1,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]}
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: Helpers.insert_sms_relay().id,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
 
     Conversation.changeset(%Conversation{}, Map.merge(defaults, params))
   end
 
-  test "a valid conversation has an SMS relay, an iteration, and at least two users" do
+  test "a valid conversation has an iteration, an SMS relay, and at least two users" do
     params =
-      %{sms_relay_id: Helpers.insert_sms_relay().id,
-        iteration: 1,
+      %{iteration: 1,
+        sms_relay_id: Helpers.insert_sms_relay().id,
         users: [Helpers.insert_user().id, Helpers.insert_user().id]}
     changeset = Conversation.changeset(%Conversation{}, params)
 
     assert {:ok, _} = Storage.insert(changeset)
   end
 
-  test "a conversation with no SMS relay is invalid" do
+  test "a conversation can optionally have its status specified" do
     params =
-      %{iteration: 1,
+      %{active?: true,
+        iteration: 1,
+        sms_relay_id: Helpers.insert_sms_relay().id,
         users: [Helpers.insert_user().id, Helpers.insert_user().id]}
     changeset = Conversation.changeset(%Conversation{}, params)
 
-    assert {:error, changeset} = Storage.insert(changeset)
-    assert length(changeset.errors) == 1
-    assert changeset.errors[:sms_relay_id] == {"can't be blank", [validation: :required]}
+    assert {:ok, _} = Storage.insert(changeset)
+  end
+
+  test "a conversation's status defaults to false" do
+    params =
+      %{iteration: 1,
+        sms_relay_id: Helpers.insert_sms_relay().id,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
+    changeset = Conversation.changeset(%Conversation{}, params)
+
+    {:ok, _} = Storage.insert(changeset)
+
+    assert List.first(Storage.all(Conversation)).active? == false
   end
 
   test "a conversation with no iteration is invalid" do
@@ -49,6 +62,17 @@ defmodule Storage.ConversationTest do
     assert {:error, changeset} = Storage.insert(changeset)
     assert length(changeset.errors) == 1
     assert changeset.errors[:iteration] == {"can't be blank", [validation: :required]}
+  end
+
+  test "a conversation with no SMS relay is invalid" do
+    params =
+      %{iteration: 1,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
+    changeset = Conversation.changeset(%Conversation{}, params)
+
+    assert {:error, changeset} = Storage.insert(changeset)
+    assert length(changeset.errors) == 1
+    assert changeset.errors[:sms_relay_id] == {"can't be blank", [validation: :required]}
   end
 
   test "a conversation with no users is invalid" do

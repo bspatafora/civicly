@@ -8,6 +8,7 @@ defmodule Storage.Conversation do
 
   schema "conversations" do
     field :iteration, :integer
+    field :active?, :boolean
     belongs_to :sms_relay, SMSRelay
     many_to_many :users, User, join_through: "conversations_users"
 
@@ -19,12 +20,11 @@ defmodule Storage.Conversation do
   def changeset(conversation, params \\ %{}) do
     users = fetch_users(params)
 
-    fields = [:iteration, :sms_relay_id]
-
+    all_fields = [:iteration, :active?, :sms_relay_id]
     conversation
     |> Storage.preload(:users)
-    |> cast(params, fields)
-    |> validate_required(fields)
+    |> cast(params, all_fields)
+    |> validate_required([:iteration, :sms_relay_id])
     |> validate_number(:iteration, greater_than: 0)
     |> foreign_key_constraint(:sms_relay_id)
     |> put_assoc(:users, users)
