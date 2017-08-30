@@ -70,6 +70,22 @@ defmodule Storage.Service do
     Storage.one(query)
   end
 
+  def active_conversation?(user_phone) do
+    user = user(user_phone)
+    user = Storage.preload(user, :conversations)
+    current_conversation(user).active?
+  end
+
+  def activate(conversation) do
+    params =
+      %{active?: true,
+        users: Enum.map(conversation.users, &(&1.id))}
+
+    conversation
+      |> Conversation.changeset(params)
+      |> Storage.update!
+  end
+
   defp user(phone) do
     query = from User,
               where: [phone: ^phone],

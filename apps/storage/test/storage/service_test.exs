@@ -3,7 +3,7 @@ defmodule Storage.ServiceTest do
 
   alias Ecto.Adapters.SQL.Sandbox
 
-  alias Storage.{Helpers, Message, Service, User}
+  alias Storage.{Conversation, Helpers, Message, Service, User}
 
   def build_message(params) do
     message = %SMSMessage{
@@ -158,5 +158,57 @@ defmodule Storage.ServiceTest do
     Helpers.insert_conversation(%{iteration: 1})
 
     assert Service.current_iteration() == 1
+  end
+
+  test "active_conversation?/1 returns false when the user's current conversation is inactive" do
+    sms_relay = Helpers.insert_sms_relay()
+    user = Helpers.insert_user()
+    partner = Helpers.insert_user()
+    Helpers.insert_conversation(%{
+      active?: true,
+      iteration: 1,
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+    Helpers.insert_conversation(%{
+      active?: false,
+      iteration: 2,
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+
+    assert Service.active_conversation?(user.phone) == false
+  end
+
+  test "active_conversation?/1 returns true when the user's current conversation is active" do
+    sms_relay = Helpers.insert_sms_relay()
+    user = Helpers.insert_user()
+    partner = Helpers.insert_user()
+    Helpers.insert_conversation(%{
+      active?: false,
+      iteration: 1,
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+    Helpers.insert_conversation(%{
+      active?: true,
+      iteration: 2,
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+
+    assert Service.active_conversation?(user.phone) == true
+  end
+
+  test "activate/1 sets the conversation's status to active" do
+    sms_relay = Helpers.insert_sms_relay()
+    user = Helpers.insert_user()
+    partner = Helpers.insert_user()
+    conversation = Helpers.insert_conversation(%{
+      active?: false,
+      iteration: 1,
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+
+    Service.activate(conversation)
+
+    conversation = Storage.get(Conversation, conversation.id)
+    assert conversation.active? == true
   end
 end

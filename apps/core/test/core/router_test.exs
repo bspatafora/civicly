@@ -88,6 +88,7 @@ defmodule Core.RouterTest do
     user = StorageHelpers.insert_user()
     sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     StorageHelpers.insert_conversation(%{
+      active?: true,
       sms_relay_id: sms_relay.id,
       users: [user.id, StorageHelpers.insert_user().id]})
     text = "Test message"

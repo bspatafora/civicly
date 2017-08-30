@@ -25,6 +25,7 @@ defmodule SMSReceiverTest do
     partner = Helpers.insert_user()
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     Helpers.insert_conversation(%{
+      active?: true,
       sms_relay_id: sms_relay.id,
       users: [user.id, partner.id]})
     text = "Test message"

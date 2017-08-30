@@ -5,7 +5,7 @@ defmodule Strings do
     """
     Thank you for joining civicly!
 
-    When the next round starts, you’ll be connected with another American.
+    When the next round starts, you'll be connected with another American.
 
     Type HELP for help, or STOP to be removed
     """
@@ -30,9 +30,19 @@ defmodule Strings do
     """
   end
 
+  def between_iterations do
+    """
+    We're between rounds right now. You'll be notified when the next one starts.
+
+    Type HELP for help
+    """
+  end
+
   def help do
     """
     Have a question? Visit civicly.us or email me at ben@civicly.us
+
+    Type STOP to be removed
     """
   end
 

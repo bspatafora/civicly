@@ -3,6 +3,7 @@ defmodule Iteration.Notifier do
 
   alias Ecto.UUID
 
+  alias Storage.Service
   alias Strings, as: S
 
   @sender Application.get_env(:iteration, :sender)
@@ -19,10 +20,13 @@ defmodule Iteration.Notifier do
         sms_relay_ip: conversation.sms_relay.ip,
         timestamp: DateTime.utc_now(),
         uuid: UUID.generate()}
-
     users = conversation.users
+
     Enum.each(users, &(send_reminders(shared_params, &1)))
+
     Enum.each(users, &(send_start(shared_params, &1, users, number, question)))
+
+    Service.activate(conversation)
   end
 
   defp send_reminders(shared_params, user) do

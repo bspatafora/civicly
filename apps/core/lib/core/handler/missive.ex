@@ -7,11 +7,15 @@ defmodule Core.Handler.Missive do
   @storage Application.get_env(:core, :storage)
 
   def handle(message) do
-    @storage.store_message(message)
+    if @storage.active_conversation?(message.sender) do
+      @storage.store_message(message)
 
-    partner_phones = @storage.partner_phones(message.sender)
-    text = prepend_name_to_text(message)
-    Sender.send_message(text, partner_phones, message)
+      partner_phones = @storage.partner_phones(message.sender)
+      text = prepend_name_to_text(message)
+      Sender.send_message(text, partner_phones, message)
+    else
+      Sender.send_command_output(S.between_iterations(), message)
+    end
   end
 
   defp prepend_name_to_text(message) do

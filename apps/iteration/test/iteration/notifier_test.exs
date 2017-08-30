@@ -6,7 +6,7 @@ defmodule Iteration.NotifierTest do
   alias Plug.Parsers
 
   alias Iteration.Notifier
-  alias Storage.Helpers
+  alias Storage.{Conversation, Helpers}
   alias Strings, as: S
 
   defmodule MessageSpy do
@@ -59,30 +59,29 @@ defmodule Iteration.NotifierTest do
       Conn.resp(conn, 200, "")
     end
 
-    Notifier.notify("Question?", "1776")
+    Notifier.notify("Test question?", "1")
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 6
 
-    assert Enum.member?(messages,
-                        %{recipient: user1.phone,
-                          text: S.reminders()})
-    assert Enum.member?(messages,
-                        %{recipient: user2.phone,
-                          text: S.reminders()})
-    assert Enum.member?(messages,
-                        %{recipient: user3.phone,
-                          text: S.reminders()})
+    assert_reminders = fn(user) ->
+      message = %{recipient: user.phone, text: S.reminders()}
+      assert Enum.member?(messages, message)
+    end
+    [user1, user2, user3] |> Enum.each(assert_reminders)
 
-    assert Enum.member?(messages,
-                        %{recipient: user1.phone,
-                          text: S.iteration_start(["User 2", "User 3"], "Question?", "1776")})
-    assert Enum.member?(messages,
-                        %{recipient: user2.phone,
-                          text: S.iteration_start(["User 1", "User 3"], "Question?", "1776")})
-    assert Enum.member?(messages,
-                        %{recipient: user3.phone,
-                          text: S.iteration_start(["User 1", "User 2"], "Question?", "1776")})
+    user1_iteration_start =
+      %{recipient: user1.phone,
+        text: S.iteration_start(["User 2", "User 3"], "Test question?", "1")}
+    user2_iteration_start =
+      %{recipient: user2.phone,
+        text: S.iteration_start(["User 1", "User 3"], "Test question?", "1")}
+    user3_iteration_start =
+      %{recipient: user3.phone,
+        text: S.iteration_start(["User 1", "User 2"], "Test question?", "1")}
+
+    [user1_iteration_start, user2_iteration_start, user3_iteration_start]
+      |> Enum.each(&(assert Enum.member?(messages, &1)))
   end
 
   test "notify/0 notifies every user", %{bypass: bypass} do
@@ -109,20 +108,36 @@ defmodule Iteration.NotifierTest do
       Conn.resp(conn, 200, "")
     end
 
-    Notifier.notify("Question?", "1776")
+    Notifier.notify("Test question?", "1")
 
     messages = MessageSpy.get(messages)
-    assert Enum.member?(messages,
-                        %{recipient: user1.phone,
-                          text: S.iteration_start(["User 2"], "Question?", "1776")})
-    assert Enum.member?(messages,
-                        %{recipient: user2.phone,
-                          text: S.iteration_start(["User 1"], "Question?", "1776")})
-    assert Enum.member?(messages,
-                        %{recipient: user3.phone,
-                          text: S.iteration_start(["User 4"], "Question?", "1776")})
-    assert Enum.member?(messages,
-                        %{recipient: user4.phone,
-                          text: S.iteration_start(["User 3"], "Question?", "1776")})
+    assert_reminders = fn(user) ->
+      message = %{recipient: user.phone, text: S.reminders()}
+      assert Enum.member?(messages, message)
+    end
+    [user1, user2, user3, user4] |> Enum.each(assert_reminders)
+  end
+
+  test "notify/0 sets each conversation's status to active", %{bypass: bypass} do
+    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
+    params1 =
+      %{active: false,
+        iteration: 1,
+        sms_relay: sms_relay,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
+    conversation1 = Helpers.insert_conversation(params1)
+    params2 =
+      %{active: false,
+        iteration: 1,
+        sms_relay: sms_relay,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
+    conversation2 = Helpers.insert_conversation(params2)
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    Notifier.notify("Test question?", "1")
+
+    [conversation1, conversation2]
+      |> Enum.each(&(assert Storage.get(Conversation, &1.id).active? == true))
   end
 end

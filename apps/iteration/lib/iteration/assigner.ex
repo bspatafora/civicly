@@ -62,7 +62,8 @@ defmodule Iteration.Assigner do
 
   defp insert_conversation(iteration, sms_relay_id, users) do
     params =
-      %{iteration: iteration,
+      %{active: false,
+        iteration: iteration,
         sms_relay_id: sms_relay_id,
         users: Enum.map(users, &(&1.id))}
 
