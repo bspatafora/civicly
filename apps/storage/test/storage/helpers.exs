@@ -3,7 +3,7 @@ defmodule Storage.Helpers do
 
   alias Ecto.UUID
 
-  alias Storage.{Conversation, SMSRelay, User}
+  alias Storage.{Conversation, Message, SMSRelay, User}
 
   def uuid do
     UUID.generate()
@@ -45,6 +45,16 @@ defmodule Storage.Helpers do
 
     {:ok, sms_relay} = Storage.insert(changeset)
     sms_relay
+  end
+
+  def insert_message(params \\ %{}) do
+    defaults =
+      %{text: "Test message",
+        timestamp: DateTime.utc_now,
+        uuid: uuid()}
+    changeset = Message.changeset(%Message{}, Map.merge(defaults, params))
+
+    Storage.insert!(changeset)
   end
 
   def first_sms_relay_ip do

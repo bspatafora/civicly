@@ -106,12 +106,32 @@ defmodule Storage.ServiceTest do
     assert message.sms_relay_ip == first_sms_relay.ip
   end
 
-  test "delete_user/1 deletes the user with the given phone" do
+  test "delete_user/1 deletes the user with the given phone, along with their messages and links to conversations" do
+    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     user = Helpers.insert_user()
+    partner = Helpers.insert_user()
+    conversation = Helpers.insert_conversation(%{
+      active?: true,
+      iteration: 1,
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+    user_message = Helpers.insert_message(%{
+      conversation_id: conversation.id,
+      user_id: user.id})
+    partner_message = Helpers.insert_message(%{
+      conversation_id: conversation.id,
+      user_id: partner.id})
 
     Service.delete_user(user.phone)
 
     assert Storage.get(User, user.id) == nil
+
+    conversation = Storage.get(Conversation, conversation.id)
+    conversation = Storage.preload(conversation, :users)
+    assert length(conversation.users) == 1
+
+    assert Storage.get(Message, user_message.id) == nil
+    assert Storage.get(Message, partner_message.id) != nil
   end
 
   test "name/1 fetches the name of the user by phone" do
