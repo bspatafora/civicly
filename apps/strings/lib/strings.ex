@@ -111,4 +111,8 @@ defmodule Strings do
   def civicly do
     "[civicly]"
   end
+
+  def prepend_civicly(text) do
+    "#{civicly()} #{text}"
+  end
 end

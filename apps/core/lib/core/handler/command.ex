@@ -13,6 +13,7 @@ defmodule Core.Handler.Command do
       {:add, name, phone} ->
         attempt_user_insert(name, phone, message)
       {:msg, phone, text} ->
+        text = S.prepend_civicly(text)
         Sender.send_message(text, [phone], message)
       {:new, number, question} ->
         Assigner.group_by_twos

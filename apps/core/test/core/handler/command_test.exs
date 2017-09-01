@@ -127,7 +127,7 @@ defmodule Core.Handler.CommandTest do
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
       assert conn.params["recipient"] == phone
-      assert conn.params["text"] == text
+      assert conn.params["text"] == S.prepend_civicly(text)
       Conn.resp(conn, 200, "")
     end
 
