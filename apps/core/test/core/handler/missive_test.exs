@@ -69,8 +69,8 @@ defmodule Core.Handler.MissiveTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 2
-    assert Enum.member?(messages, %{recipient: partner1.phone, text: "#{user.name}: #{text}"})
-    assert Enum.member?(messages, %{recipient: partner2.phone, text: "#{user.name}: #{text}"})
+    assert Enum.member?(messages, %{recipient: partner1.phone, text: text})
+    assert Enum.member?(messages, %{recipient: partner2.phone, text: text})
   end
 
   test "it responds with a no partners message when the user is not in an active conversation", %{bypass: bypass} do

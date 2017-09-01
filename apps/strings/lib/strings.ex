@@ -108,10 +108,6 @@ defmodule Strings do
     "#{civicly()} Added #{name}"
   end
 
-  def prepend_name(name, text) do
-    "#{name}: #{text}"
-  end
-
   def civicly do
     "[civicly]"
   end

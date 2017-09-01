@@ -5,7 +5,6 @@ defmodule SMSReceiverTest do
   alias Ecto.Adapters.SQL.Sandbox
   alias Plug.{Conn, Parsers}
   alias Storage.Helpers
-  alias Strings, as: S
 
   def parse_body_params(conn) do
     opts = Parsers.init([parsers: [:json], json_decoder: Poison])
@@ -41,7 +40,7 @@ defmodule SMSReceiverTest do
     Bypass.expect bypass, fn outbound_sms_conn ->
       outbound_sms_conn = parse_body_params(outbound_sms_conn)
       assert outbound_sms_conn.params["recipient"] == partner.phone
-      assert outbound_sms_conn.params["text"] == S.prepend_name(user.name, text)
+      assert outbound_sms_conn.params["text"] == text
       Conn.resp(outbound_sms_conn, 200, "")
     end
 

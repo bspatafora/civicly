@@ -134,14 +134,6 @@ defmodule Storage.ServiceTest do
     assert Storage.get(Message, partner_message.id) != nil
   end
 
-  test "name/1 fetches the name of the user by phone" do
-    user = Helpers.insert_user()
-
-    name = Service.name(user.phone)
-
-    assert name == user.name
-  end
-
   test "first_sms_relay/0 fetches the first SMS relay" do
     Helpers.insert_sms_relay(%{ip: "0.0.0.0"})
     Helpers.insert_sms_relay(%{ip: "localhost"})

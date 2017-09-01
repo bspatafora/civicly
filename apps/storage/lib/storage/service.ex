@@ -50,10 +50,6 @@ defmodule Storage.Service do
     Storage.delete!(user)
   end
 
-  def name(phone) do
-    user(phone).name
-  end
-
   def first_sms_relay do
     SMSRelay |> first |> Storage.one
   end
