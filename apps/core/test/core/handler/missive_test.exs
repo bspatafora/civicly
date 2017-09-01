@@ -116,4 +116,22 @@ defmodule Core.Handler.MissiveTest do
 
     Missive.handle(message)
   end
+
+  test "it responds with a between iterations message when the user has no conversations", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    user = StorageHelpers.insert_user()
+    message = Helpers.build_message(%{
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: "Test message"})
+
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      assert conn.params["recipient"] == user.phone
+      assert conn.params["text"] == S.between_iterations()
+      Conn.resp(conn, 200, "")
+    end
+
+    Missive.handle(message)
+  end
 end

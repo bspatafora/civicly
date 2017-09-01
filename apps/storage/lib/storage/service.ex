@@ -73,7 +73,12 @@ defmodule Storage.Service do
   def active_conversation?(user_phone) do
     user = user(user_phone)
     user = Storage.preload(user, :conversations)
-    current_conversation(user).active?
+
+    if Enum.empty?(user.conversations) do
+      false
+    else
+      current_conversation(user).active?
+    end
   end
 
   def activate(conversation) do

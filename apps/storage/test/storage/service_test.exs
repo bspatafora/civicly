@@ -198,6 +198,13 @@ defmodule Storage.ServiceTest do
     assert Service.active_conversation?(user.phone) == false
   end
 
+  test "active_conversation?/1 returns false when the user has no conversations" do
+    Helpers.insert_sms_relay()
+    user = Helpers.insert_user()
+
+    assert Service.active_conversation?(user.phone) == false
+  end
+
   test "active_conversation?/1 returns true when the user's current conversation is active" do
     sms_relay = Helpers.insert_sms_relay()
     user = Helpers.insert_user()
