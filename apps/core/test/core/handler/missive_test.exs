@@ -8,7 +8,7 @@ defmodule Core.Handler.MissiveTest do
   alias Core.Helpers
   alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
-  alias Storage.{Message, Service}
+  alias Storage.Message
   alias Strings, as: S
 
   setup do
@@ -73,27 +73,7 @@ defmodule Core.Handler.MissiveTest do
     assert Enum.member?(messages, %{recipient: partner2.phone, text: "#{user.name}: #{text}"})
   end
 
-  test "it relays a missive to no one if all of a user's partners have been deleted" do
-    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    user = StorageHelpers.insert_user()
-    partner = StorageHelpers.insert_user()
-    StorageHelpers.insert_conversation(%{
-      active?: true,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
-    message = Helpers.build_message(%{
-      recipient: sms_relay.phone,
-      sender: user.phone,
-      text: "Test message"})
-
-    Service.delete_user(partner.phone)
-
-    # Will fail with a "Bypass got an HTTP request but wasn't
-    # expecting one" error if any message is relayed
-    Missive.handle(message)
-  end
-
-  test "it responds with a between iterations message when the user is not in an active conversation", %{bypass: bypass} do
+  test "it responds with a no partners message when the user is not in an active conversation", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     user = StorageHelpers.insert_user()
     partner1 = StorageHelpers.insert_user()
@@ -110,14 +90,14 @@ defmodule Core.Handler.MissiveTest do
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
       assert conn.params["recipient"] == user.phone
-      assert conn.params["text"] == S.between_iterations()
+      assert conn.params["text"] == S.no_partners()
       Conn.resp(conn, 200, "")
     end
 
     Missive.handle(message)
   end
 
-  test "it responds with a between iterations message when the user has no conversations", %{bypass: bypass} do
+  test "it responds with a no partners message when the user has no conversations", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     user = StorageHelpers.insert_user()
     message = Helpers.build_message(%{
@@ -128,9 +108,34 @@ defmodule Core.Handler.MissiveTest do
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
       assert conn.params["recipient"] == user.phone
-      assert conn.params["text"] == S.between_iterations()
+      assert conn.params["text"] == S.no_partners()
       Conn.resp(conn, 200, "")
     end
+
+    Missive.handle(message)
+  end
+
+  test "it responds with a no partners message when all of the user's partners have been deleted", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+    user = StorageHelpers.insert_user()
+    partner = StorageHelpers.insert_user()
+    StorageHelpers.insert_conversation(%{
+      active?: true,
+      sms_relay_id: sms_relay.id,
+      users: [user.id, partner.id]})
+    message = Helpers.build_message(%{
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: "Test message"})
+
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      assert conn.params["recipient"] == user.phone
+      assert conn.params["text"] == S.no_partners()
+      Conn.resp(conn, 200, "")
+    end
+
+    Storage.delete!(partner)
 
     Missive.handle(message)
   end

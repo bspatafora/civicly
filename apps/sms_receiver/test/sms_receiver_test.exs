@@ -64,6 +64,7 @@ defmodule SMSReceiverTest do
     second_sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     user = Helpers.insert_user()
     Helpers.insert_conversation(%{
+      active?: true,
       sms_relay_id: second_sms_relay.id,
       users: [user.id, Helpers.insert_user().id]})
     data = %{

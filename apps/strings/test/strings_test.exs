@@ -15,7 +15,7 @@ defmodule StringsTest do
      S.reminders,
      iteration_start,
      S.iteration_end,
-     S.between_iterations,
+     S.no_partners,
      S.help,
      S.user_deletion,
      partner_deletion]

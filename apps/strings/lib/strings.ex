@@ -36,9 +36,9 @@ defmodule Strings do
     """
   end
 
-  def between_iterations do
+  def no_partners do
     """
-    #{civicly()} We're in between rounds right now, so there's no one to send that message to! You'll be notified when the next round begins.
+    #{civicly()} There's no one to send that message to right now! You'll be connected with someone when the next round begins.
 
     Type HELP for help
     """
