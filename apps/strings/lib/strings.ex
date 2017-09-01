@@ -7,7 +7,7 @@ defmodule Strings do
 
     When the next round starts, you'll be connected with another American.
 
-    Type HELP for help, or STOP to be removed
+    Type HELP for help, or STOP to delete your account
     """
   end
 
@@ -20,25 +20,25 @@ defmodule Strings do
     """
   end
 
-  def iteration_start(partners, question, year) do
+  def iteration_start(partners, question, number) do
     partners = Enum.join(partners, " and ")
 
     """
-    Welcome to iteration #{year}! You're connected to #{partners}.
+    #{civicly()} Welcome to round #{number}. Say hello to #{partners}!
 
-    Question for you: #{question}
+    Here's a question: #{question}
     """
   end
 
   def iteration_end do
     """
-    The current round has ended. You'll be notified when the next one starts.
+    #{civicly()} The current round has ended. You'll be notified when the next one begins.
     """
   end
 
   def between_iterations do
     """
-    We're between rounds right now. You'll be notified when the next one starts.
+    #{civicly()} We're in between rounds right now, so there's no one to send that message to! You'll be notified when the next round begins.
 
     Type HELP for help
     """
@@ -46,9 +46,25 @@ defmodule Strings do
 
   def help do
     """
-    Have a question? Visit civicly.us or email me at ben@civicly.us
+    #{civicly()} Have a question? Visit civicly.us or email me at ben@civicly.us
 
-    Type STOP to be removed
+    Type STOP to delete your account
+    """
+  end
+
+  def user_deletion do
+    """
+    #{civicly()} Your account has been deleted.
+
+    To rejoin, email me at ben@civicly.us
+    """
+  end
+
+  def partner_deletion(name) do
+    """
+    #{civicly()} #{name} has deleted their account. Maybe it was an accident?
+
+    You'll be connected with a new partner when the next round begins.
     """
   end
 
@@ -81,26 +97,22 @@ defmodule Strings do
   end
 
   def invalid_command do
-    "Invalid command"
+    "#{civicly()} Invalid command"
   end
 
   def insert_failed do
-    "Insert failed"
+    "#{civicly()} Insert failed"
   end
 
   def user_added(name) do
-    "Added #{name}"
-  end
-
-  def user_deletion do
-    "You have been deleted"
-  end
-
-  def partner_deletion(name) do
-    "#{name} has quit"
+    "#{civicly()} Added #{name}"
   end
 
   def prepend_name(name, text) do
     "#{name}: #{text}"
+  end
+
+  def civicly do
+    "[civicly]"
   end
 end
