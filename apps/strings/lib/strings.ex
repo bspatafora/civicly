@@ -20,7 +20,7 @@ defmodule Strings do
     """
   end
 
-  def iteration_start(partners, question, number) do
+  def iteration_start(partners, number, question) do
     partners = Enum.join(partners, " and ")
 
     """
@@ -36,7 +36,7 @@ defmodule Strings do
     """
   end
 
-  def no_partners do
+  def empty_room do
     """
     #{civicly()} There's no one to send that message to right now! You'll be connected with someone when the next round begins.
 

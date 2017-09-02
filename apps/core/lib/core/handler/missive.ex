@@ -15,10 +15,10 @@ defmodule Core.Handler.Missive do
       if Enum.any?(partner_phones) do
         store_and_relay(message, partner_phones)
       else
-        send_no_partners(message)
+        send_empty_room(message)
       end
     else
-      send_no_partners(message)
+      send_empty_room(message)
     end
   end
 
@@ -28,7 +28,7 @@ defmodule Core.Handler.Missive do
     Sender.send_message(message.text, partner_phones, message)
   end
 
-  defp send_no_partners(message) do
-    Sender.send_command_output(S.no_partners(), message)
+  defp send_empty_room(message) do
+    Sender.send_command_output(S.empty_room(), message)
   end
 end

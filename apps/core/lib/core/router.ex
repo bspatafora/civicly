@@ -6,7 +6,6 @@ defmodule Core.Router do
 
   @ben Application.get_env(:storage, :ben_phone)
 
-  @spec handle(SMSMessage.t) :: no_return()
   def handle(message) do
     cond do
       command?(message) ->
@@ -21,10 +20,8 @@ defmodule Core.Router do
   end
 
   defp command?(message) do
-    from_ben? = message.sender == @ben
     command? = String.starts_with?(message.text, S.command_prefix())
-
-    from_ben? && command?
+    message.sender == @ben && command?
   end
 
   defp stop_request?(message) do

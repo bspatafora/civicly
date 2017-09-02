@@ -90,7 +90,7 @@ defmodule Core.Handler.MissiveTest do
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
       assert conn.params["recipient"] == user.phone
-      assert conn.params["text"] == S.no_partners()
+      assert conn.params["text"] == S.empty_room()
       Conn.resp(conn, 200, "")
     end
 
@@ -108,7 +108,7 @@ defmodule Core.Handler.MissiveTest do
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
       assert conn.params["recipient"] == user.phone
-      assert conn.params["text"] == S.no_partners()
+      assert conn.params["text"] == S.empty_room()
       Conn.resp(conn, 200, "")
     end
 
@@ -131,7 +131,7 @@ defmodule Core.Handler.MissiveTest do
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
       assert conn.params["recipient"] == user.phone
-      assert conn.params["text"] == S.no_partners()
+      assert conn.params["text"] == S.empty_room()
       Conn.resp(conn, 200, "")
     end
 

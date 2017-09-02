@@ -7,7 +7,6 @@ defmodule SMSSender do
 
   @headers [{"Content-type", "application/json; charset=UTF-8"}]
 
-  @spec send(SMSMessage.t) :: no_return()
   def send(message) do
     body = Poison.encode!(%{
       recipient: message.recipient,
