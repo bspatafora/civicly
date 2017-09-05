@@ -35,6 +35,10 @@ defmodule SMSSenderTest do
     Helpers.insert_sms_relay(%{ip: "localhost"})
     recipient_phone = "5555555555"
     text = "Test message"
+    message = build_message(
+      %{recipient: recipient_phone,
+        sms_relay_ip: "localhost",
+        text: text})
 
     Bypass.expect bypass, fn conn ->
       conn = parse_body_params(conn)
@@ -48,24 +52,18 @@ defmodule SMSSenderTest do
       Conn.resp(conn, 200, "")
     end
 
-    message = build_message(%{
-      recipient: recipient_phone,
-      sms_relay_ip: "localhost",
-      text: text})
-
     SMSSender.send(message)
   end
 
   test "send/1 refreshes the message's SMS relay IP before sending", %{bypass: bypass} do
     Helpers.insert_sms_relay(%{ip: "localhost"})
-    Helpers.insert_sms_relay(%{ip: "127.0.0.2"})
     recipient_phone = "5555555555"
+    message = build_message(
+      %{recipient: recipient_phone,
+        sms_relay_ip: "127.0.0.2",
+        text: "Test message"})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
-
-    message = build_message(%{
-      recipient: recipient_phone,
-      sms_relay_ip: "127.0.0.2"})
 
     SMSSender.send(message)
   end

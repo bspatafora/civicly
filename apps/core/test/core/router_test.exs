@@ -19,11 +19,11 @@ defmodule Core.RouterTest do
     {:ok, bypass: bypass}
   end
 
-  test "it routes a command", %{bypass: bypass} do
-    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    message = Helpers.build_message(%{
-      sender: @ben,
-      text: "#{S.add_command()} Test User 5555555555"})
+  test "handle/1 routes an admin command", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
+    message = Helpers.build_message(
+      %{sender: @ben,
+        text: "#{S.add_command()} Test User 5555555555"})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
@@ -32,16 +32,17 @@ defmodule Core.RouterTest do
     assert length(Storage.all(User)) == 1
   end
 
-  test "it routes a STOP request", %{bypass: bypass} do
+  test "handle/1 routes a STOP request", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user()
     partner = StorageHelpers.insert_user()
-    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    StorageHelpers.insert_conversation(%{
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
-    message = Helpers.build_message(%{
-      sender: user.phone,
-      text: S.stop_request()})
+    StorageHelpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: S.stop_request()})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
@@ -50,12 +51,12 @@ defmodule Core.RouterTest do
     assert Storage.get(User, user.id) == nil
   end
 
-  test "it routes a HELP request", %{bypass: bypass} do
+  test "handle/1 routes a HELP request", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
     phone = "5555555555"
-    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    message = Helpers.build_message(%{
-      sender: phone,
-      text: S.help_request()})
+    message = Helpers.build_message(
+      %{sender: phone,
+        text: S.help_request()})
 
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
@@ -67,12 +68,12 @@ defmodule Core.RouterTest do
     Router.handle(message)
   end
 
-  test "it routes a HELP request regardless of capitalization", %{bypass: bypass} do
+  test "handle/1 routes a HELP request regardless of capitalization", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
     phone = "5555555555"
-    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    message = Helpers.build_message(%{
-      sender: phone,
-      text: "Help"})
+    message = Helpers.build_message(
+      %{sender: phone,
+        text: "Help"})
 
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
@@ -84,18 +85,17 @@ defmodule Core.RouterTest do
     Router.handle(message)
   end
 
-  test "it routes a missive", %{bypass: bypass} do
+  test "handle/1 routes a missive", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user()
-    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    StorageHelpers.insert_conversation(%{
-      active?: true,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, StorageHelpers.insert_user().id]})
+    StorageHelpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, StorageHelpers.insert_user().id]})
     text = "Test message"
-    message = Helpers.build_message(%{
-      recipient: sms_relay.phone,
-      sender: user.phone,
-      text: text})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: text})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 

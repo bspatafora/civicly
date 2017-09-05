@@ -23,20 +23,22 @@ defmodule Storage.ServiceTest do
   end
 
   test "partner_phones/1 provides the partner phones for a user's current conversation" do
+    sms_relay = Helpers.insert_sms_relay()
     user1 = Helpers.insert_user()
     user2 = Helpers.insert_user()
     user3 = Helpers.insert_user()
     user4 = Helpers.insert_user()
     user5 = Helpers.insert_user()
-    sms_relay = Helpers.insert_sms_relay()
-    Helpers.insert_conversation(%{
-      iteration: 1,
-      sms_relay_id: sms_relay.id,
-      users: [user1.id, user2.id, user3.id]})
-    Helpers.insert_conversation(%{
-      iteration: 2,
-      sms_relay_id: sms_relay.id,
-      users: [user1.id, user4.id, user5.id]})
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user1.id, user2.id, user3.id]})
+    Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 2,
+        sms_relay_id: sms_relay.id,
+        users: [user1.id, user4.id, user5.id]})
 
     partner_phones = Service.partner_phones(user1.phone)
 
@@ -49,25 +51,22 @@ defmodule Storage.ServiceTest do
     sender = Helpers.insert_user()
     recipient = Helpers.insert_user()
     text = "Test message"
-
-    Helpers.insert_conversation(%{
-      iteration: 1,
-      users: [sender.id, recipient.id]})
-
-    current_conversation = Helpers.insert_conversation(%{
-      iteration: 2,
-      users: [sender.id, recipient.id]})
-
-    message = build_message(%{
-      recipient: recipient.phone,
-      sender: sender.phone,
-      text: text})
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        users: [sender.id, recipient.id]})
+    current_conversation = Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 2,
+        users: [sender.id, recipient.id]})
+    message = build_message(
+      %{recipient: recipient.phone,
+        sender: sender.phone,
+        text: text})
 
     Service.store_message(message)
 
-    messages = Storage.all(Message)
-    message = List.first(messages)
-    assert length(messages) == 1
+    message = List.first(Storage.all(Message))
     assert message.conversation_id == current_conversation.id
     assert message.user_id == sender.id
     assert message.text == text
@@ -80,9 +79,7 @@ defmodule Storage.ServiceTest do
 
     {:ok, _} = Service.insert_user(name, phone)
 
-    users = Storage.all(User)
-    user = List.first(users)
-    assert length(users) == 1
+    user = List.first(Storage.all(User))
     assert user.name == name
     assert user.phone == phone
   end
@@ -98,7 +95,6 @@ defmodule Storage.ServiceTest do
 
   test "refresh_sms_relay_ip/1 replaces the message's SMS relay IP with the IP of the first SMS relay in the database" do
     first_sms_relay = Helpers.insert_sms_relay(%{ip: "127.0.0.1"})
-    Helpers.insert_sms_relay(%{ip: "localhost"})
     message = build_message(%{sms_relay_ip: "localhost"})
 
     message = Service.refresh_sms_relay_ip(message)
@@ -107,20 +103,20 @@ defmodule Storage.ServiceTest do
   end
 
   test "delete_user/1 deletes the user with the given phone, along with their messages and links to conversations" do
-    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
+    sms_relay = Helpers.insert_sms_relay()
     user = Helpers.insert_user()
     partner = Helpers.insert_user()
-    conversation = Helpers.insert_conversation(%{
-      active?: true,
-      iteration: 1,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
-    user_message = Helpers.insert_message(%{
-      conversation_id: conversation.id,
-      user_id: user.id})
-    partner_message = Helpers.insert_message(%{
-      conversation_id: conversation.id,
-      user_id: partner.id})
+    conversation = Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    user_message = Helpers.insert_message(
+      %{conversation_id: conversation.id,
+        user_id: user.id})
+    partner_message = Helpers.insert_message(
+      %{conversation_id: conversation.id,
+        user_id: partner.id})
 
     Service.delete_user(user.phone)
 
@@ -176,16 +172,16 @@ defmodule Storage.ServiceTest do
     sms_relay = Helpers.insert_sms_relay()
     user = Helpers.insert_user()
     partner = Helpers.insert_user()
-    Helpers.insert_conversation(%{
-      active?: true,
-      iteration: 1,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
-    Helpers.insert_conversation(%{
-      active?: false,
-      iteration: 2,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
+    Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 2,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
 
     assert Service.active_conversation?(user.phone) == false
   end
@@ -201,27 +197,27 @@ defmodule Storage.ServiceTest do
     sms_relay = Helpers.insert_sms_relay()
     user = Helpers.insert_user()
     partner = Helpers.insert_user()
-    Helpers.insert_conversation(%{
-      active?: false,
-      iteration: 1,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
-    Helpers.insert_conversation(%{
-      active?: true,
-      iteration: 2,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 2,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
 
     assert Service.active_conversation?(user.phone) == true
   end
 
   test "activate/1 sets the conversation's status to active" do
     sms_relay = Helpers.insert_sms_relay()
-    conversation = Helpers.insert_conversation(%{
-      active?: false,
-      iteration: 1,
-      sms_relay_id: sms_relay.id,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]})
+    conversation = Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]})
 
     Service.activate(conversation)
 
@@ -231,16 +227,16 @@ defmodule Storage.ServiceTest do
 
   test "inactivate_all_conversations/0 sets the status of all conversations to inactive" do
     sms_relay = Helpers.insert_sms_relay()
-    conversation1 = Helpers.insert_conversation(%{
-      active?: true,
-      iteration: 1,
-      sms_relay_id: sms_relay.id,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]})
-    conversation2 = Helpers.insert_conversation(%{
-      active?: true,
-      iteration: 2,
-      sms_relay_id: sms_relay.id,
-      users: [Helpers.insert_user().id, Helpers.insert_user().id]})
+    conversation1 = Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]})
+    conversation2 = Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 2,
+        sms_relay_id: sms_relay.id,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]})
 
     Service.inactivate_all_conversations()
 

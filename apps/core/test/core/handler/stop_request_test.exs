@@ -19,16 +19,17 @@ defmodule Core.Handler.StopRequestTest do
     {:ok, bypass: bypass}
   end
 
-  test "it deletes the user who sent the STOP request", %{bypass: bypass} do
+  test "handle/1 deletes the sender", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user()
     partner = StorageHelpers.insert_user()
-    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    StorageHelpers.insert_conversation(%{
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
-    message = Helpers.build_message(%{
-      sender: user.phone,
-      text: "STOP"})
+    StorageHelpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: "STOP"})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
@@ -37,17 +38,18 @@ defmodule Core.Handler.StopRequestTest do
     assert Storage.get(User, user.id) == nil
   end
 
-  test "it notifies the user and their partners", %{bypass: bypass} do
+  test "handle/1 notifies the sender and their partners", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user()
     partner1 = StorageHelpers.insert_user()
     partner2 = StorageHelpers.insert_user()
-    sms_relay = StorageHelpers.insert_sms_relay(%{ip: "localhost"})
-    StorageHelpers.insert_conversation(%{
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner1.id, partner2.id]})
-    message = Helpers.build_message(%{
-      sender: user.phone,
-      text: "STOP"})
+    StorageHelpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner1.id, partner2.id]})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: "STOP"})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -62,9 +64,11 @@ defmodule Core.Handler.StopRequestTest do
     assert length(messages) == 3
     user_deletion_message = %{recipient: user.phone, text: S.user_deletion()}
     partner_deletion_message1 =
-      %{recipient: partner1.phone, text: S.partner_deletion(user.name)}
+      %{recipient: partner1.phone,
+        text: S.partner_deletion(user.name)}
     partner_deletion_message2 =
-      %{recipient: partner2.phone, text: S.partner_deletion(user.name)}
+      %{recipient: partner2.phone,
+        text: S.partner_deletion(user.name)}
     assert Enum.member?(messages, user_deletion_message)
     assert Enum.member?(messages, partner_deletion_message1)
     assert Enum.member?(messages, partner_deletion_message2)

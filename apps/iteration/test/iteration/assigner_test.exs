@@ -13,7 +13,7 @@ defmodule Iteration.AssignerTest do
     Sandbox.mode(Storage, {:shared, self()})
   end
 
-  test "group_by_twos/0 assigns all users to conversations" do
+  test "group_by_twos/0 assigns each user to a two-person conversation" do
     Helpers.insert_sms_relay()
     user_ids =
       [Helpers.insert_user(%{phone: @ben_phone}).id,
@@ -60,8 +60,7 @@ defmodule Iteration.AssignerTest do
     Assigner.group_by_twos()
 
     conversations = Storage.all(Conversation)
-    iterations = conversations
-                 |> Enum.map(&(&1.iteration))
+    iterations = conversations |> Enum.map(&(&1.iteration))
 
     assert Enum.all?(iterations, &(&1 == 1))
   end
@@ -75,8 +74,7 @@ defmodule Iteration.AssignerTest do
     Assigner.group_by_twos()
 
     conversations = Storage.all(Conversation)
-    iterations = conversations
-                 |> Enum.map(&(&1.iteration))
+    iterations = conversations |> Enum.map(&(&1.iteration))
 
     assert List.first(iterations) == 1
     assert List.last(iterations) == 2
@@ -92,13 +90,12 @@ defmodule Iteration.AssignerTest do
     Assigner.group_by_twos()
 
     conversations = Storage.all(Conversation)
-    sms_relay_ids = conversations
-                    |> Enum.map(&(&1.sms_relay_id))
+    sms_relay_ids = conversations |> Enum.map(&(&1.sms_relay_id))
 
     assert Enum.all?(sms_relay_ids, &(&1 == sms_relay.id))
   end
 
-  test "group_by_threes/0 assigns all users to conversations" do
+  test "group_by_threes/0 assigns each user to a three-person conversation" do
     Helpers.insert_sms_relay()
     user_ids =
       [Helpers.insert_user(%{phone: @ben_phone}).id,
@@ -143,7 +140,6 @@ defmodule Iteration.AssignerTest do
   test "group_by_threes/0 includes Ben in two conversations when there are two leftover users" do
     Helpers.insert_sms_relay()
     ben = Helpers.insert_user(%{phone: @ben_phone})
-    ben_id = ben.id
     other_user_ids =
       [Helpers.insert_user().id,
        Helpers.insert_user().id,
@@ -159,7 +155,7 @@ defmodule Iteration.AssignerTest do
                             |> Enum.map(&(&1.id))
 
     assert length(conversations) == 2
-    assert conversation_user_ids -- other_user_ids == [ben_id, ben_id]
+    assert conversation_user_ids -- other_user_ids == [ben.id, ben.id]
     assert Enum.member?(List.first(conversations).users, ben)
     assert Enum.member?(List.last(conversations).users, ben)
   end
@@ -176,8 +172,7 @@ defmodule Iteration.AssignerTest do
     Assigner.group_by_threes()
 
     conversations = Storage.all(Conversation)
-    iterations = conversations
-                 |> Enum.map(&(&1.iteration))
+    iterations = conversations |> Enum.map(&(&1.iteration))
 
     assert Enum.all?(iterations, &(&1 == 1))
   end
@@ -192,8 +187,7 @@ defmodule Iteration.AssignerTest do
     Assigner.group_by_threes()
 
     conversations = Storage.all(Conversation)
-    iterations = conversations
-                 |> Enum.map(&(&1.iteration))
+    iterations = conversations |> Enum.map(&(&1.iteration))
 
     assert List.first(iterations) == 1
     assert List.last(iterations) == 2
@@ -211,8 +205,7 @@ defmodule Iteration.AssignerTest do
     Assigner.group_by_threes()
 
     conversations = Storage.all(Conversation)
-    sms_relay_ids = conversations
-                    |> Enum.map(&(&1.sms_relay_id))
+    sms_relay_ids = conversations |> Enum.map(&(&1.sms_relay_id))
 
     assert Enum.all?(sms_relay_ids, &(&1 == sms_relay.id))
   end

@@ -20,13 +20,13 @@ defmodule SMSReceiverTest do
   end
 
   test "it relays an inbound message to the sender's partner", %{bypass: bypass} do
+    sms_relay = Helpers.insert_sms_relay()
     user = Helpers.insert_user()
     partner = Helpers.insert_user()
-    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
-    Helpers.insert_conversation(%{
-      active?: true,
-      sms_relay_id: sms_relay.id,
-      users: [user.id, partner.id]})
+    Helpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
     text = "Test message"
     inbound_sms_data = %{
       "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
@@ -48,7 +48,7 @@ defmodule SMSReceiverTest do
   end
 
   test "it updates the first SMS relay IP on a heartbeat request" do
-    Helpers.insert_sms_relay()
+    Helpers.insert_sms_relay(%{ip: "localhost"})
     conn = conn(:post, "/sms_relay_heartbeat", %{})
     conn = put_req_header(conn, "content-type", "application/json")
     conn = %{conn | remote_ip: {0, 0, 0, 0}}
@@ -59,16 +59,15 @@ defmodule SMSReceiverTest do
   end
 
   test "it updates the first SMS relay IP on an inbound message request", %{bypass: bypass} do
-    Helpers.insert_sms_relay(%{ip: "localhost"})
-    second_sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
+    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     user = Helpers.insert_user()
     Helpers.insert_conversation(%{
       active?: true,
-      sms_relay_id: second_sms_relay.id,
+      sms_relay_id: sms_relay.id,
       users: [user.id, Helpers.insert_user().id]})
     data = %{
       "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
-      "recipient": second_sms_relay.phone,
+      "recipient": sms_relay.phone,
       "sender": user.phone,
       "text": "Test message",
       "timestamp": "2017-06-14T00:00:00.000Z"}

@@ -17,13 +17,12 @@ defmodule Core.Handler.HelpRequestTest do
     {:ok, bypass: bypass}
   end
 
-  test "it responds to the user with the help text", %{bypass: bypass} do
-    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+  test "handle/1 responds to the sender with the help text", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
     phone = "5555555555"
-
-    message = Helpers.build_message(%{
-      sender: phone,
-      text: "HELP"})
+    message = Helpers.build_message(
+      %{sender: phone,
+        text: "HELP"})
 
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)

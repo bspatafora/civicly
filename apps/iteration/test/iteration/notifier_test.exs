@@ -37,19 +37,21 @@ defmodule Iteration.NotifierTest do
   end
 
   test "notify/0 sends each user dialog reminders and a notification that a new iteration has started", %{bypass: bypass} do
+    sms_relay = Helpers.insert_sms_relay()
     user1 = Helpers.insert_user(%{name: "User 1"})
     user2 = Helpers.insert_user(%{name: "User 2"})
     user3 = Helpers.insert_user(%{name: "User 3"})
-    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     old_conversation_params =
-      %{iteration: 1,
-        sms_relay: sms_relay,
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user1.id, user2.id, user3.id]}
+    current_conversation_params =
+      %{active?: false,
+        iteration: 2,
+        sms_relay_id: sms_relay.id,
         users: [user1.id, user2.id, user3.id]}
     Helpers.insert_conversation(old_conversation_params)
-    current_conversation_params =
-      %{iteration: 2,
-        sms_relay: sms_relay,
-        users: [user1.id, user2.id, user3.id]}
     Helpers.insert_conversation(current_conversation_params)
 
     {:ok, messages} = MessageSpy.new()
@@ -85,21 +87,21 @@ defmodule Iteration.NotifierTest do
   end
 
   test "notify/0 notifies every user", %{bypass: bypass} do
+    sms_relay = Helpers.insert_sms_relay()
     user1 = Helpers.insert_user(%{name: "User 1"})
     user2 = Helpers.insert_user(%{name: "User 2"})
     user3 = Helpers.insert_user(%{name: "User 3"})
     user4 = Helpers.insert_user(%{name: "User 4"})
-    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
-    params1 =
-      %{iteration: 1,
-        sms_relay: sms_relay,
-        users: [user1.id, user2.id]}
-    Helpers.insert_conversation(params1)
-    params2 =
-      %{iteration: 1,
-        sms_relay: sms_relay,
-        users: [user3.id, user4.id]}
-    Helpers.insert_conversation(params2)
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user1.id, user2.id]})
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user3.id, user4.id]})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -118,20 +120,16 @@ defmodule Iteration.NotifierTest do
     [user1, user2, user3, user4] |> Enum.each(assert_reminders)
   end
 
-  test "notify/0 sets each conversation's status to active", %{bypass: bypass} do
-    sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
-    params1 =
-      %{active: false,
+  test "notify/0 activates each conversation in the iteration", %{bypass: bypass} do
+    sms_relay = Helpers.insert_sms_relay()
+    conversation1 = Helpers.insert_conversation(
+      %{active?: false,
         iteration: 1,
-        sms_relay: sms_relay,
-        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
-    conversation1 = Helpers.insert_conversation(params1)
-    params2 =
-      %{active: false,
+        sms_relay_id: sms_relay.id})
+    conversation2 = Helpers.insert_conversation(
+      %{active?: false,
         iteration: 1,
-        sms_relay: sms_relay,
-        users: [Helpers.insert_user().id, Helpers.insert_user().id]}
-    conversation2 = Helpers.insert_conversation(params2)
+        sms_relay_id: sms_relay.id})
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 

@@ -16,11 +16,14 @@ defmodule Core.SenderTest do
     {:ok, bypass: bypass}
   end
 
-  test "send_message/3 sends a message with the provided text to each recipient", %{bypass: bypass} do
-    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+  test "send_message/3 sends a message with the specified text to each recipient", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
     text = "Test message"
     recipient1_phone = "5555555556"
     recipient2_phone = "5555555557"
+    message = Helpers.build_message(
+      %{recipient: "5555555555",
+        text: text})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -28,11 +31,6 @@ defmodule Core.SenderTest do
       MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
       Conn.resp(conn, 200, "")
     end
-
-    message = Helpers.build_message(%{
-      recipient: "5555555555",
-      sms_relay_ip: "localhost",
-      text: text})
 
     Sender.send_message(text, [recipient1_phone, recipient2_phone], message)
 
@@ -42,33 +40,33 @@ defmodule Core.SenderTest do
     assert Enum.member?(messages, %{recipient: recipient2_phone, text: text})
   end
 
-  test "send_command_output/2 sends a message with the provided text to the user who issued the command", %{bypass: bypass} do
-    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
+  test "send_command_output/2 sends a message with the specified text to the original sender", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
     text = "Test message"
-    user_phone = "5555555555"
+    sender_phone = "5555555555"
+    message = Helpers.build_message(
+      %{recipient: "5555555556",
+        sender: sender_phone,
+        text: text})
 
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)
-
-      assert conn.params["recipient"] == user_phone
+      assert conn.params["recipient"] == sender_phone
       assert conn.params["text"] == text
-
       Conn.resp(conn, 200, "")
     end
-
-    message = Helpers.build_message(%{
-      sender: user_phone,
-      sms_relay_ip: "localhost",
-      text: text})
 
     Sender.send_command_output(text, message)
   end
 
-  test "send_to_all/2 sends a message with the provided text to every user", %{bypass: bypass} do
+  test "send_to_all/2 sends a message with the specified text to every user", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
     user1 = StorageHelpers.insert_user()
     user2 = StorageHelpers.insert_user()
-    StorageHelpers.insert_sms_relay(%{ip: "localhost"})
     text = "Test message"
+    message = Helpers.build_message(
+      %{recipient: "5555555555",
+        text: text})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -76,11 +74,6 @@ defmodule Core.SenderTest do
       MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
       Conn.resp(conn, 200, "")
     end
-
-    message = Helpers.build_message(%{
-      recipient: "5555555555",
-      sms_relay_ip: "localhost",
-      text: text})
 
     Sender.send_to_all(text, message)
 
