@@ -68,12 +68,12 @@ defmodule Core.RouterTest do
     Router.handle(message)
   end
 
-  test "handle/1 routes a HELP request regardless of capitalization", %{bypass: bypass} do
+  test "handle/1 routes a HELP request regardless of capitalization or leading/trailing spaces", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     phone = "5555555555"
     message = Helpers.build_message(
       %{sender: phone,
-        text: "Help"})
+        text: " Help "})
 
     Bypass.expect bypass, fn conn ->
       conn = Helpers.parse_body_params(conn)

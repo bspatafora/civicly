@@ -29,6 +29,10 @@ defmodule Core.Router do
   end
 
   defp help_request?(message) do
-    String.upcase(message.text) == S.help_request()
+    text = message.text
+      |> String.trim
+      |> String.upcase
+
+    text == S.help_request()
   end
 end
