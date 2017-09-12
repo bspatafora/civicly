@@ -16,7 +16,7 @@ defmodule SMSSender do
   end
 
   defp attempt_to_send(message, body, attempt) do
-    if attempt == 7 do
+    if attempt > 12 do
       log_send_failure(message)
     else
       message = Service.refresh_sms_relay_ip(message)
