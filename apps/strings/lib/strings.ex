@@ -3,11 +3,9 @@ defmodule Strings do
 
   def welcome do
     """
-    Thank you for joining civicly!
+    Thank you for joining civicly! When the next round starts, you'll get a text connecting you with another American.
 
-    When the next round starts, you'll be connected with another American.
-
-    Type HELP for help, or STOP to delete your account
+    civicly.us/welcome
     """
   end
 
@@ -38,7 +36,7 @@ defmodule Strings do
 
   def empty_room do
     """
-    #{civicly()} There's no one to send that message to right now! You'll be connected with someone when the next round begins.
+    #{civicly()} Sorry, but there's no one to send that message to right now! You'll be connected with someone when the next round begins.
 
     Type HELP for help
     """
@@ -46,9 +44,9 @@ defmodule Strings do
 
   def help do
     """
-    #{civicly()} Have a question? Visit civicly.us or email me at ben@civicly.us
+    #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us
 
-    Type STOP to delete your account
+    Type STOP (in all caps) to immediately and permanently delete your account
     """
   end
 
