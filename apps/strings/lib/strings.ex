@@ -86,6 +86,10 @@ defmodule Strings do
     command_prefix() <> "msg"
   end
 
+  def all_command do
+    command_prefix() <> "all"
+  end
+
   def new_command do
     command_prefix() <> "new"
   end

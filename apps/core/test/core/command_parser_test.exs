@@ -142,7 +142,16 @@ defmodule Core.CommandParserTest do
     assert {:invalid} = CommandParser.parse(text)
   end
 
-  test "parse/1 returns the command name of a valid :end command" do
+  test "parse/1 returns the command name of an :end command" do
     assert CommandParser.parse(S.end_command()) == :end
+  end
+
+  test "parse/1 returns the command name and data of an :all command" do
+    text = "#{S.all_command()} Test message"
+
+    {command, text} = CommandParser.parse(text)
+
+    assert command == :all
+    assert text == "Test message"
   end
 end

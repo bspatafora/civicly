@@ -15,6 +15,9 @@ defmodule Core.Handler.Command do
       {:msg, phone, text} ->
         text = S.prepend_civicly(text)
         Sender.send_message(text, [phone], message)
+      {:all, text} ->
+        text = S.prepend_civicly(text)
+        Sender.send_to_all(text, message)
       {:new, number, question} ->
         Assigner.group_by_twos()
         Notifier.notify(number, question)

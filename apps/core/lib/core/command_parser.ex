@@ -6,16 +6,18 @@ defmodule Core.CommandParser do
   def parse(text) do
     add_command = S.add_command()
     msg_command = S.msg_command()
+    all_command = S.all_command()
     new_command = S.new_command()
     end_command = S.end_command()
 
-    command_space_data = ~r/^:\b(add|msg|new)\b .+$/
-    add_msg_or_new = String.match?(text, command_space_data)
+    command_space_data = ~r/^:\b(add|msg|all|new)\b .+$/
+    add_msg_all_or_new = String.match?(text, command_space_data)
 
-    if add_msg_or_new or text == end_command do
+    if add_msg_all_or_new or text == end_command do
       case split_on_first_space(text) do
         {^add_command, data} -> parse_add(data)
         {^msg_command, data} -> parse_msg(data)
+        {^all_command, data} -> parse_all(data)
         {^new_command, data} -> parse_new(data)
         {^end_command, _} -> :end
       end
@@ -50,6 +52,10 @@ defmodule Core.CommandParser do
     else
       {:invalid}
     end
+  end
+
+  defp parse_all(data) do
+    {:all, data}
   end
 
   defp parse_new(data) do

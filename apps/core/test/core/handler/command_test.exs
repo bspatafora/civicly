@@ -215,4 +215,29 @@ defmodule Core.Handler.CommandTest do
     end
     [user1, user2, user3, user4] |> Enum.each(assert_end_message)
   end
+
+  test "handle/1 forwards the message to all phones when it receives an :all command", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
+    user1 = StorageHelpers.insert_user()
+    user2 = StorageHelpers.insert_user()
+    text = "Test message"
+    message = Helpers.build_message(
+      %{sender: @ben,
+        text: "#{S.all_command()} #{text}"})
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    Command.handle(message)
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 2
+    text = S.prepend_civicly(text)
+    assert Enum.member?(messages, %{recipient: user1.phone, text: text})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: text})
+  end
 end
