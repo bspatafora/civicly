@@ -1,9 +1,10 @@
-defmodule SMSSenderTest do
+defmodule SMSSender.SenderTest do
   use ExUnit.Case
 
   alias Ecto.Adapters.SQL.Sandbox
   alias Plug.{Conn, Parsers}
 
+  alias SMSSender.Sender
   alias Storage.Helpers
 
   def parse_body_params(conn) do
@@ -52,7 +53,7 @@ defmodule SMSSenderTest do
       Conn.resp(conn, 200, "")
     end
 
-    SMSSender.send(message)
+    Sender.send(message)
   end
 
   test "send/1 refreshes the message's SMS relay IP before sending", %{bypass: bypass} do
@@ -65,6 +66,6 @@ defmodule SMSSenderTest do
 
     Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
 
-    SMSSender.send(message)
+    Sender.send(message)
   end
 end
