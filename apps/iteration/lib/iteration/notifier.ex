@@ -22,11 +22,14 @@ defmodule Iteration.Notifier do
         uuid: UUID.generate()}
     users = conversation.users
 
-    Enum.each(users, &(send_reminders(shared_params, &1)))
-
-    Enum.each(users, &(send_start(shared_params, &1, users, number, question)))
+    Enum.each(users, &(notify(shared_params, &1, users, number, question)))
 
     Service.activate(conversation)
+  end
+
+  defp notify(shared_params, user, users, number, question) do
+    send_reminders(shared_params, user)
+    send_start(shared_params, user, users, number, question)
   end
 
   defp send_reminders(shared_params, user) do
