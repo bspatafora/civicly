@@ -134,4 +134,10 @@ defmodule Storage.MessageTest do
 
     assert message.timestamp.time_zone == "Etc/UTC"
   end
+
+  test "a message's text can be longer than 255 characters" do
+    changeset = changeset(%{text: String.duplicate("a", 256)})
+
+    assert {:ok, _} = Storage.insert(changeset)
+  end
 end
