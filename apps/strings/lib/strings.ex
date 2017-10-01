@@ -22,9 +22,9 @@ defmodule Strings do
 
   def question(question) do
     """
-    #{civicly()} Here's a question to get you started: #{question}
+    #{civicly()} Here's a question to get you started. (Don't be afraid to send the first text!)
 
-    (Don't be afraid to send the first text!)
+    #{question}
     """
   end
 
