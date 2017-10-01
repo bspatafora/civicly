@@ -98,6 +98,10 @@ defmodule Strings do
     command_prefix() <> "new"
   end
 
+  def notify_command do
+    command_prefix() <> "notify"
+  end
+
   def end_command do
     command_prefix() <> "end"
   end

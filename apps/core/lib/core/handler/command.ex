@@ -21,6 +21,8 @@ defmodule Core.Handler.Command do
       {:new, question} ->
         Assigner.group_by_twos()
         Notifier.notify(question)
+      {:notify, question} ->
+        Notifier.notify(question)
       :end ->
         Service.inactivate_all_conversations()
         Sender.send_to_all(S.iteration_end(), message)

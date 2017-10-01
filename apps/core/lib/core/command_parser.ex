@@ -8,17 +8,19 @@ defmodule Core.CommandParser do
     msg_command = S.msg_command()
     all_command = S.all_command()
     new_command = S.new_command()
+    notify_command = S.notify_command()
     end_command = S.end_command()
 
-    command_space_data = ~r/^:\b(add|msg|all|new)\b .+$/
-    add_msg_all_or_new = String.match?(text, command_space_data)
+    command_space_data = ~r/^:\b(add|msg|all|new|notify)\b .+$/
+    add_msg_all_new_or_notify = String.match?(text, command_space_data)
 
-    if add_msg_all_or_new or text == end_command do
+    if add_msg_all_new_or_notify or text == end_command do
       case split_on_first_space(text) do
         {^add_command, data} -> parse_add(data)
         {^msg_command, data} -> parse_msg(data)
         {^all_command, data} -> parse_all(data)
         {^new_command, data} -> parse_new(data)
+        {^notify_command, data} -> parse_notify(data)
         {^end_command, _} -> :end
       end
     else
@@ -64,6 +66,17 @@ defmodule Core.CommandParser do
 
     if valid_data do
       {:new, data}
+    else
+      {:invalid}
+    end
+  end
+
+  defp parse_notify(data) do
+    question = ~r/^.+\?$/
+    valid_data = String.match?(data, question)
+
+    if valid_data do
+      {:notify, data}
     else
       {:invalid}
     end

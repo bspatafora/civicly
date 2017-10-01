@@ -118,7 +118,28 @@ defmodule Core.CommandParserTest do
   end
 
   test "parse/1 returns :invalid when a :new command's question has no question mark" do
-    text = "#{S.new_command()} 123 Test question"
+    text = "#{S.new_command()} Test question"
+
+    assert {:invalid} = CommandParser.parse(text)
+  end
+
+  test "parse/1 returns the command name and data of a valid :notify command" do
+    text = "#{S.notify_command()} Test question?"
+
+    {command, question} = CommandParser.parse(text)
+
+    assert command == :notify
+    assert question == "Test question?"
+  end
+
+  test "parse/1 returns :invalid when a :notify command contains no data" do
+    text = S.notify_command()
+
+    assert {:invalid} = CommandParser.parse(text)
+  end
+
+  test "parse/1 returns :invalid when a :notify command's question has no question mark" do
+    text = "#{S.notify_command()} Test question"
 
     assert {:invalid} = CommandParser.parse(text)
   end
