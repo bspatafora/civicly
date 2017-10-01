@@ -152,7 +152,7 @@ defmodule Core.Handler.CommandTest do
     assert length(Storage.all(Conversation)) == 1
     messages = MessageSpy.get(messages)
     assert length(messages) == 4
-    start_message = S.iteration_start(["Test User"], "1", "Test question?")
+    start_message = S.iteration_start(["Test User"])
     assert Enum.member?(messages, %{recipient: @ben, text: start_message})
   end
 

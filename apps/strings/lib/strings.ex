@@ -3,34 +3,36 @@ defmodule Strings do
 
   def welcome do
     """
-    Thank you for joining civicly! When the next round starts, you'll get a text connecting you with another American.
+    #{civicly()} Thank you for joining civicly! Go to civicly.us/welcome to get started.
 
-    civicly.us/welcome
+    Type HELP for help
     """
   end
 
-  def reminders do
-    """
-    Remember:
-    1. Attacking evokes defensiveness; better to ask, listen, offer
-    2. We can't get better if we're shut
-    3. Fortune favors the bold and curious
-    """
-  end
-
-  def iteration_start(partners, number, question) do
+  # Accepts multiple partners, but currently written for one
+  def iteration_start(partners) do
     partners = Enum.join(partners, " and ")
 
     """
-    #{civicly()} Welcome to round #{number}. Say hello to #{partners}!
+    #{civicly()} Now connected to #{partners}, your compatriot for the next 4 days.
 
-    Here's a question: #{question}
+    Remember: We're all here because we believe in civic, civil conversation!
+    """
+  end
+
+  def question(question) do
+    """
+    #{civicly()} Here's a question to get you started: #{question}
+
+    (Don't be afraid to send the first text!)
     """
   end
 
   def iteration_end do
     """
-    #{civicly()} The current round has ended. You'll be notified when the next one begins.
+    #{civicly()} The round has ended. You'll get a text when the next one begins.
+
+    Type HELP for help
     """
   end
 
@@ -44,9 +46,9 @@ defmodule Strings do
 
   def help do
     """
-    #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us
+    #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us.
 
-    Type STOP (in all caps) to immediately and permanently delete your account
+    Type STOP (in all caps) to immediately and permanently delete your account.
     """
   end
 
@@ -54,15 +56,17 @@ defmodule Strings do
     """
     #{civicly()} Your account has been deleted.
 
-    To rejoin, email me at ben@civicly.us
+    Email ben@civicly.us to rejoin.
     """
   end
 
   def partner_deletion(name) do
     """
-    #{civicly()} #{name} has deleted their account. Maybe it was an accident?
+    #{civicly()} #{name}'s account has been deleted.
 
-    You'll be connected with a new partner when the next round begins.
+    You'll be connected to someone new when the next round begins.
+
+    Type HELP for help
     """
   end
 

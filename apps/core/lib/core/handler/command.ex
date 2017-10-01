@@ -18,9 +18,9 @@ defmodule Core.Handler.Command do
       {:all, text} ->
         text = S.prepend_civicly(text)
         Sender.send_to_all(text, message)
-      {:new, number, question} ->
+      {:new, question} ->
         Assigner.group_by_twos()
-        Notifier.notify(number, question)
+        Notifier.notify(question)
       :end ->
         Service.inactivate_all_conversations()
         Sender.send_to_all(S.iteration_end(), message)

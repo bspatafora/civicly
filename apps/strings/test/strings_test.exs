@@ -6,14 +6,14 @@ defmodule StringsTest do
   def messages do
     name = String.duplicate("a", 15)
     question = String.duplicate("a", 65)
-    number = "1234"
 
-    iteration_start = S.iteration_start([name], question, number)
+    iteration_start = S.iteration_start([name])
+    question = S.question(question)
     partner_deletion = S.partner_deletion(name)
 
     [S.welcome,
-     S.reminders,
      iteration_start,
+     question,
      S.iteration_end,
      S.empty_room,
      S.help,

@@ -59,12 +59,11 @@ defmodule Core.CommandParser do
   end
 
   defp parse_new(data) do
-    number_space_question = ~r/^\d+ .+\?$/
-    valid_data = String.match?(data, number_space_question)
+    question = ~r/^.+\?$/
+    valid_data = String.match?(data, question)
 
     if valid_data do
-      {number, question} = split_on_first_space(data)
-      {:new, number, question}
+      {:new, data}
     else
       {:invalid}
     end
