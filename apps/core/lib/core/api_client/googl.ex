@@ -24,7 +24,8 @@ defmodule Core.APIClient.Googl do
   end
 
   defp remove_protocol(url) do
-    {_, rest} = String.split_at(url, 7)
-    rest
+    url
+      |> String.replace_prefix("http://", "")
+      |> String.replace_prefix("https://", "")
   end
 end
