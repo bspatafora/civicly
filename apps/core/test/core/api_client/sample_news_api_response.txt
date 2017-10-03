@@ -1,0 +1,31 @@
+{
+  "status": "ok",
+  "source": "associated-press",
+  "sortBy": "top",
+  "articles": [
+    {
+      "author": "SALLY HO and REGINA GARCIA CANO",
+      "title": "Sniper in high-rise hotel kills at least 58 in Las Vegas",
+      "description": "LAS VEGAS (AP) — A gunman perched on the 32nd floor of a Las Vegas hotel-casino unleashed a hail of bullets on an outdoor country music festival below, killing at least 58 people as tens of thousands of concertgoers screamed and ran for their lives, officials said Monday. It was the deadliest mass shooting in modern U.S. history. At least 515 others were injured in the Sunday night attack, authorities said.",
+      "url": "https://apnews.com/4eeaef2efced49698855d13830de3327",
+      "urlToImage": "https://storage.googleapis.com/afs-prod/media/media:7ee12d5a36444bd9b976ef98d2f920dc/3000.jpeg",
+      "publishedAt": "2017-10-02T17:25:00Z"
+    },
+    {
+      "author": "KEN RITTER",
+      "title": "Las Vegas shooter was retired, had no criminal record",
+      "description": "MESQUITE, Nev. (AP) — The man who killed 58 people and injured at least 515 others at a Las Vegas concert was a retiree with no criminal history in the Nevada county where he lived, police said Monday. The brother of Stephen Paddock, 64, said he's \"completely dumbfounded\" by the shooting at a country music concert Sunday night, the deadliest in modern U.S. history. Eric Paddock told the Orlando Sentinel newspaper that he can't understand what happened.",
+      "url": "https://apnews.com/b40154840ba744ceb1e002fad32bd5c9",
+      "urlToImage": "https://storage.googleapis.com/afs-prod/media/media:738381998e6f4d599d6e1c150d0dc09c/3000.jpeg",
+      "publishedAt": "2017-10-02T16:54:32Z"
+    },
+    {
+      "author": "RENATA BRITO",
+      "title": "Rio's kids are dying in the crossfire of a wave of violence",
+      "description": "RIO DE JANEIRO (AP) — An unborn boy's lung is punctured by a bullet while still in the womb. A 2-year-old girl is shot in the head while playing at a restaurant. Three stray bullets cut down a 13-year-old during physical education class at school. Rio de Janeiro, which just a year ago was in the global spotlight as it hosted the Summer Olympics, has always struggled with crime. But amid a national economic crisis that has exacerbated deep problems of inequality, this city famous for both its glamorous beaches and its sprawling slums is experiencing a wave of violence that's the worst in a decade.",
+      "url": "https://apnews.com/efeeaed43c7b47a0ae4a6cfaa8b871e2",
+      "urlToImage": "https://storage.googleapis.com/afs-prod/media/media:2dadbcbb18f1442887f2d2d155a4b142/2532.jpeg",
+      "publishedAt": "2017-10-02T17:16:31Z"
+    }
+  ]
+}

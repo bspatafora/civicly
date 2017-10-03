@@ -24,6 +24,8 @@ defmodule Core.Mixfile do
      {:sms_sender, in_umbrella: true},
      {:storage, in_umbrella: true},
      {:strings, in_umbrella: true},
-     {:bypass, "~> 0.6", only: :test}]
+     {:bypass, "~> 0.6", only: :test},
+     {:httpoison, "~> 0.11.0"},
+     {:poison, "~> 2.2"}]
   end
 end
