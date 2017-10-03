@@ -28,7 +28,9 @@ defmodule Core.Handler.Command do
         Service.inactivate_all_conversations()
         Sender.send_to_all(S.iteration_end(), message)
       :news ->
-        send_news(message)
+        Sender.send_to_all(news(), message)
+      :news? ->
+        Sender.send_command_output(news(), message)
       {:invalid} ->
         Sender.send_command_output(S.invalid_command(), message)
     end
@@ -44,9 +46,8 @@ defmodule Core.Handler.Command do
     end
   end
 
-  defp send_news(message) do
+  defp news do
     {title, url} = NewsAPI.ap_top
-    text = S.news(title, Googl.shorten(url))
-    Sender.send_to_all(text, message)
+    S.news(title, Googl.shorten(url))
   end
 end

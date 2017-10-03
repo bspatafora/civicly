@@ -114,6 +114,10 @@ defmodule Strings do
     command_prefix() <> "news"
   end
 
+  def news_check_command do
+    command_prefix() <> "news?"
+  end
+
   def invalid_command do
     "#{civicly()} Invalid command"
   end

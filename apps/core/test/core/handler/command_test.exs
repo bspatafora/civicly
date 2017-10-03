@@ -305,4 +305,36 @@ defmodule Core.Handler.CommandTest do
     end
     [user1, user2] |> Enum.each(assert_news_message)
   end
+
+  test "handle/1 sends out the AP top story to Ben when it receives a valid :news? command", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
+    StorageHelpers.insert_user()
+    message = Helpers.build_message(
+      %{sender: @ben,
+        text: S.news_check_command()})
+
+    Bypass.expect bypass, "GET", "/v1/articles", fn conn ->
+      response_body = File.read!("test/core/api_client/news_api_response.txt")
+      Conn.resp(conn, 200, response_body)
+    end
+
+    Bypass.expect bypass, "POST", "/urlshortener/v1/url", fn conn ->
+      response_body = File.read!("test/core/api_client/googl_response.txt")
+      Conn.resp(conn, 200, response_body)
+    end
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    Command.handle(message)
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 1
+    news_text = "[civicly] (AP) Sniper in high-rise hotel kills at least 58 in Las Vegas goo.gl/fbsS"
+    assert Enum.member?(messages, %{recipient: @ben, text: news_text})
+  end
 end
