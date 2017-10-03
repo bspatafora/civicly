@@ -2,6 +2,7 @@ defmodule Core.Handler.Command do
   @moduledoc false
 
   alias Core.{CommandParser, Sender}
+  alias Core.APIClient.{Googl, NewsAPI}
   alias Iteration.{Assigner, Notifier}
   alias Storage.Service
   alias Strings, as: S
@@ -26,6 +27,8 @@ defmodule Core.Handler.Command do
       :end ->
         Service.inactivate_all_conversations()
         Sender.send_to_all(S.iteration_end(), message)
+      :news ->
+        send_news(message)
       {:invalid} ->
         Sender.send_command_output(S.invalid_command(), message)
     end
@@ -39,5 +42,11 @@ defmodule Core.Handler.Command do
       {:error, _} ->
         Sender.send_command_output(S.insert_failed(), message)
     end
+  end
+
+  defp send_news(message) do
+    {title, url} = NewsAPI.ap_top
+    text = S.news(title, Googl.shorten(url))
+    Sender.send_to_all(text, message)
   end
 end

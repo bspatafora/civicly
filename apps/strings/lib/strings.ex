@@ -70,6 +70,10 @@ defmodule Strings do
     """
   end
 
+  def news(title, url) do
+    "#{civicly()} (AP) #{title} #{url}"
+  end
+
   def stop_request do
     "STOP"
   end
@@ -104,6 +108,10 @@ defmodule Strings do
 
   def end_command do
     command_prefix() <> "end"
+  end
+
+  def news_command do
+    command_prefix() <> "news"
   end
 
   def invalid_command do

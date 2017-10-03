@@ -156,4 +156,8 @@ defmodule Core.CommandParserTest do
     assert command == :all
     assert text == "Test message"
   end
+
+  test "parse/1 returns the command name of a :news command" do
+    assert CommandParser.parse(S.news_command()) == :news
+  end
 end

@@ -12,8 +12,7 @@ defmodule Core.APIClient.NewsAPITest do
 
   test "ap_top/0 returns the title and URL of the current top AP story", %{bypass: bypass} do
     Bypass.expect bypass, "GET", "/v1/articles", fn conn ->
-      sample_response_file = "test/core/api_client/sample_news_api_response.txt"
-      {:ok, response_body} = File.read(sample_response_file)
+      response_body = File.read!("test/core/api_client/news_api_response.txt")
       Conn.resp(conn, 200, response_body)
     end
 
