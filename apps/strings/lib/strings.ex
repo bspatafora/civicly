@@ -95,6 +95,10 @@ defmodule Strings do
   end
 
   def all_command do
+    command_prefix() <> "all!"
+  end
+
+  def all_active_command do
     command_prefix() <> "all"
   end
 

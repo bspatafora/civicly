@@ -189,6 +189,7 @@ defmodule Iteration.AssignerTest do
     conversations = Storage.all(Conversation)
     iterations = conversations |> Enum.map(&(&1.iteration))
 
+    iterations = Enum.sort(iterations)
     assert List.first(iterations) == 1
     assert List.last(iterations) == 2
   end

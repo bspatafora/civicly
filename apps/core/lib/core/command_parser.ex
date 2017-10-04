@@ -7,18 +7,20 @@ defmodule Core.CommandParser do
     add_command = S.add_command()
     msg_command = S.msg_command()
     all_command = S.all_command()
+    all_active_command = S.all_active_command()
     new_command = S.new_command()
     notify_command = S.notify_command()
     end_command = S.end_command()
     news_command = S.news_command()
     news_check_command = S.news_check_command()
 
-    command = ~r/(^:\b(add|msg|all|new|notify)\b .+$|^:(end|news|news\?)$)/
+    command = ~r/(^:(add|msg|all!|all|new|notify) .+$|^:(end|news|news\?)$)/
     if String.match?(text, command) do
       case split_on_first_space(text) do
         {^add_command, data} -> parse_add(data)
         {^msg_command, data} -> parse_msg(data)
         {^all_command, data} -> {:all, data}
+        {^all_active_command, data} -> {:all_active, data}
         {^new_command, data} -> parse_new(data)
         {^notify_command, data} -> parse_notify(data)
         {^end_command, _} -> :end

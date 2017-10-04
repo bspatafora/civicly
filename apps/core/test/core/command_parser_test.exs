@@ -157,11 +157,20 @@ defmodule Core.CommandParserTest do
     assert text == "Test message"
   end
 
+  test "parse/1 returns the command name and data of an :all_active command" do
+    text = "#{S.all_active_command()} Test message"
+
+    {command, text} = CommandParser.parse(text)
+
+    assert command == :all_active
+    assert text == "Test message"
+  end
+
   test "parse/1 returns the command name of a :news command" do
     assert CommandParser.parse(S.news_command()) == :news
   end
 
-  test "parse/1 returns the command name of a :news? command" do
+  test "parse/1 returns the command name of a :news_check command" do
     assert CommandParser.parse(S.news_check_command()) == :news?
   end
 end

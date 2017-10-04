@@ -96,6 +96,13 @@ defmodule Storage.Service do
     Enum.map(all_users, &(&1.phone))
   end
 
+  def active_phones do
+    current_conversations()
+      |> Enum.map(&(&1.users))
+      |> List.flatten
+      |> Enum.map(&(&1.phone))
+  end
+
   defp user(phone) do
     query = from User,
               where: [phone: ^phone],

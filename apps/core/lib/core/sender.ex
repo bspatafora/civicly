@@ -13,6 +13,10 @@ defmodule Core.Sender do
     send_message(text, Service.all_phones(), message)
   end
 
+  def send_to_active(text, message) do
+    send_message(text, Service.active_phones(), message)
+  end
+
   def send_message(text, recipients, message) do
     message = Map.merge(message, %{sender: message.recipient, text: text})
 
