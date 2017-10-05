@@ -1,7 +1,8 @@
 use Mix.Config
 
 config :logger,
-  backends: [{LoggerJSONFileBackend, :json}]
+  backends: [{LoggerJSONFileBackend, :json}],
+  level: :info
 
 config :logger, :json,
   level: :info,
