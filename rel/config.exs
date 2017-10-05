@@ -32,7 +32,8 @@ release :civically do
     :plug,
     :httpoison,
     :ecto,
-    :postgrex
+    :postgrex,
+    :uuid
   ]
 end
 
