@@ -34,6 +34,10 @@ defmodule SMSReceiver do
     send_resp(conn, 200, "")
   end
 
+  match _ do
+    send_resp(conn, 404, "")
+  end
+
   defp update_sms_relay_ip(conn) do
     Service.update_first_sms_relay_ip(remote_ip(conn))
   end

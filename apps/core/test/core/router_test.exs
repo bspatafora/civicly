@@ -103,4 +103,14 @@ defmodule Core.RouterTest do
 
     assert length(Storage.all(Message)) == 1
   end
+
+  test "handle/1 does not throw an error when the sender is not in the database" do
+    StorageHelpers.insert_sms_relay()
+    phone = "5555555555"
+    message = Helpers.build_message(
+      %{sender: phone,
+        text: "Test message"})
+
+    Router.handle(message)
+  end
 end

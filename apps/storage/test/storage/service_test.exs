@@ -282,4 +282,14 @@ defmodule Storage.ServiceTest do
     assert !Enum.member?(active_phones, inactive_user2.phone)
     assert !Enum.member?(active_phones, new_user.phone)
   end
+
+  test "user?/1 returns true if a user with the given phone exists" do
+    user = Helpers.insert_user()
+
+    assert Service.user?(user.phone) == true
+  end
+
+  test "user?/1 returns false if no user with the given phone exists" do
+    assert Service.user?("5555555555") == false
+  end
 end

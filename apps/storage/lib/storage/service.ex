@@ -103,12 +103,14 @@ defmodule Storage.Service do
       |> Enum.map(&(&1.phone))
   end
 
-  defp user(phone) do
-    query = from User,
-              where: [phone: ^phone],
-              limit: 1
+  def user?(phone) do
+    !!user(phone)
+  end
 
-    Storage.one!(query)
+  defp user(phone) do
+    query = from User, where: [phone: ^phone]
+
+    Storage.one(query)
   end
 
   defp current_conversation(user) do
