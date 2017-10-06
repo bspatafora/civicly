@@ -28,8 +28,8 @@ defmodule Core.Handler.Command do
       {:notify, question} ->
         Notifier.notify(question)
       :end ->
-        Service.inactivate_all_conversations()
         Sender.send_to_active(S.iteration_end(), message)
+        Service.inactivate_all_conversations()
       :news ->
         Sender.send_to_active(news(), message)
       :news? ->

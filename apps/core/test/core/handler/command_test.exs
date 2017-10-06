@@ -208,7 +208,7 @@ defmodule Core.Handler.CommandTest do
       |> Enum.each(&(assert &1.active? == false))
   end
 
-  test "handle/1 notifies every active user that the iteration has ended when it receives a valid :end command", %{bypass: bypass} do
+  test "handle/1 notifies all users in active conversations that the iteration has ended when it receives a valid :end command", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay()
     user1 = StorageHelpers.insert_user()
     user2 = StorageHelpers.insert_user()
@@ -239,7 +239,7 @@ defmodule Core.Handler.CommandTest do
     assert !Enum.member?(messages, %{recipient: inactive.phone, text: text})
   end
 
-  test "handle/1 forwards the message to all phones when it receives an :all! command", %{bypass: bypass} do
+  test "handle/1 forwards the message to all users when it receives an :all! command", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     user1 = StorageHelpers.insert_user()
     user2 = StorageHelpers.insert_user()
@@ -264,7 +264,7 @@ defmodule Core.Handler.CommandTest do
     assert Enum.member?(messages, %{recipient: user2.phone, text: text})
   end
 
-  test "handle/1 forwards the message to all active phones when it receives an :all_active command", %{bypass: bypass} do
+  test "handle/1 forwards the message to all users in active conversations when it receives an :all_active command", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay()
     user1 = StorageHelpers.insert_user()
     user2 = StorageHelpers.insert_user()
@@ -296,7 +296,7 @@ defmodule Core.Handler.CommandTest do
     assert !Enum.member?(messages, %{recipient: inactive.phone, text: text})
   end
 
-  test "handle/1 sends out the AP top story when it receives a valid :news command", %{bypass: bypass} do
+  test "handle/1 sends out the AP top story to all users in active conversations when it receives a valid :news command", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay()
     user1 = StorageHelpers.insert_user()
     user2 = StorageHelpers.insert_user()

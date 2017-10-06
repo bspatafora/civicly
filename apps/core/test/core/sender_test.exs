@@ -35,7 +35,7 @@ defmodule Core.SenderTest do
     Sender.send_command_output(text, message)
   end
 
-  test "send_to_all/2 sends a message with the specified text to every user", %{bypass: bypass} do
+  test "send_to_all/2 sends a message with the specified text to all users", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     user1 = StorageHelpers.insert_user()
     user2 = StorageHelpers.insert_user()
@@ -59,7 +59,7 @@ defmodule Core.SenderTest do
     assert Enum.member?(messages, %{recipient: user2.phone, text: text})
   end
 
-  test "send_to_active/2 sends a message with the specified text to every user active in the current iteration", %{bypass: bypass} do
+  test "send_to_active/2 sends a message with the specified text to all users in active conversations", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay()
     user1 = StorageHelpers.insert_user()
     user2 = StorageHelpers.insert_user()

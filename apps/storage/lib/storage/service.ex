@@ -97,14 +97,24 @@ defmodule Storage.Service do
   end
 
   def active_phones do
-    current_conversations()
+    active_conversations()
       |> Enum.map(&(&1.users))
       |> List.flatten
       |> Enum.map(&(&1.phone))
   end
 
   def user?(phone) do
-    !!user(phone)
+    case user(phone) do
+      nil -> false
+      _ -> true
+    end
+  end
+
+  defp active_conversations do
+    query = from Conversation,
+              where: [active?: true],
+              preload: [:users]
+    Storage.all(query)
   end
 
   defp user(phone) do
