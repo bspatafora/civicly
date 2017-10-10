@@ -56,7 +56,7 @@ defmodule Strings do
     """
     #{civicly()} Your account has been deleted.
 
-    Email ben@civicly.us to rejoin.
+    Please send one last text with your reason(s) for leaving. It would be a huge help.
     """
   end
 
