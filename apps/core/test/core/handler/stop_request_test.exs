@@ -38,7 +38,7 @@ defmodule Core.Handler.StopRequestTest do
     assert Storage.get(User, user.id) == nil
   end
 
-  test "handle/1 notifies the sender and their partners", %{bypass: bypass} do
+  test "handle/1 notifies the sender and their partners when the sender is in an active conversation", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user()
     partner1 = StorageHelpers.insert_user()
@@ -72,5 +72,33 @@ defmodule Core.Handler.StopRequestTest do
     assert Enum.member?(messages, user_deletion_message)
     assert Enum.member?(messages, partner_deletion_message1)
     assert Enum.member?(messages, partner_deletion_message2)
+  end
+
+  test "handle/1 notifies just the sender when the sender is not in an active conversation", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
+    user = StorageHelpers.insert_user()
+    partner1 = StorageHelpers.insert_user()
+    partner2 = StorageHelpers.insert_user()
+    StorageHelpers.insert_conversation(
+      %{active?: false,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner1.id, partner2.id]})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: "STOP"})
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    StopRequest.handle(message)
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 1
+    user_deletion_message = %{recipient: user.phone, text: S.user_deletion()}
+    assert Enum.member?(messages, user_deletion_message)
   end
 end
