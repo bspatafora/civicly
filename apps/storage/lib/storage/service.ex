@@ -8,16 +8,13 @@ defmodule Storage.Service do
 
   def partner_phones(user_phone) do
     user = user(user_phone)
-    user = Storage.preload(user, :conversations)
     conversation = current_conversation(user)
-    conversation = Storage.preload(conversation, :users)
 
     partner_phones(conversation, user.id)
   end
 
   def store_message(message) do
     user = user(message.sender)
-    user = Storage.preload(user, :conversations)
     conversation = current_conversation(user)
 
     params =
@@ -78,13 +75,14 @@ defmodule Storage.Service do
   end
 
   def activate(conversation) do
-    params =
-      %{active?: true,
-        users: Enum.map(conversation.users, &(&1.id))}
+    set_status(conversation, true)
+  end
 
-    conversation
-      |> Conversation.changeset(params)
-      |> Storage.update!
+  def inactivate_current_conversation(phone) do
+    user = user(phone)
+    conversation = current_conversation(user)
+
+    set_status(conversation, false)
   end
 
   def inactivate_all_conversations do
@@ -110,6 +108,17 @@ defmodule Storage.Service do
     end
   end
 
+  defp set_status(conversation, status) do
+    conversation = Storage.preload(conversation, :users)
+    params =
+      %{active?: status,
+        users: Enum.map(conversation.users, &(&1.id))}
+
+    conversation
+      |> Conversation.changeset(params)
+      |> Storage.update!
+  end
+
   defp active_conversations do
     query = from Conversation,
               where: [active?: true],
@@ -124,10 +133,12 @@ defmodule Storage.Service do
   end
 
   defp current_conversation(user) do
+    user = Storage.preload(user, :conversations)
     Enum.max_by(user.conversations, &(&1.iteration))
   end
 
   defp partner_phones(conversation, user_id) do
+    conversation = Storage.preload(conversation, :users)
     conversation.users
       |> Enum.reject(&(&1.id == user_id))
       |> Enum.map(&(&1.phone))

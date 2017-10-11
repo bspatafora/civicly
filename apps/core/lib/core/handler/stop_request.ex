@@ -7,15 +7,18 @@ defmodule Core.Handler.StopRequest do
   @storage Application.get_env(:core, :storage)
 
   def handle(message) do
-    if @storage.active_conversation?(message.sender) do
-      partner_phones = @storage.partner_phones(message.sender)
+    sender = message.sender
 
-      user = delete_user(message.sender)
+    if @storage.active_conversation?(sender) do
+      partner_phones = @storage.partner_phones(sender)
+
+      inactivate_conversation(sender, partner_phones)
+      user = delete_user(sender)
 
       send_partner_deletion(message, user.name, partner_phones)
       send_user_deletion(message)
     else
-      delete_user(message.sender)
+      delete_user(sender)
 
       send_user_deletion(message)
     end
@@ -23,6 +26,14 @@ defmodule Core.Handler.StopRequest do
 
   defp delete_user(phone) do
     @storage.delete_user(phone)
+  end
+
+  defp inactivate_conversation(phone, partner_phones) do
+    two_person_conversation? = length(partner_phones) == 1
+
+    if two_person_conversation? do
+      @storage.inactivate_current_conversation(phone)
+    end
   end
 
   defp send_partner_deletion(message, name, partner_phones) do

@@ -8,7 +8,7 @@ defmodule Core.Handler.StopRequestTest do
   alias Core.Helpers
   alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
-  alias Storage.User
+  alias Storage.{Conversation, User}
   alias Strings, as: S
 
   setup do
@@ -36,6 +36,47 @@ defmodule Core.Handler.StopRequestTest do
     StopRequest.handle(message)
 
     assert Storage.get(User, user.id) == nil
+  end
+
+  test "handle/1 inactivates the conversation when there is only one partner left", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
+    user = StorageHelpers.insert_user()
+    partner = StorageHelpers.insert_user()
+    conversation = StorageHelpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: "STOP"})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    StopRequest.handle(message)
+
+    conversation = Storage.get(Conversation, conversation.id)
+    assert conversation.active? == false
+  end
+
+  test "handle/1 does not inactivate the conversation when there is more than one partner left", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
+    user = StorageHelpers.insert_user()
+    partner1 = StorageHelpers.insert_user()
+    partner2 = StorageHelpers.insert_user()
+    conversation = StorageHelpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner1.id, partner2.id]})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: "STOP"})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    StopRequest.handle(message)
+
+    conversation = Storage.get(Conversation, conversation.id)
+    assert conversation.active? == true
   end
 
   test "handle/1 notifies the sender and their partners when the sender is in an active conversation", %{bypass: bypass} do
