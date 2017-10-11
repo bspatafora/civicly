@@ -51,6 +51,25 @@ defmodule Core.RouterTest do
     assert Storage.get(User, user.id) == nil
   end
 
+  test "handle/1 routes a STOP request regardless of capitalization or leading/trailing spaces", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
+    user = StorageHelpers.insert_user()
+    partner = StorageHelpers.insert_user()
+    StorageHelpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: " Stop "})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    Router.handle(message)
+
+    assert Storage.get(User, user.id) == nil
+  end
+
   test "handle/1 routes a HELP request", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     phone = "5555555555"

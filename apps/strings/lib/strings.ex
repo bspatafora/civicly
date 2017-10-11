@@ -48,7 +48,7 @@ defmodule Strings do
     """
     #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us.
 
-    Type STOP (in all caps) to immediately and permanently delete your account.
+    Type STOP to immediately and permanently delete your account.
     """
   end
 

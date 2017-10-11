@@ -30,15 +30,17 @@ defmodule Core.Router do
   end
 
   defp stop_request?(message) do
-    message.text == S.stop_request()
+    normalize(message.text) == S.stop_request()
   end
 
   defp help_request?(message) do
-    text = message.text
+    normalize(message.text) == S.help_request()
+  end
+
+  defp normalize(string) do
+    string
       |> String.trim
       |> String.upcase
-
-    text == S.help_request()
   end
 
   defp user?(message) do
