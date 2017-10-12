@@ -4,7 +4,7 @@ defmodule Iteration.AssignerTest do
   alias Ecto.Adapters.SQL.Sandbox
 
   alias Iteration.Assigner
-  alias Storage.{Conversation, Helpers}
+  alias Storage.{Conversation, Helpers, User}
 
   @ben_phone Application.get_env(:storage, :ben_phone)
 
@@ -154,6 +154,7 @@ defmodule Iteration.AssignerTest do
                             |> Enum.flat_map(&(&1.users))
                             |> Enum.map(&(&1.id))
 
+    ben = Storage.get(User, ben.id)
     assert length(conversations) == 2
     assert conversation_user_ids -- other_user_ids == [ben.id, ben.id]
     assert Enum.member?(List.first(conversations).users, ben)

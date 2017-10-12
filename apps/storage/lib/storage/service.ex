@@ -108,6 +108,25 @@ defmodule Storage.Service do
     end
   end
 
+  def in_tutorial?(phone) do
+    tutorial_step(phone) != 0
+  end
+
+  def tutorial_step(phone) do
+    user(phone).tutorial_step
+  end
+
+  def advance_tutorial(phone) do
+    user = user(phone)
+    step = user.tutorial_step
+
+    new_step = if step == 5, do: 0, else: step + 1
+
+    user
+      |> User.changeset(%{tutorial_step: new_step})
+      |> Storage.update!
+  end
+
   defp set_status(conversation, status) do
     conversation = Storage.preload(conversation, :users)
     params =

@@ -2,6 +2,7 @@ defmodule StringsTest do
   use ExUnit.Case
 
   alias Strings, as: S
+  alias Strings.Tutorial, as: T
 
   def messages do
     name = String.duplicate("a", 15)
@@ -11,14 +12,37 @@ defmodule StringsTest do
     question = S.question(question)
     partner_deletion = S.partner_deletion(name)
 
-    [S.welcome,
-     iteration_start,
-     question,
-     S.iteration_end,
-     S.empty_room,
-     S.help,
-     S.user_deletion,
-     partner_deletion]
+    strings =
+      [S.welcome,
+       iteration_start,
+       question,
+       S.iteration_end,
+       S.empty_room,
+       S.help,
+       S.user_deletion,
+       partner_deletion]
+
+    tutorial_strings =
+      [T.step_1_part_1,
+       T.step_1_part_2,
+       T.step_1_key,
+       T.step_1_error,
+       T.step_2_part_1,
+       T.step_2_part_2,
+       T.step_2_key,
+       T.step_2_error,
+       T.step_3,
+       T.step_4_part_1,
+       T.step_4_part_2,
+       T.step_4_key,
+       T.step_4_error,
+       T.step_5,
+       T.step_5_key,
+       T.step_5_error,
+       T.complete_part_1,
+       T.complete_part_2]
+
+    Enum.concat(strings, tutorial_strings)
   end
 
   test "no message is longer than 160 characters" do

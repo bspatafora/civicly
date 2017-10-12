@@ -8,6 +8,7 @@ defmodule Core.RouterTest do
   alias Storage.Helpers, as: StorageHelpers
   alias Storage.{Message, User}
   alias Strings, as: S
+  alias Strings.Tutorial, as: T
 
   @ben Application.get_env(:storage, :ben_phone)
 
@@ -102,6 +103,21 @@ defmodule Core.RouterTest do
     end
 
     Router.handle(message)
+  end
+
+  test "handle/1 routes a tutorial message", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
+    user = StorageHelpers.insert_user(%{tutorial_step: 1})
+    message = Helpers.build_message(
+      %{sender: user.phone,
+        text: T.step_1_key})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    Router.handle(message)
+
+    user = Storage.get(User, user.id)
+    assert user.tutorial_step == 2
   end
 
   test "handle/1 routes a missive", %{bypass: bypass} do

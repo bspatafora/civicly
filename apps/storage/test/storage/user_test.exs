@@ -23,6 +23,14 @@ defmodule Storage.UserTest do
     assert changeset.valid?
   end
 
+  test "a user's tutorial step defaults to 0" do
+    params = %{name: "Test User", phone: "5555555555"}
+    changeset = User.changeset(%User{}, params)
+    {:ok, user} = Storage.insert(changeset)
+
+    assert user.tutorial_step == 0
+  end
+
   test "a user with no name is invalid" do
     params = %{phone: "5555555555"}
     changeset = User.changeset(%User{}, params)

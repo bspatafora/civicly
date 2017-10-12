@@ -292,4 +292,38 @@ defmodule Storage.ServiceTest do
   test "user?/1 returns false if no user with the given phone exists" do
     assert Service.user?("5555555555") == false
   end
+
+  test "in_tutorial?/1 returns true if the user has not yet completed the tutorial" do
+    user = Helpers.insert_user(%{tutorial_step: 1})
+
+    assert Service.in_tutorial?(user.phone) == true
+  end
+
+  test "in_tutorial?/1 returns false if the user has completed the tutorial" do
+    user = Helpers.insert_user(%{tutorial_step: 0})
+
+    assert Service.in_tutorial?(user.phone) == false
+  end
+
+  test "tutorial_step/1 returns the tutorial step the user is on" do
+    user = Helpers.insert_user(%{tutorial_step: 1})
+
+    assert Service.tutorial_step(user.phone) == 1
+  end
+
+  test "advance_tutorial/1 increments the tutorial step the user is on" do
+    user = Helpers.insert_user(%{tutorial_step: 1})
+
+    Service.advance_tutorial(user.phone)
+
+    assert Service.tutorial_step(user.phone) == 2
+  end
+
+  test "advance_tutorial/1 sets the user's tutorial step to 0 when their current step is 5" do
+    user = Helpers.insert_user(%{tutorial_step: 5})
+
+    Service.advance_tutorial(user.phone)
+
+    assert Service.tutorial_step(user.phone) == 0
+  end
 end
