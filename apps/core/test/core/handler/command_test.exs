@@ -35,6 +35,7 @@ defmodule Core.Handler.CommandTest do
     user = List.first(Storage.all(User))
     assert user.name == "Test User"
     assert user.phone == "5555555555"
+    assert user.tutorial_step == 1
   end
 
   test "handle/1 notifies the sender when an :add command succeeds", %{bypass: bypass} do

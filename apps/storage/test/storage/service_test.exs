@@ -82,6 +82,7 @@ defmodule Storage.ServiceTest do
     user = List.first(Storage.all(User))
     assert user.name == name
     assert user.phone == phone
+    assert user.tutorial_step == 1
   end
 
   test "update_first_sms_relay_ip/1 updates the IP of the first SMS relay in the database" do

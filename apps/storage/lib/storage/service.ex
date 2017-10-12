@@ -28,7 +28,10 @@ defmodule Storage.Service do
   end
 
   def insert_user(name, phone) do
-    params = %{name: name, phone: phone}
+    params =
+      %{name: name,
+        phone: phone,
+        tutorial_step: 1}
     changeset = User.changeset(%User{}, params)
 
     Storage.insert(changeset)
