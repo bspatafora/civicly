@@ -24,7 +24,7 @@ defmodule Core.Handler.TutorialTest do
     user = StorageHelpers.insert_user(%{tutorial_step: 1})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "Next "})
+        text: "#{String.upcase(S.step_1_key)} "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -74,7 +74,7 @@ defmodule Core.Handler.TutorialTest do
     user = StorageHelpers.insert_user(%{tutorial_step: 2})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "Ready "})
+        text: "#{String.upcase(S.step_2_key)} "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -89,8 +89,10 @@ defmodule Core.Handler.TutorialTest do
     assert user.tutorial_step == 3
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 1
-    assert List.first(messages).text == S.step_3()
+    assert length(messages) == 2
+    texts = messages |> Enum.map(&(&1.text))
+    assert Enum.member?(texts, S.step_3_part_1())
+    assert Enum.member?(texts, S.step_3_part_2(user.name))
   end
 
   test "handle/1 sends an error message and does not advance a user from step 2 when they send something other than the key", %{bypass: bypass} do
@@ -148,7 +150,7 @@ defmodule Core.Handler.TutorialTest do
     user = StorageHelpers.insert_user(%{tutorial_step: 4})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "I agree "})
+        text: "#{String.upcase(S.step_4_key)} "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -196,7 +198,7 @@ defmodule Core.Handler.TutorialTest do
     user = StorageHelpers.insert_user(%{tutorial_step: 5})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "I agree "})
+        text: "#{String.upcase(S.step_5_key)} "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->

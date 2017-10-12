@@ -127,6 +127,10 @@ defmodule Storage.Service do
       |> Storage.update!
   end
 
+  def name(phone) do
+    user(phone).name
+  end
+
   defp set_status(conversation, status) do
     conversation = Storage.preload(conversation, :users)
     params =

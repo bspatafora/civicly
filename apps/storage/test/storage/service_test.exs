@@ -326,4 +326,10 @@ defmodule Storage.ServiceTest do
 
     assert Service.tutorial_step(user.phone) == 0
   end
+
+  test "name/1 returns the user's name" do
+    user = Helpers.insert_user()
+
+    assert Service.name(user.phone) == user.name
+  end
 end

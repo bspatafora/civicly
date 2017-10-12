@@ -31,8 +31,10 @@ defmodule Core.Handler.Tutorial do
   end
 
   defp handle_step_2(message) do
+    name = @storage.name(message.sender)
+
     key = S.step_2_key()
-    next_step_messages = [S.step_3()]
+    next_step_messages = [S.step_3_part_1(), S.step_3_part_2(name)]
     error = S.step_2_error()
 
     handle_branch(message, key, next_step_messages, error)
