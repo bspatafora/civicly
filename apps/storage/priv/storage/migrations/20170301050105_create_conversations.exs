@@ -13,7 +13,6 @@ defmodule Storage.Migrations.CreateConversations do
 
     execute "CREATE EXTENSION IF NOT EXISTS btree_gist"
     execute "CREATE EXTENSION IF NOT EXISTS intarray"
-    create constraint(:conversations, :one_per_user_per_time, exclude: "gist (start WITH =, (array[left_user_id, right_user_id]) WITH &&)")
 
     create constraint(:conversations, :different_user_ids, check: "left_user_id <> right_user_id")
 

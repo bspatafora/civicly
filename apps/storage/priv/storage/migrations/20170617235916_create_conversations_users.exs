@@ -2,8 +2,6 @@ defmodule Storage.Migrations.CreateConversationsUsers do
   use Ecto.Migration
 
   def change do
-    drop constraint(:conversations, :one_per_user_per_time)
-
     alter table(:conversations) do
       remove :left_user_id
       remove :right_user_id
