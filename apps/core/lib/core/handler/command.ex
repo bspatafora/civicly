@@ -6,6 +6,7 @@ defmodule Core.Handler.Command do
   alias Iteration.{Assigner, Notifier}
   alias Storage.Service
   alias Strings, as: S
+  alias Strings.Tutorial, as: T
 
   @storage Application.get_env(:core, :storage)
 
@@ -43,7 +44,8 @@ defmodule Core.Handler.Command do
     case @storage.insert_user(name, phone) do
       {:ok, user} ->
         Sender.send_command_output(S.user_added(user.name), message)
-        Sender.send_message(S.welcome(), [phone], message)
+        Sender.send_message(T.step_1_part_1(user.name), [phone], message)
+        Sender.send_message(T.step_1_part_2(), [phone], message)
       {:error, _} ->
         Sender.send_command_output(S.insert_failed(), message)
     end

@@ -10,6 +10,7 @@ defmodule Core.Handler.CommandTest do
   alias Storage.Helpers, as: StorageHelpers
   alias Storage.{Conversation, User}
   alias Strings, as: S
+  alias Strings.Tutorial, as: T
 
   @ben Application.get_env(:storage, :ben_phone)
 
@@ -52,7 +53,7 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 2
+    assert length(messages) == 3
     user_added_message = %{recipient: @ben, text: S.user_added("Test User")}
     assert Enum.member?(messages, user_added_message)
   end
@@ -60,9 +61,10 @@ defmodule Core.Handler.CommandTest do
   test "handle/1 welcomes the new user when an :add command succeeds", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     new_user_phone = "5555555555"
+    name = "Test User"
     message = Helpers.build_message(
       %{sender: @ben,
-        text: "#{S.add_command()} Test User #{new_user_phone}"})
+        text: "#{S.add_command()} #{name} #{new_user_phone}"})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -74,9 +76,11 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 2
-    welcome_message = %{recipient: new_user_phone, text: S.welcome()}
-    assert Enum.member?(messages, welcome_message)
+    assert length(messages) == 3
+    message1 = %{recipient: new_user_phone, text: T.step_1_part_1(name)}
+    message2 = %{recipient: new_user_phone, text: T.step_1_part_2()}
+    assert Enum.member?(messages, message1)
+    assert Enum.member?(messages, message2)
   end
 
   test "handle/1 notifies the sender when an :add command fails", %{bypass: bypass} do

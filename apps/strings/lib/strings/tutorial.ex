@@ -1,8 +1,8 @@
 defmodule Strings.Tutorial do
   @moduledoc false
 
-  def step_1_part_1 do
-    "Welcome to civicly, Ben S! Thanks for joining your fellow Americans in making a habit out of civic conversation."
+  def step_1_part_1(name) do
+    "Welcome to civicly, #{name}! Thanks for joining your fellow Americans in making a habit out of civic conversation."
   end
 
   def step_1_part_2 do

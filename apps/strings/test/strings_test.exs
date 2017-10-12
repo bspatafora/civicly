@@ -13,8 +13,7 @@ defmodule StringsTest do
     partner_deletion = S.partner_deletion(name)
 
     strings =
-      [S.welcome,
-       iteration_start,
+      [iteration_start,
        question,
        S.iteration_end,
        S.empty_room,
@@ -22,8 +21,10 @@ defmodule StringsTest do
        S.user_deletion,
        partner_deletion]
 
+    step_1_part_1 = T.step_1_part_1(name)
+
     tutorial_strings =
-      [T.step_1_part_1,
+      [step_1_part_1,
        T.step_1_part_2,
        T.step_1_key,
        T.step_1_error,

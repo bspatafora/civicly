@@ -1,14 +1,6 @@
 defmodule Strings do
   @moduledoc false
 
-  def welcome do
-    """
-    #{civicly()} Thank you for joining civicly! Go to civicly.us/welcome to get started.
-
-    Type HELP for help
-    """
-  end
-
   # Accepts multiple partners, but currently written for one
   def iteration_start(partners) do
     partners = Enum.join(partners, " and ")
