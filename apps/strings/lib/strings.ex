@@ -24,7 +24,7 @@ defmodule Strings do
     """
     #{civicly()} The round has ended. You'll get a text when the next one begins.
 
-    Type HELP for help
+    Type "Help" for help
     """
   end
 
@@ -32,7 +32,7 @@ defmodule Strings do
     """
     #{civicly()} Sorry, but there's no one to send that message to right now! You'll be connected with someone when the next round begins.
 
-    Type HELP for help
+    Type "Help" for help
     """
   end
 
@@ -40,7 +40,7 @@ defmodule Strings do
     """
     #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us.
 
-    Type STOP to immediately and permanently delete your account.
+    Type "Stop" to immediately and permanently delete your account.
     """
   end
 
@@ -48,7 +48,7 @@ defmodule Strings do
     """
     #{civicly()} Your account has been deleted.
 
-    Please send one last text with your reason(s) for leaving. It would be a huge help.
+    Please send one last text with your reason for leaving. It would be a huge help.
     """
   end
 
@@ -58,7 +58,7 @@ defmodule Strings do
 
     You'll be connected to someone new when the next round begins.
 
-    Type HELP for help
+    Type "Help" for help
     """
   end
 

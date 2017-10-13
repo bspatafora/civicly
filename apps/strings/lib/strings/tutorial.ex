@@ -107,7 +107,7 @@ defmodule Strings.Tutorial do
     """
     #{S.civicly()} In the meantime, civicly.us/tips will help you get the most out of civicly. We're happy you're here!
 
-    Text Help at any time for help.
+    Text "Help" at any time for help.
     """
   end
 end
