@@ -134,6 +134,12 @@ defmodule Storage.Service do
     user(phone).name
   end
 
+  def active_users do
+    query = from User, where: [tutorial_step: 0]
+
+    Storage.all(query)
+  end
+
   defp set_status(conversation, status) do
     conversation = Storage.preload(conversation, :users)
     params =

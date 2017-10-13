@@ -1,7 +1,7 @@
 defmodule Iteration.Assigner do
   @moduledoc false
 
-  alias Storage.{Conversation, Service, User}
+  alias Storage.{Conversation, Service}
 
   def group_by_threes do
     group(&by_threes/2)
@@ -14,7 +14,7 @@ defmodule Iteration.Assigner do
   defp group(group_strategy) do
     iteration = next_iteration()
     sms_relay_id = sms_relay_id()
-    {flexible_user, users} = pop_ben(Storage.all(User))
+    {flexible_user, users} = pop_ben(Service.active_users())
 
     users
     |> Enum.shuffle

@@ -333,4 +333,16 @@ defmodule Storage.ServiceTest do
 
     assert Service.name(user.phone) == user.name
   end
+
+  test "active_users/0 returns all users who have completed the tutorial" do
+    Helpers.insert_user(%{tutorial_step: 0})
+    Helpers.insert_user(%{tutorial_step: 0})
+    Helpers.insert_user(%{tutorial_step: 1})
+    Helpers.insert_user(%{tutorial_step: 2})
+    Helpers.insert_user(%{tutorial_step: 3})
+    Helpers.insert_user(%{tutorial_step: 4})
+    Helpers.insert_user(%{tutorial_step: 5})
+
+    assert length(Service.active_users) == 2
+  end
 end

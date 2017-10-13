@@ -13,9 +13,11 @@ defmodule Iteration.AssignerTest do
     Sandbox.mode(Storage, {:shared, self()})
   end
 
-  test "group_by_twos/0 assigns each user to a two-person conversation" do
+  test "group_by_twos/0 assigns each active user to a two-person conversation" do
     Helpers.insert_sms_relay()
-    user_ids =
+    Helpers.insert_user(%{tutorial_step: 1})
+    Helpers.insert_user(%{tutorial_step: 1})
+    active_user_ids =
       [Helpers.insert_user(%{phone: @ben_phone}).id,
        Helpers.insert_user().id,
        Helpers.insert_user().id,
@@ -30,7 +32,7 @@ defmodule Iteration.AssignerTest do
                             |> Enum.map(&(&1.id))
 
     assert length(conversations) == 2
-    assert user_ids -- conversation_user_ids == []
+    assert active_user_ids -- conversation_user_ids == []
   end
 
   test "group_by_twos/0 leaves Ben out when there is an odd number of users" do
@@ -95,9 +97,12 @@ defmodule Iteration.AssignerTest do
     assert Enum.all?(sms_relay_ids, &(&1 == sms_relay.id))
   end
 
-  test "group_by_threes/0 assigns each user to a three-person conversation" do
+  test "group_by_threes/0 assigns each active user to a three-person conversation" do
     Helpers.insert_sms_relay()
-    user_ids =
+    Helpers.insert_user(%{tutorial_step: 1})
+    Helpers.insert_user(%{tutorial_step: 1})
+    Helpers.insert_user(%{tutorial_step: 1})
+    active_user_ids =
       [Helpers.insert_user(%{phone: @ben_phone}).id,
        Helpers.insert_user().id,
        Helpers.insert_user().id,
@@ -114,7 +119,7 @@ defmodule Iteration.AssignerTest do
                             |> Enum.map(&(&1.id))
 
     assert length(conversations) == 2
-    assert user_ids -- conversation_user_ids == []
+    assert active_user_ids -- conversation_user_ids == []
   end
 
   test "group_by_threes/0 leaves Ben out when there is one leftover user" do
