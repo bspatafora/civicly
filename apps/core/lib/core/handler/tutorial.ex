@@ -18,6 +18,7 @@ defmodule Core.Handler.Tutorial do
 
   defp normalize(string) do
     string
+      |> String.replace(".", "", global: false)
       |> String.trim
       |> String.downcase
   end

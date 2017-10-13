@@ -19,12 +19,12 @@ defmodule Core.Handler.TutorialTest do
     {:ok, bypass: bypass}
   end
 
-  test "handle/1 advances the user from step 1 to step 2 when they send the key (regardless of case/spacing)", %{bypass: bypass} do
+  test "handle/1 advances the user from step 1 to step 2 when they send the key (regardless of case/spacing/period use)", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user(%{tutorial_step: 1})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "#{String.upcase(S.step_1_key)} "})
+        text: "#{String.upcase(S.step_1_key)}. "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -69,12 +69,12 @@ defmodule Core.Handler.TutorialTest do
     assert List.first(messages).text == S.step_1_error()
   end
 
-  test "handle/1 advances the user from step 2 to step 3 when they send the key (regardless of case/spacing)", %{bypass: bypass} do
+  test "handle/1 advances the user from step 2 to step 3 when they send the key (regardless of case/spacing/period use)", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user(%{tutorial_step: 2})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "#{String.upcase(S.step_2_key)} "})
+        text: "#{String.upcase(S.step_2_key)}. "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -145,12 +145,12 @@ defmodule Core.Handler.TutorialTest do
     assert Enum.member?(texts, S.step_4_part_2())
   end
 
-  test "handle/1 advances the user from step 4 to step 5 when they send the key (regardless of case/spacing)", %{bypass: bypass} do
+  test "handle/1 advances the user from step 4 to step 5 when they send the key (regardless of case/spacing/period use)", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user(%{tutorial_step: 4})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "#{String.upcase(S.step_4_key)} "})
+        text: "#{String.upcase(S.step_4_key)}. "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
@@ -193,12 +193,12 @@ defmodule Core.Handler.TutorialTest do
     assert List.first(messages).text == S.step_4_error()
   end
 
-  test "handle/1 advances the user from step 5 to step 0 when they send the key (regardless of case/spacing)", %{bypass: bypass} do
+  test "handle/1 advances the user from step 5 to step 0 when they send the key (regardless of case/spacing/period use)", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     user = StorageHelpers.insert_user(%{tutorial_step: 5})
     message = Helpers.build_message(
       %{sender: user.phone,
-        text: "#{String.upcase(S.step_5_key)} "})
+        text: "#{String.upcase(S.step_5_key)}. "})
 
     {:ok, messages} = MessageSpy.new()
     Bypass.expect bypass, fn conn ->
