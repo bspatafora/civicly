@@ -44,7 +44,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_2_error do
-    "#{S.civicly()} Text \"Ready\" to continue the tutorial, or \"Help\" for help."
+    "#{S.civicly()} Text the word \"Ready\" to continue the tutorial, or \"Help\" for help."
   end
 
   def step_3_part_1 do
@@ -84,7 +84,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_4_error do
-    "#{S.civicly()} Text \"I will be civil\" to continue the tutorial, or \"Help\" for help."
+    "#{S.civicly()} Text the phrase \"I will be civil\" to continue the tutorial, or \"Help\" for help."
   end
 
   def step_5 do
@@ -96,7 +96,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_5_error do
-    "#{S.civicly()} Text \"I agree\" to continue the tutorial, or \"Help\" for help."
+    "#{S.civicly()} Text the phrase \"I agree\" to continue the tutorial, or \"Help\" for help."
   end
 
   def complete_part_1 do
