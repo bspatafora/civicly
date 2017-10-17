@@ -63,7 +63,7 @@ defmodule Strings do
   end
 
   def news(title, url) do
-    "#{civicly()} (AP) #{title} #{url}"
+    "#{civicly()} (Reuters) #{title} #{url}"
   end
 
   def stop_request do

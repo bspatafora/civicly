@@ -10,15 +10,15 @@ defmodule Core.APIClient.NewsAPITest do
     {:ok, bypass: bypass}
   end
 
-  test "ap_top/0 returns the title and URL of the current top AP story", %{bypass: bypass} do
+  test "reuters_top/0 returns the title and URL of the current top Reuters story", %{bypass: bypass} do
     Bypass.expect bypass, "GET", "/v1/articles", fn conn ->
       response_body = File.read!("test/core/api_client/news_api_response.txt")
       Conn.resp(conn, 200, response_body)
     end
 
-    {title, url} = NewsAPI.ap_top
+    {title, url} = NewsAPI.reuters_top
 
-    assert title == "Sniper in high-rise hotel kills at least 58 in Las Vegas"
-    assert url == "https://apnews.com/4eeaef2efced49698855d13830de3327"
+    assert title == "After victory in Raqqa over IS, Kurds face tricky peace"
+    assert url == "https://www.reuters.com/article/us-mideast-crisis-syria-raqqa-future-ana/after-victory-in-raqqa-over-is-kurds-face-tricky-peace-idUSKBN1CM2C6"
   end
 end

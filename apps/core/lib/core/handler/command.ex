@@ -52,7 +52,7 @@ defmodule Core.Handler.Command do
   end
 
   defp news do
-    {title, url} = NewsAPI.ap_top
+    {title, url} = NewsAPI.reuters_top()
     S.news(title, Googl.shorten(url))
   end
 end

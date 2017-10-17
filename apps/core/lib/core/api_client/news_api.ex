@@ -3,9 +3,9 @@ defmodule Core.APIClient.NewsAPI do
 
   alias Core.APIClient.APIClient
 
-  def ap_top do
+  def reuters_top do
     key = get_config(:news_api_key)
-    path = "/v1/articles?source=associated-press&sortBy=top&apiKey=#{key}"
+    path = "/v1/articles?source=reuters&sortBy=top&apiKey=#{key}"
     url = get_config(:news_api_origin) <> path
 
     response_body = APIClient.get!(url)
