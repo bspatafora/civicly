@@ -22,7 +22,7 @@ defmodule StringsTest do
        partner_deletion]
 
     step_1_part_1 = T.step_1_part_1(name)
-    step_3_part_2 = T.step_1_part_1(name)
+    step_3_part_2 = T.step_3_part_2(name)
 
     tutorial_strings =
       [step_1_part_1,

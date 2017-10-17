@@ -49,15 +49,15 @@ defmodule Strings.Tutorial do
 
   def step_3_part_1 do
     """
-    #{S.civicly()} Now connected to Ben S, your compatriot for the next 4 days.
+    #{S.civicly()} Say hi to Ben S, your compatriot for the next 4 days.
 
-    Here's a question to get you started: What's your favorite color?
+    Here's a question to get things rolling: What's your favorite color?
     """
   end
 
   def step_3_part_2(name) do
     """
-    Hi, #{name}! My favorite color is probably green. You?
+    Hey, #{name}! My favorite color is probably green. You?
 
     (Note how this message DIDN'T start with [civicly], since I'm your conversation partner.)
     """
