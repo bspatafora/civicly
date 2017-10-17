@@ -8,13 +8,13 @@ defmodule Strings do
     """
     #{civicly()} Now connected to #{partners}, your compatriot for the next 4 days.
 
-    Remember: We're all here because we believe in civic, civil conversation!
+    Remember, we're all here because we believe in civic, civil conversation.
     """
   end
 
   def question(question) do
     """
-    #{civicly()} Here's a question to get you started. (Don't be afraid to send the first text!)
+    #{civicly()} Here's a question to get things rolling. Be bold: Send the first text!
 
     #{question}
     """
