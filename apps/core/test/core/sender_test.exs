@@ -90,6 +90,34 @@ defmodule Core.SenderTest do
     assert !Enum.member?(messages, %{recipient: inactive.phone, text: text})
   end
 
+  test "send_to_active/1 sends a message with the specified text to all users in active conversations", %{bypass: bypass} do
+    sms_relay = StorageHelpers.insert_sms_relay()
+    user1 = StorageHelpers.insert_user()
+    user2 = StorageHelpers.insert_user()
+    inactive = StorageHelpers.insert_user()
+    StorageHelpers.insert_conversation(
+      %{active?: true,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [user1.id, user2.id]})
+    text = "Test message"
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    Sender.send_to_active(text)
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 2
+    assert Enum.member?(messages, %{recipient: user1.phone, text: text})
+    assert Enum.member?(messages, %{recipient: user2.phone, text: text})
+    assert !Enum.member?(messages, %{recipient: inactive.phone, text: text})
+  end
+
   test "send_message/3 sends a message with the specified text to each recipient", %{bypass: bypass} do
     StorageHelpers.insert_sms_relay()
     text = "Test message"

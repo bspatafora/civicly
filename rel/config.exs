@@ -22,6 +22,7 @@ release :civically do
   set version: "0.1.0"
   set applications: [
     :core,
+    :notifier,
     :sms_message,
     :sms_receiver,
     :sms_sender,
@@ -33,7 +34,9 @@ release :civically do
     :httpoison,
     :ecto,
     :postgrex,
-    :uuid
+    :uuid,
+    :quantum,
+    :timex
   ]
 end
 
