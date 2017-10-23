@@ -27,9 +27,14 @@ defmodule SMSReceiver do
       timestamp: to_datetime(conn.params["timestamp"]),
       uuid: conn.params["id"]}
 
-    log_receipt(message)
+    if Service.duplicate?(message) do
+      log_duplicate(message)
+    else
+      Service.insert_recently_received_message(message)
 
-    Router.handle(message)
+      log_received(message)
+      Router.handle(message)
+    end
 
     send_resp(conn, 200, "")
   end
@@ -51,9 +56,17 @@ defmodule SMSReceiver do
     datetime
   end
 
-  defp log_receipt(message) do
-    Logger.info("SMS received", [
-      name: "SMSReceived",
+  defp log_duplicate(message) do
+    log(message, "Duplicate SMS received", "DuplicateSMSReceived")
+  end
+
+  defp log_received(message) do
+    log(message, "SMS received", "SMSReceived")
+  end
+
+  defp log(message, log_message, log_name) do
+    Logger.info(log_message, [
+      name: log_name,
       recipient: message.recipient,
       sender: message.sender,
       sms_relay_ip: message.sms_relay_ip,

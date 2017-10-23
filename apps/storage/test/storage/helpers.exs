@@ -3,7 +3,7 @@ defmodule Storage.Helpers do
 
   alias Ecto.UUID
 
-  alias Storage.{Conversation, Message, SMSRelay, User}
+  alias Storage.{Conversation, Message, RecentlyReceivedMessage, SMSRelay, User}
 
   def uuid do
     UUID.generate()
@@ -50,9 +50,20 @@ defmodule Storage.Helpers do
   def insert_message(params \\ %{}) do
     defaults =
       %{text: "Test message",
-        timestamp: DateTime.utc_now,
+        timestamp: DateTime.utc_now(),
         uuid: uuid()}
     changeset = Message.changeset(%Message{}, Map.merge(defaults, params))
+
+    Storage.insert!(changeset)
+  end
+
+  def insert_recently_received_message(params \\ %{}) do
+    defaults =
+      %{sender: random_phone(),
+        text: "Test message",
+        timestamp: DateTime.utc_now()}
+    params = Map.merge(defaults, params)
+    changeset = RecentlyReceivedMessage.changeset(%RecentlyReceivedMessage{}, params)
 
     Storage.insert!(changeset)
   end

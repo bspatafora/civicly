@@ -4,7 +4,7 @@ defmodule Storage.Service do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias Storage.{Conversation, Message, SMSRelay, User}
+  alias Storage.{Conversation, Message, RecentlyReceivedMessage, SMSRelay, User}
 
   def partner_phones(user_phone) do
     user = user(user_phone)
@@ -138,6 +138,35 @@ defmodule Storage.Service do
     query = from User, where: [tutorial_step: 0]
 
     Storage.all(query)
+  end
+
+  def duplicate?(message) do
+    purge_recently_received_messages()
+
+    query = from RecentlyReceivedMessage,
+              where: [sender: ^message.sender, text: ^message.text]
+    duplicates = Storage.all(query)
+
+    Enum.any?(duplicates)
+  end
+
+  def insert_recently_received_message(message) do
+    params =
+      %{sender: message.sender,
+        text: message.text,
+        timestamp: message.timestamp}
+    changeset = RecentlyReceivedMessage.changeset(%RecentlyReceivedMessage{}, params)
+
+    Storage.insert(changeset)
+  end
+
+  defp purge_recently_received_messages do
+    unix_now = DateTime.to_unix(DateTime.utc_now())
+    unix_five_minutes_ago = unix_now - 300
+    five_minutes_ago = DateTime.from_unix!(unix_five_minutes_ago)
+    delete_query = from m in RecentlyReceivedMessage,
+                     where: m.timestamp < ^five_minutes_ago
+    Storage.delete_all(delete_query)
   end
 
   defp set_status(conversation, status) do
