@@ -6,15 +6,15 @@ defmodule Strings do
     partners = Enum.join(partners, " and ")
 
     """
-    #{civicly()} Say hi to #{partners}, your compatriot for the next 4 days.
+    #{civicly()} Now connected to #{partners}, your compatriot for the next 4 days. Say hi!
 
-    Remember, we're all here because we believe in civic, civil conversation.
+    Remember, we're all here to have some civil, civic conversation.
     """
   end
 
   def question(question) do
     """
-    #{civicly()} Here's a question to get things rolling. Be bold: Send the first text!
+    #{civicly()} Here's a question to get you both started. Be bold: Send that first text!
 
     #{question}
     """
@@ -24,7 +24,7 @@ defmodule Strings do
     """
     #{civicly()} The round has ended. You'll get a text when the next one begins.
 
-    Type "Help" for help
+    Text "Help" for help.
     """
   end
 
@@ -32,15 +32,15 @@ defmodule Strings do
     """
     #{civicly()} Sorry, but there's no one to send that message to right now! You'll be connected with someone when the next round begins.
 
-    Type "Help" for help
+    Text "Help" for help.
     """
   end
 
   def help do
     """
-    #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us.
+    #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us
 
-    Type "Stop" to immediately and permanently delete your account.
+    Text "Stop" to immediately and permanently delete your account.
     """
   end
 
@@ -58,7 +58,7 @@ defmodule Strings do
 
     You'll be connected to someone new when the next round begins.
 
-    Type "Help" for help
+    Text "Help" for help.
     """
   end
 
