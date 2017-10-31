@@ -10,7 +10,7 @@ defmodule Core.APIClient.NewsAPITest do
     {:ok, bypass: bypass}
   end
 
-  test "reuters_top/0 returns the title and URL of the current top Reuters story", %{bypass: bypass} do
+  test "reuters_top/0 returns the title and URL of the current top Reuters story (excluding special reports)", %{bypass: bypass} do
     Bypass.expect bypass, "GET", "/v1/articles", fn conn ->
       response_body = File.read!("test/core/api_client/news_api_response.txt")
       Conn.resp(conn, 200, response_body)

@@ -4,6 +4,14 @@
   "sortBy": "top",
   "articles": [
     {
+      "author": "Joseph Menn",
+      "title": "Special Report: Microsoft responded quietly after detecting secret database hack in 2013",
+      "description": "Microsoft Corp's secret internal database for tracking bugs in its own software was broken into by a highly sophisticated hacking group more than four years ago, according to five former employees, in only the second known breach of such a corporate database.",
+      "url": "https://www.reuters.com/article/us-microsoft-cyber-insight/microsoft-responded-quietly-after-detecting-secret-database-hack-in-2013-idUSKBN1CM0D0",
+      "urlToImage": "https://s4.reutersmedia.net/resources/r/?m=02&d=20171017&t=2&i=1205786497&w=&fh=545px&fw=&ll=&pl=&sq=&r=LYNXMPED9G06Y",
+      "publishedAt": "2017-10-17T15:24:15Z"
+    },
+    {
       "author": "John Davison and Tom Perry",
       "title": "After victory in Raqqa over IS, Kurds face tricky peace",
       "description": "Kurdish groups who led the fight against Islamic State in its former capital Raqqa must navigate a complex peace to avoid ethnic tension with the city's Arab majority and to secure critical U.S. aid.",
@@ -18,14 +26,6 @@
       "url": "https://www.reuters.com/article/us-usa-trump-nbc-pai/fcc-chairman-rejects-trump-suggestion-on-broadcast-licenses-idUSKBN1CM28W",
       "urlToImage": "https://s1.reutersmedia.net/resources/r/?m=02&d=20171017&t=2&i=1205873185&w=&fh=545px&fw=&ll=&pl=&sq=&r=LYNXMPED9G1FA",
       "publishedAt": "2017-10-17T15:36:24Z"
-    },
-    {
-      "author": "Joseph Menn",
-      "title": "Exclusive: Microsoft responded quietly after detecting secret database hack in 2013",
-      "description": "Microsoft Corp's secret internal database for tracking bugs in its own software was broken into by a highly sophisticated hacking group more than four years ago, according to five former employees, in only the second known breach of such a corporate database.",
-      "url": "https://www.reuters.com/article/us-microsoft-cyber-insight/microsoft-responded-quietly-after-detecting-secret-database-hack-in-2013-idUSKBN1CM0D0",
-      "urlToImage": "https://s4.reutersmedia.net/resources/r/?m=02&d=20171017&t=2&i=1205786497&w=&fh=545px&fw=&ll=&pl=&sq=&r=LYNXMPED9G06Y",
-      "publishedAt": "2017-10-17T15:24:15Z"
     }
   ]
 }
