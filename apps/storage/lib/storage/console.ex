@@ -10,7 +10,9 @@ defmodule Storage.Console do
   @timestamp_pad 15
 
   def conversations(iteration) do
-    query = from Conversation, where: [iteration: ^iteration]
+    query = from Conversation,
+              where: [iteration: ^iteration],
+              order_by: [asc: :id]
     conversations = Storage.all(query)
     conversations = conversations
       |> Storage.preload(:users)
@@ -41,14 +43,7 @@ defmodule Storage.Console do
   defp display_user(user) do
     IO.write "  |  "
     IO.write String.pad_trailing(user.name, @name_pad)
-    IO.write display_phone(user.phone)
-  end
-
-  defp display_phone(phone) do
-    area = String.slice(phone, 0..2)
-    exchange = String.slice(phone, 3..5)
-    line = String.slice(phone, 6..9)
-    "(#{area}) #{exchange}-#{line}"
+    IO.write user.phone
   end
 
   def messages(conversation_id) do
@@ -59,7 +54,8 @@ defmodule Storage.Console do
 
     display_messages_header()
 
-    messages = Enum.sort(conversation.messages, &(&1.timestamp < &2.timestamp))
+    datetime_comparison = fn (a, b) -> DateTime.compare(a.timestamp, b.timestamp) == :lt end
+    messages = Enum.sort(conversation.messages, &(datetime_comparison.(&1, &2)))
     messages |> Enum.each(&(display_message(&1)))
   end
 
@@ -81,10 +77,16 @@ defmodule Storage.Console do
   end
 
   defp format_datetime(dt) do
-    hour = String.pad_leading(Integer.to_string(dt.hour), 2, "0")
-    minute = String.pad_leading(Integer.to_string(dt.minute), 2, "0")
-    second = String.pad_leading(Integer.to_string(dt.second), 2, "0")
+    month = pad_leading_zero(dt.month)
+    day = pad_leading_zero(dt.day)
+    hour = pad_leading_zero(dt.hour)
+    minute = pad_leading_zero(dt.minute)
+    second = pad_leading_zero(dt.second)
 
-    "#{dt.month}/#{dt.day} #{hour}:#{minute}:#{second}"
+    "#{month}/#{day} #{hour}:#{minute}:#{second}"
+  end
+
+  defp pad_leading_zero(integer) do
+    String.pad_leading(Integer.to_string(integer), 2, "0")
   end
 end
