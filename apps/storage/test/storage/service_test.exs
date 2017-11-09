@@ -3,7 +3,8 @@ defmodule Storage.ServiceTest do
 
   alias Ecto.Adapters.SQL.Sandbox
 
-  alias Storage.{Conversation, Helpers, Message, RecentlyReceivedMessage, Service, User}
+  alias Storage.{CommandHistory, Conversation, Helpers, Message,
+                 RecentlyReceivedMessage, Service, User}
 
   def build_message(params \\ %{}) do
     message = %SMSMessage{
@@ -403,5 +404,15 @@ defmodule Storage.ServiceTest do
     assert recently_received_message.sender == message.sender
     assert recently_received_message.text == message.text
     assert recently_received_message.timestamp == message.timestamp
+  end
+
+  test "insert_command_history/1 inserts a command history entry" do
+    message = build_message()
+
+    Service.insert_command_history(message)
+
+    command_history = List.first(Storage.all(CommandHistory))
+    assert command_history.text == message.text
+    assert command_history.timestamp == message.timestamp
   end
 end

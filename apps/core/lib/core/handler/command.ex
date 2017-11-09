@@ -11,6 +11,8 @@ defmodule Core.Handler.Command do
   @storage Application.get_env(:core, :storage)
 
   def handle(message) do
+    Service.insert_command_history(message)
+
     case CommandParser.parse(message.text) do
       {:add, name, phone} ->
         attempt_user_insert(name, phone, message)

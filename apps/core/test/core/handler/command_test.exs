@@ -8,7 +8,7 @@ defmodule Core.Handler.CommandTest do
   alias Core.Helpers
   alias Core.Helpers.MessageSpy
   alias Storage.Helpers, as: StorageHelpers
-  alias Storage.{Conversation, User}
+  alias Storage.{CommandHistory, Conversation, User}
   alias Strings, as: S
   alias Strings.Tutorial, as: T
 
@@ -20,6 +20,24 @@ defmodule Core.Handler.CommandTest do
 
     bypass = Bypass.open(port: 9002)
     {:ok, bypass: bypass}
+  end
+
+  test "handle/1 inserts a command history entry", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
+    text = ":command Data"
+    time = DateTime.utc_now()
+    message = Helpers.build_message(
+      %{sender: @ben,
+        timestamp: time,
+        text: text})
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    Command.handle(message)
+
+    command_history = List.first(Storage.all(CommandHistory))
+    assert command_history.text == text
+    assert command_history.timestamp == time
   end
 
   test "handle/1 inserts a new user when it receives a valid :add command", %{bypass: bypass} do

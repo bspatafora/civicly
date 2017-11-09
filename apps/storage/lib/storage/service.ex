@@ -4,7 +4,7 @@ defmodule Storage.Service do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias Storage.{Conversation, Message, RecentlyReceivedMessage, SMSRelay, User}
+  alias Storage.{CommandHistory, Conversation, Message, RecentlyReceivedMessage, SMSRelay, User}
 
   def partner_phones(user_phone) do
     user = user(user_phone)
@@ -156,6 +156,15 @@ defmodule Storage.Service do
         text: message.text,
         timestamp: message.timestamp}
     changeset = RecentlyReceivedMessage.changeset(%RecentlyReceivedMessage{}, params)
+
+    Storage.insert(changeset)
+  end
+
+  def insert_command_history(message) do
+    params =
+      %{text: message.text,
+        timestamp: message.timestamp}
+    changeset = CommandHistory.changeset(%CommandHistory{}, params)
 
     Storage.insert(changeset)
   end
