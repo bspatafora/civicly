@@ -38,7 +38,7 @@ defmodule Strings do
 
   def help do
     """
-    #{civicly()} Have a question? Visit civicly.us/welcome or email me at ben@civicly.us
+    #{civicly()} Have a question? Visit civicly.us/faq or email me at ben@civicly.us
 
     Text "Stop" to immediately and permanently delete your account.
     """
