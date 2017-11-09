@@ -6,15 +6,15 @@ defmodule Strings do
     partners = Enum.join(partners, " and ")
 
     """
-    #{civicly()} Now connected to #{partners}, your compatriot for the next 4 days. Say hi!
+    #{civicly()} Say hi to #{partners}, your compatriot for the next 4 days!
 
-    Remember, we're all here to have some civil, civic conversation.
+    Remember, we're all here for civil, civic conversation.
     """
   end
 
   def question(question) do
     """
-    #{civicly()} Here's a question to get you both started. Be bold: Send that first text!
+    #{civicly()} Here's a question to get you started:
 
     #{question}
     """
@@ -24,7 +24,7 @@ defmodule Strings do
     """
     #{civicly()} The round has ended. You'll get a text when the next one begins.
 
-    Text "Help" for help.
+    Text "Help" for info.
     """
   end
 
@@ -32,7 +32,7 @@ defmodule Strings do
     """
     #{civicly()} Sorry, but there's no one to send that message to right now! You'll be connected with someone when the next round begins.
 
-    Text "Help" for help.
+    Text "Help" for info.
     """
   end
 
@@ -58,7 +58,7 @@ defmodule Strings do
 
     You'll be connected to someone new when the next round begins.
 
-    Text "Help" for help.
+    Text "Help" for info.
     """
   end
 
