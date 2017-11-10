@@ -415,4 +415,42 @@ defmodule Storage.ServiceTest do
     assert command_history.text == message.text
     assert command_history.timestamp == message.timestamp
   end
+
+  test "not_yet_engaged_phones/0 returns the phone of every user with an active conversation who has yet to send a message" do
+    sms_relay = Helpers.insert_sms_relay()
+    engaged = Helpers.insert_user()
+    not_yet_engaged1 = Helpers.insert_user()
+    not_yet_engaged2 = Helpers.insert_user()
+    not_yet_engaged3 = Helpers.insert_user()
+    inactive1 = Helpers.insert_user()
+    inactive2 = Helpers.insert_user()
+    conversation = Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [engaged.id, not_yet_engaged1.id]})
+    Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [not_yet_engaged2.id, not_yet_engaged3.id]})
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        sms_relay_id: sms_relay.id,
+        users: [inactive1.id, inactive2.id]})
+    Helpers.insert_message(
+      %{conversation_id: conversation.id,
+        user_id: engaged.id})
+
+    not_yet_engaged_phones = Service.not_yet_engaged_phones()
+
+    assert length(not_yet_engaged_phones) == 3
+    assert Enum.member?(not_yet_engaged_phones, not_yet_engaged1.phone)
+    assert Enum.member?(not_yet_engaged_phones, not_yet_engaged2.phone)
+    assert Enum.member?(not_yet_engaged_phones, not_yet_engaged3.phone)
+    assert !Enum.member?(not_yet_engaged_phones, engaged.phone)
+    assert !Enum.member?(not_yet_engaged_phones, inactive1.phone)
+    assert !Enum.member?(not_yet_engaged_phones, inactive2.phone)
+  end
 end

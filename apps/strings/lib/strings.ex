@@ -20,6 +20,10 @@ defmodule Strings do
     """
   end
 
+  def conversation_reminder do
+    "#{civicly()} The first message is always the toughest..."
+  end
+
   def iteration_end do
     """
     #{civicly()} The round has ended. You'll get a text when the next one begins.

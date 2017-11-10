@@ -141,4 +141,25 @@ defmodule Core.SenderTest do
     assert Enum.member?(messages, %{recipient: recipient1_phone, text: text})
     assert Enum.member?(messages, %{recipient: recipient2_phone, text: text})
   end
+
+  test "send_message/2 sends a message with the specified text to each recipient", %{bypass: bypass} do
+    StorageHelpers.insert_sms_relay()
+    text = "Test message"
+    recipient1_phone = "5555555556"
+    recipient2_phone = "5555555557"
+
+    {:ok, messages} = MessageSpy.new()
+    Bypass.expect bypass, fn conn ->
+      conn = Helpers.parse_body_params(conn)
+      MessageSpy.record(messages, conn.params["recipient"], conn.params["text"])
+      Conn.resp(conn, 200, "")
+    end
+
+    Sender.send_message(text, [recipient1_phone, recipient2_phone])
+
+    messages = MessageSpy.get(messages)
+    assert length(messages) == 2
+    assert Enum.member?(messages, %{recipient: recipient1_phone, text: text})
+    assert Enum.member?(messages, %{recipient: recipient2_phone, text: text})
+  end
 end

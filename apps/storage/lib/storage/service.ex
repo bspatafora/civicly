@@ -169,6 +169,23 @@ defmodule Storage.Service do
     Storage.insert(changeset)
   end
 
+  def not_yet_engaged_phones do
+    active_users = active_conversations()
+      |> Enum.map(&(&1.users))
+      |> List.flatten
+
+    engaged_user_ids = active_conversations()
+      |> Enum.map(&(Storage.preload(&1, :messages)))
+      |> Enum.map(&(&1.messages))
+      |> List.flatten
+      |> Enum.map(&(&1.user_id))
+      |> Enum.dedup
+
+    active_users
+      |> Enum.reject(&(Enum.member?(engaged_user_ids, &1.id)))
+      |> Enum.map(&(&1.phone))
+  end
+
   defp purge_recently_received_messages do
     unix_now = DateTime.to_unix(DateTime.utc_now())
     unix_five_minutes_ago = unix_now - 300
