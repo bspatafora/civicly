@@ -24,6 +24,10 @@ defmodule Strings do
     "#{civicly()} The first message is always the toughest..."
   end
 
+  def time_warning do
+    "#{civicly()} The round ends in 4 hours, at which point you will be disconnected from your partner."
+  end
+
   def iteration_end do
     """
     #{civicly()} The round has ended. You'll get a text when the next one begins.
