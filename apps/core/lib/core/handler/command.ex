@@ -2,7 +2,7 @@ defmodule Core.Handler.Command do
   @moduledoc false
 
   alias Core.{CommandParser, Sender}
-  alias Core.Action.News
+  alias Core.Action.{End, News}
   alias Iteration.{Assigner, Notifier}
   alias Storage.Service
   alias Strings, as: S
@@ -31,8 +31,7 @@ defmodule Core.Handler.Command do
       {:notify, question} ->
         Notifier.notify(question)
       :end ->
-        Sender.send_to_active(S.iteration_end(), message)
-        Service.inactivate_all_conversations()
+        End.execute()
       :news ->
         News.send(message)
       :news? ->

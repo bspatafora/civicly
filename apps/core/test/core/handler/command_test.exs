@@ -208,39 +208,14 @@ defmodule Core.Handler.CommandTest do
     assert Enum.member?(messages, %{recipient: @ben, text: start_message})
   end
 
-  test "handle/1 ends the iteration when it receives valid :end command", %{bypass: bypass} do
+  test "handle/1 ends the iteration when it receives a valid :end command", %{bypass: bypass} do
     sms_relay = StorageHelpers.insert_sms_relay()
-    conversation1 = StorageHelpers.insert_conversation(
-      %{active?: true,
-        iteration: 1,
-        sms_relay_id: sms_relay.id})
-    conversation2 = StorageHelpers.insert_conversation(
-      %{active?: true,
-        iteration: 2,
-        sms_relay_id: sms_relay.id})
-    message = Helpers.build_message(
-      %{sender: @ben,
-        text: S.end_command()})
-
-    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
-
-    Command.handle(message)
-
-    [conversation1, conversation2]
-      |> Enum.map(&(Storage.get(Conversation, &1.id)))
-      |> Enum.each(&(assert &1.active? == false))
-  end
-
-  test "handle/1 notifies all users in active conversations that the iteration has ended when it receives a valid :end command", %{bypass: bypass} do
-    sms_relay = StorageHelpers.insert_sms_relay()
-    user1 = StorageHelpers.insert_user()
-    user2 = StorageHelpers.insert_user()
-    inactive = StorageHelpers.insert_user()
+    user = StorageHelpers.insert_user()
     StorageHelpers.insert_conversation(
       %{active?: true,
         iteration: 1,
         sms_relay_id: sms_relay.id,
-        users: [user1.id, user2.id]})
+        users: [user.id, StorageHelpers.insert_user().id]})
     message = Helpers.build_message(
       %{sender: @ben,
         text: S.end_command()})
@@ -256,10 +231,7 @@ defmodule Core.Handler.CommandTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 2
-    text = S.iteration_end()
-    assert Enum.member?(messages, %{recipient: user1.phone, text: text})
-    assert Enum.member?(messages, %{recipient: user2.phone, text: text})
-    assert !Enum.member?(messages, %{recipient: inactive.phone, text: text})
+    assert Enum.member?(messages, %{recipient: user.phone, text: S.iteration_end()})
   end
 
   test "handle/1 forwards the message to all users when it receives an :all! command", %{bypass: bypass} do
