@@ -5,7 +5,7 @@ defmodule SMSReceiver do
   require Logger
 
   alias Core.Router
-  alias Storage.Service
+  alias Storage.Service.{RecentlyReceivedMessage, SMSRelay}
 
   plug Plug.Parsers, parsers: [:json], json_decoder: Poison
   plug :match
@@ -27,10 +27,10 @@ defmodule SMSReceiver do
       timestamp: to_datetime(conn.params["timestamp"]),
       uuid: conn.params["id"]}
 
-    if Service.duplicate?(message) do
+    if RecentlyReceivedMessage.duplicate?(message) do
       log_duplicate(message)
     else
-      Service.insert_recently_received_message(message)
+      RecentlyReceivedMessage.insert(message)
 
       log_received(message)
       Router.handle(message)
@@ -44,7 +44,7 @@ defmodule SMSReceiver do
   end
 
   defp update_sms_relay_ip(conn) do
-    Service.update_first_sms_relay_ip(remote_ip(conn))
+    SMSRelay.update_ip(remote_ip(conn))
   end
 
   defp remote_ip(conn) do

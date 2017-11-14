@@ -5,6 +5,7 @@ defmodule Core.Sender do
 
   alias SMSMessage
   alias Storage.Service
+  alias Storage.Service.{SMSRelay}
 
   @sender Application.get_env(:core, :sender)
 
@@ -29,11 +30,11 @@ defmodule Core.Sender do
   end
 
   defp internal_message do
-    sms_relay = Service.first_sms_relay
+    sms_relay = SMSRelay.get()
     %SMSMessage{
-      recipient: sms_relay.phone,
+      recipient: sms_relay.phone(),
       sender: "",
-      sms_relay_ip: sms_relay.ip,
+      sms_relay_ip: sms_relay.ip(),
       text: "",
       timestamp: DateTime.utc_now(),
       uuid: UUID.generate()}

@@ -2,15 +2,15 @@ defmodule Core.Handler.StopRequest do
   @moduledoc false
 
   alias Core.Sender
+  alias Storage.Service
+  alias Storage.Service.User
   alias Strings, as: S
-
-  @storage Application.get_env(:core, :storage)
 
   def handle(message) do
     sender = message.sender
 
-    if @storage.active_conversation?(sender) do
-      partner_phones = @storage.partner_phones(sender)
+    if Service.in_conversation?(sender) do
+      partner_phones = Service.partner_phones(sender)
 
       inactivate_conversation(sender, partner_phones)
       user = delete_user(sender)
@@ -25,14 +25,14 @@ defmodule Core.Handler.StopRequest do
   end
 
   defp delete_user(phone) do
-    @storage.delete_user(phone)
+    User.delete(phone)
   end
 
   defp inactivate_conversation(phone, partner_phones) do
     two_person_conversation? = length(partner_phones) == 1
 
     if two_person_conversation? do
-      @storage.inactivate_current_conversation(phone)
+      Service.inactivate_current_conversation(phone)
     end
   end
 

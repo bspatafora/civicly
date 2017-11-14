@@ -2,12 +2,11 @@ defmodule Core.Handler.Tutorial do
   @moduledoc false
 
   alias Core.Sender
+  alias Storage.Service.User
   alias Strings.Tutorial, as: S
 
-  @storage Application.get_env(:core, :storage)
-
   def handle(message) do
-    case @storage.tutorial_step(message.sender) do
+    case User.tutorial_step(message.sender) do
       1 -> handle_step_1(message)
       2 -> handle_step_2(message)
       3 -> handle_step_3(message)
@@ -32,7 +31,7 @@ defmodule Core.Handler.Tutorial do
   end
 
   defp handle_step_2(message) do
-    name = @storage.name(message.sender)
+    name = User.name(message.sender)
 
     key = S.step_2_key()
     next_step_messages = [S.step_3_part_1(), S.step_3_part_2(name)]
@@ -42,7 +41,7 @@ defmodule Core.Handler.Tutorial do
   end
 
   defp handle_step_3(message) do
-    @storage.advance_tutorial(message.sender)
+    User.advance_tutorial(message.sender)
 
     [S.step_4_part_1(), S.step_4_part_2()]
       |> Enum.each(&(Sender.send_command_output(&1, message)))
@@ -66,7 +65,7 @@ defmodule Core.Handler.Tutorial do
 
   defp handle_branch(message, key, next_step_messages, error) do
     if normalize(message.text) == key do
-      @storage.advance_tutorial(message.sender)
+      User.advance_tutorial(message.sender)
 
       next_step_messages
         |> Enum.each(&(Sender.send_command_output(&1, message)))

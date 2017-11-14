@@ -5,6 +5,18 @@ defmodule Storage.Helpers do
 
   alias Storage.{Conversation, Message, RecentlyReceivedMessage, SMSRelay, User}
 
+  def build_message(params \\ %{}) do
+    message = %SMSMessage{
+      recipient: random_phone(),
+      sender: random_phone(),
+      sms_relay_ip: "localhost",
+      text: "Test message",
+      timestamp: DateTime.utc_now(),
+      uuid: uuid()}
+
+    Map.merge(message, params)
+  end
+
   def uuid do
     UUID.generate()
   end

@@ -4,14 +4,12 @@ defmodule Core.Handler.Command do
   alias Core.{CommandParser, Sender}
   alias Core.Action.{End, News}
   alias Iteration.{Assigner, Notifier}
-  alias Storage.Service
+  alias Storage.Service.{CommandHistory, User}
   alias Strings, as: S
   alias Strings.Tutorial, as: T
 
-  @storage Application.get_env(:core, :storage)
-
   def handle(message) do
-    Service.insert_command_history(message)
+    CommandHistory.insert(message)
 
     case CommandParser.parse(message.text) do
       {:add, name, phone} ->
@@ -42,7 +40,7 @@ defmodule Core.Handler.Command do
   end
 
   defp attempt_user_insert(name, phone, message) do
-    case @storage.insert_user(name, phone) do
+    case User.insert(name, phone) do
       {:ok, user} ->
         Sender.send_command_output(S.user_added(user.name), message)
         Sender.send_message(T.step_1_part_1(user.name), [phone], message)

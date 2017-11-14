@@ -3,7 +3,7 @@ defmodule SMSSender.Sender do
 
   require Logger
 
-  alias Storage.Service
+  alias Storage.Service.SMSRelay
 
   @headers [{"Content-type", "application/json; charset=UTF-8"}]
 
@@ -19,7 +19,7 @@ defmodule SMSSender.Sender do
     if attempt > 12 do
       log_send_failure(message)
     else
-      message = Service.refresh_sms_relay_ip(message)
+      message = refresh_sms_relay_ip(message)
       url = url(message.sms_relay_ip)
 
       case post(body, url) do
@@ -32,6 +32,10 @@ defmodule SMSSender.Sender do
           attempt_to_send(message, body, attempt + 1)
       end
     end
+  end
+
+  defp refresh_sms_relay_ip(message) do
+    Map.put(message, :sms_relay_ip, SMSRelay.get().ip)
   end
 
   defp post(body, url) do

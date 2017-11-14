@@ -1,7 +1,7 @@
 defmodule Iteration.Assigner do
   @moduledoc false
 
-  alias Storage.{Conversation, Service}
+  alias Storage.Service.{Conversation, SMSRelay, User}
 
   def group_by_threes do
     group(&by_threes/2)
@@ -13,24 +13,20 @@ defmodule Iteration.Assigner do
 
   defp group(group_strategy) do
     iteration = next_iteration()
-    sms_relay_id = sms_relay_id()
-    {flexible_user, users} = pop_ben(Service.active_users())
+    sms_relay_id = SMSRelay.get().id
+    {flexible_user, users} = pop_ben(User.all_enabled())
 
     users
     |> Enum.shuffle
     |> group_strategy.(flexible_user)
-    |> Enum.each(&(insert_conversation(iteration, sms_relay_id, &1)))
+    |> Enum.each(&(Conversation.insert(iteration, sms_relay_id, &1)))
   end
 
   defp next_iteration do
-    case Service.current_iteration() do
+    case Conversation.current_iteration() do
       nil -> 1
       iteration -> iteration + 1
     end
-  end
-
-  defp sms_relay_id do
-    Service.first_sms_relay.id
   end
 
   defp pop_ben(users) do
@@ -58,16 +54,5 @@ defmodule Iteration.Assigner do
 
   defp by_twos(users, flexible_user) do
     Enum.chunk(users, 2, 2, [flexible_user])
-  end
-
-  defp insert_conversation(iteration, sms_relay_id, users) do
-    params =
-      %{active: false,
-        iteration: iteration,
-        sms_relay_id: sms_relay_id,
-        users: Enum.map(users, &(&1.id))}
-
-    changeset = Conversation.changeset(%Conversation{}, params)
-    Storage.insert!(changeset)
   end
 end

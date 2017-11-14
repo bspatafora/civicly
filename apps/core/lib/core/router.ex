@@ -4,10 +4,10 @@ defmodule Core.Router do
   require Logger
 
   alias Core.Handler.{Command, HelpRequest, Missive, StopRequest, Tutorial}
+  alias Storage.Service.User
   alias Strings, as: S
 
   @ben Application.get_env(:storage, :ben_phone)
-  @storage Application.get_env(:core, :storage)
 
   def handle(message) do
     cond do
@@ -17,7 +17,7 @@ defmodule Core.Router do
         StopRequest.handle(message)
       help_request?(message) ->
         HelpRequest.handle(message)
-      user?(message) ->
+      sender_is_user?(message) ->
         handle_user(message)
       true ->
         log_unknown_sender(message)
@@ -43,12 +43,12 @@ defmodule Core.Router do
       |> String.upcase
   end
 
-  defp user?(message) do
-    @storage.user?(message.sender)
+  defp sender_is_user?(message) do
+    User.exists?(message.sender)
   end
 
   defp handle_user(message) do
-    if @storage.in_tutorial?(message.sender) do
+    if User.in_tutorial?(message.sender) do
       Tutorial.handle(message)
     else
       Missive.handle(message)

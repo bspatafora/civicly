@@ -3,14 +3,13 @@ defmodule Iteration.Notifier do
 
   alias Ecto.UUID
 
-  alias Storage.Service
+  alias Storage.Service.Conversation
   alias Strings, as: S
 
   @sender Application.get_env(:iteration, :sender)
-  @storage Application.get_env(:iteration, :storage)
 
   def notify(question) do
-    conversations = @storage.current_conversations()
+    conversations = Conversation.all_current()
     Enum.each(conversations, &(notify_users(&1, question)))
   end
 
@@ -24,7 +23,7 @@ defmodule Iteration.Notifier do
 
     Enum.each(users, &(notify(shared_params, &1, users, question)))
 
-    Service.activate(conversation)
+    Conversation.activate(conversation)
   end
 
   defp notify(shared_params, user, users, question) do
