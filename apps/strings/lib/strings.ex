@@ -54,9 +54,9 @@ defmodule Strings do
 
   def user_deletion do
     """
-    #{civicly()} Your account has been deleted.
+    #{civicly()} Your account has been deleted. Visit civicly.us to rejoin.
 
-    Please send one last text with your reason for leaving. It would be a huge help.
+    Please send one last text with your reason for leaving.
     """
   end
 
