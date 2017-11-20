@@ -43,8 +43,7 @@ defmodule Core.Handler.Command do
     case User.insert(name, phone) do
       {:ok, user} ->
         Sender.send_command_output(S.user_added(user.name), message)
-        Sender.send_message(T.step_1_part_1(user.name), [phone], message)
-        Sender.send_message(T.step_1_part_2(), [phone], message)
+        Sender.send_message(T.step_1(), [phone], message)
       {:error, _} ->
         Sender.send_command_output(S.insert_failed(), message)
     end

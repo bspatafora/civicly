@@ -89,10 +89,11 @@ defmodule Core.Handler.TutorialTest do
     assert user.tutorial_step == 3
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 2
+    assert length(messages) == 3
     texts = messages |> Enum.map(&(&1.text))
     assert Enum.member?(texts, S.step_3_part_1())
     assert Enum.member?(texts, S.step_3_part_2(user.name))
+    assert Enum.member?(texts, S.step_3_part_3())
   end
 
   test "handle/1 sends an error message and does not advance a user from step 2 when they send something other than the key", %{bypass: bypass} do

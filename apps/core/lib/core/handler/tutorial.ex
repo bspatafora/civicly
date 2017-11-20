@@ -34,7 +34,8 @@ defmodule Core.Handler.Tutorial do
     name = User.name(message.sender)
 
     key = S.step_2_key()
-    next_step_messages = [S.step_3_part_1(), S.step_3_part_2(name)]
+    next_step_messages =
+      [S.step_3_part_1(), S.step_3_part_2(name), S.step_3_part_3()]
     error = S.step_2_error()
 
     handle_branch(message, key, next_step_messages, error)

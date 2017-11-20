@@ -27,18 +27,17 @@ defmodule StringsTest do
        partner_deletion,
        news]
 
-    step_1_part_1 = T.step_1_part_1(name)
     step_3_part_2 = T.step_3_part_2(name)
 
     tutorial_strings =
-      [step_1_part_1,
-       T.step_1_part_2,
+      [T.step_1,
        T.step_1_error,
        T.step_2_part_1,
        T.step_2_part_2,
        T.step_2_error,
        T.step_3_part_1,
        step_3_part_2,
+       T.step_3_part_3,
        T.step_4_part_1,
        T.step_4_part_2,
        T.step_4_error,

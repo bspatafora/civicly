@@ -8,7 +8,7 @@ defmodule Strings do
     """
     #{civicly()} Say hi to #{partners}, your compatriot for the next 4 days!
 
-    Remember, we're all here for civil, civic conversation.
+    Remember, we're all here for civic, civil conversation.
     """
   end
 

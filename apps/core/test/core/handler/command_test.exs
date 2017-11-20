@@ -72,7 +72,7 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 3
+    assert length(messages) == 2
     user_added_message = %{recipient: @ben, text: S.user_added("Test User")}
     assert Enum.member?(messages, user_added_message)
   end
@@ -95,11 +95,9 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
 
     messages = MessageSpy.get(messages)
-    assert length(messages) == 3
-    message1 = %{recipient: new_user_phone, text: T.step_1_part_1(name)}
-    message2 = %{recipient: new_user_phone, text: T.step_1_part_2()}
-    assert Enum.member?(messages, message1)
-    assert Enum.member?(messages, message2)
+    assert length(messages) == 2
+    welcome_message = %{recipient: new_user_phone, text: T.step_1()}
+    assert Enum.member?(messages, welcome_message)
   end
 
   test "handle/1 notifies the sender when an :add command fails", %{bypass: bypass} do
