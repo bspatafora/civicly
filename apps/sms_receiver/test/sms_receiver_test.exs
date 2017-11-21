@@ -61,6 +61,29 @@ defmodule SMSReceiverTest do
     SMSReceiver.call(inbound_sms_conn, SMSReceiver.init([]))
   end
 
+  test "post /receive strips the sender phone to nine digits", %{bypass: bypass} do
+    sms_relay = Helpers.insert_sms_relay()
+    user = Helpers.insert_user()
+    partner = Helpers.insert_user()
+    Helpers.insert_conversation(
+      %{active?: true,
+        sms_relay_id: sms_relay.id,
+        users: [user.id, partner.id]})
+    text = "Test message"
+    inbound_sms_data = %{
+      "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
+      "recipient": sms_relay.phone,
+      "sender": "+1#{user.phone}",
+      "text": text,
+      "timestamp": "2017-04-04T00:00:00.000Z"}
+    inbound_sms_conn = conn(:post, "/receive", inbound_sms_data)
+    inbound_sms_conn = put_req_header(inbound_sms_conn, "content-type", "application/json")
+
+    Bypass.expect bypass, &(Conn.resp(&1, 200, ""))
+
+    SMSReceiver.call(inbound_sms_conn, SMSReceiver.init([]))
+  end
+
   test "post /receive updates the first SMS relay IP", %{bypass: bypass} do
     sms_relay = Helpers.insert_sms_relay(%{ip: "localhost"})
     user = Helpers.insert_user()

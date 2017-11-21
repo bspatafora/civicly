@@ -21,7 +21,7 @@ defmodule SMSReceiver do
 
     message = %SMSMessage{
       recipient: conn.params["recipient"],
-      sender: conn.params["sender"],
+      sender: strip_to_nine_digits(conn.params["sender"]),
       sms_relay_ip: remote_ip(conn),
       text: conn.params["text"],
       timestamp: to_datetime(conn.params["timestamp"]),
@@ -49,6 +49,13 @@ defmodule SMSReceiver do
 
   defp remote_ip(conn) do
     conn.remote_ip |> Tuple.to_list |> Enum.join(".")
+  end
+
+  defp strip_to_nine_digits(phone) do
+    phone
+      |> String.reverse
+      |> String.slice(0..9)
+      |> String.reverse
   end
 
   defp to_datetime(string) do
