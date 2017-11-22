@@ -25,7 +25,7 @@ defmodule Core.APIClient.NewsAPI do
   end
 
   defp remove_special_reports(stories) do
-    special_report_prefix = "Special Report:"
+    special_report_prefix = "Special Report"
     special_report? =
       fn(story) ->
         title = Map.fetch!(story, "title")
