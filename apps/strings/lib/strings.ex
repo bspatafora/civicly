@@ -6,7 +6,7 @@ defmodule Strings do
     partners = Enum.join(partners, " and ")
 
     """
-    #{civicly()} Say hi to #{partners}, your compatriot for the next 4 days!
+    #{civicly()} Now connected to #{partners}, your compatriot for the next 4 days. Say hi!
 
     Remember, we're all here for civic, civil conversation.
     """

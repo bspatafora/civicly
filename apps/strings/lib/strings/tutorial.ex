@@ -41,7 +41,7 @@ defmodule Strings.Tutorial do
 
   def step_3_part_1 do
     """
-    #{S.civicly()} Say hi to Ben S, your compatriot for the next 4 days!
+    #{S.civicly()} Now connected to Ben S, your compatriot for the next 4 days. Say hi!
 
     Here's a question to get you started: What is your favorite color?
     """
