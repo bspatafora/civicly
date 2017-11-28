@@ -46,7 +46,7 @@ defmodule Strings do
 
   def help do
     """
-    #{civicly()} Have a question? Visit civicly.us/faq or email me at ben@civicly.us
+    #{civicly()} Have a question? Visit http://civicly.us/faq or email me at ben@civicly.us
 
     Text "Stop" to immediately and permanently delete your account.
     """
@@ -54,7 +54,7 @@ defmodule Strings do
 
   def user_deletion do
     """
-    #{civicly()} Your account has been deleted. Visit civicly.us to rejoin.
+    #{civicly()} Your account has been deleted. Visit http://civicly.us to rejoin.
 
     Please send one last text with your reason for leaving.
     """

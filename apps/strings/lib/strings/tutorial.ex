@@ -87,8 +87,8 @@ defmodule Strings.Tutorial do
     """
     #{S.civicly()} Excellent. Finally, please have a look at these:
 
-    civicly.us/terms
-    civicly.us/privacy
+    http://civicly.us/terms
+    http://civicly.us/privacy
 
     Text "Accept" to agree, or "Help" for more info.
     """
@@ -108,9 +108,9 @@ defmodule Strings.Tutorial do
 
   def complete_part_2 do
     """
-    #{S.civicly()} In the meantime, civicly.us/tips will help you get the most out of civicly.
+    #{S.civicly()} In the meantime, http://civicly.us/tips will help you get the most out of civicly.
 
-    Thanks for joining your fellow Americans in civic, civil conversation!
+    We're happy you're here!
     """
   end
 end

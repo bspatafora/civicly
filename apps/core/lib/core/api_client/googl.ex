@@ -19,13 +19,6 @@ defmodule Core.APIClient.Googl do
   end
 
   defp get_short_url(response_body) do
-    short_url = Map.fetch!(response_body, "id")
-    remove_protocol(short_url)
-  end
-
-  defp remove_protocol(url) do
-    url
-      |> String.replace_prefix("http://", "")
-      |> String.replace_prefix("https://", "")
+    Map.fetch!(response_body, "id")
   end
 end

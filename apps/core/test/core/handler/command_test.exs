@@ -323,7 +323,7 @@ defmodule Core.Handler.CommandTest do
     Command.handle(message)
 
     messages = MessageSpy.get(messages)
-    story = "[civicly] (Reuters) After victory in Raqqa over IS, Kurds face tricky peace goo.gl/fbsS"
+    story = "[civicly] (Reuters) After victory in Raqqa over IS, Kurds face tricky peace https://goo.gl/fbsS"
     assert Enum.member?(messages, %{recipient: user1.phone, text: story})
     assert Enum.member?(messages, %{recipient: user2.phone, text: story})
     assert !Enum.member?(messages, %{recipient: inactive.phone, text: story})
@@ -357,7 +357,7 @@ defmodule Core.Handler.CommandTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 1
-    news_text = "[civicly] (Reuters) After victory in Raqqa over IS, Kurds face tricky peace goo.gl/fbsS"
-    assert Enum.member?(messages, %{recipient: @ben, text: news_text})
+    story = "[civicly] (Reuters) After victory in Raqqa over IS, Kurds face tricky peace https://goo.gl/fbsS"
+    assert Enum.member?(messages, %{recipient: @ben, text: story})
   end
 end
