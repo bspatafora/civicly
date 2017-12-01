@@ -123,14 +123,14 @@ defmodule Storage.MessageTest do
   end
 
   test "a message is timestamped in UTC" do
-    {:ok, message} = Storage.insert(changeset())
+    message = Storage.insert!(changeset())
 
     assert message.inserted_at.time_zone == "Etc/UTC"
     assert message.updated_at.time_zone == "Etc/UTC"
   end
 
   test "a message's timestamp is stored in UTC" do
-    {:ok, message} = Storage.insert(changeset())
+    message = Storage.insert!(changeset())
 
     assert message.timestamp.time_zone == "Etc/UTC"
   end

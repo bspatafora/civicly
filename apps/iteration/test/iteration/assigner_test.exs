@@ -78,8 +78,8 @@ defmodule Iteration.AssignerTest do
     conversations = Storage.all(Conversation)
     iterations = conversations |> Enum.map(&(&1.iteration))
 
-    assert List.first(iterations) == 1
-    assert List.last(iterations) == 2
+    assert Enum.member?(iterations, 1)
+    assert Enum.member?(iterations, 2)
   end
 
   test "group_by_twos/0 assigns all users the first SMS relay in the database" do

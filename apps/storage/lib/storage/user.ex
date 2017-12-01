@@ -10,6 +10,7 @@ defmodule Storage.User do
     field :name, :string
     field :phone, :string
     field :tutorial_step, :integer, default: 0
+    field :engagement_level, :integer, default: -1
 
     many_to_many :conversations, Conversation, join_through: "conversations_users"
     has_many :messages, Message
@@ -19,7 +20,7 @@ defmodule Storage.User do
 
   def changeset(user, params \\ %{}) do
     user
-    |> cast(params, [:name, :phone, :tutorial_step])
+    |> cast(params, [:name, :phone, :tutorial_step, :engagement_level])
     |> validate_required([:name, :phone])
     |> validate_length(:name, max: 100)
     |> validate_format(:phone, ~r/^\d{10}$/)

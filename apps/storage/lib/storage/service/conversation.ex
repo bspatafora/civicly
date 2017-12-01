@@ -59,6 +59,16 @@ defmodule Storage.Service.Conversation do
     set_status(conversation, false)
   end
 
+  def latest_by_user(user_id, count) do
+    query = from c in Conversation,
+              join: cu in "conversations_users",
+              on: cu.conversation_id == c.id,
+              where: cu.user_id == ^user_id,
+              order_by: [desc: c.iteration],
+              limit: ^count
+    Storage.all(query)
+  end
+
   defp set_status(conversation, status) do
     conversation = Storage.preload(conversation, :users)
     params =

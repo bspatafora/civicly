@@ -65,4 +65,10 @@ defmodule Storage.Service.User do
       |> User.changeset(%{tutorial_step: new_step})
       |> Storage.update!
   end
+
+  def update_engagement_level(user, engagement_level) do
+    user
+      |> User.changeset(%{engagement_level: engagement_level})
+      |> Storage.update!
+  end
 end

@@ -21,6 +21,7 @@ defmodule Storage.Mixfile do
 
   defp deps do
     [{:ecto, "~> 2.1"},
-     {:postgrex, "~> 0.13.1"}]
+     {:postgrex, "~> 0.13.1"},
+     {:timex, "~> 3.1"}]
   end
 end

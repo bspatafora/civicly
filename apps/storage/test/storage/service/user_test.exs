@@ -128,4 +128,13 @@ defmodule Storage.Service.UserTest do
 
     assert UserService.tutorial_step(user.phone) == 0
   end
+
+  test "update_engagement_level/2 updates the user's engagement level" do
+    user = Helpers.insert_user(%{engagement_level: -1})
+
+    UserService.update_engagement_level(user, 5)
+
+    user = Storage.get(User, user.id)
+    assert user.engagement_level == 5
+  end
 end

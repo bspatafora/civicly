@@ -69,7 +69,7 @@ defmodule Storage.SMSRelayTest do
   end
 
   test "an SMS relay is timestamped in UTC" do
-    {:ok, sms_relay} = Storage.insert(changeset())
+    sms_relay = Storage.insert!(changeset())
 
     assert sms_relay.inserted_at.time_zone == "Etc/UTC"
     assert sms_relay.updated_at.time_zone == "Etc/UTC"

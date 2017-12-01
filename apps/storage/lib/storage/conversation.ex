@@ -8,7 +8,8 @@ defmodule Storage.Conversation do
 
   schema "conversations" do
     field :iteration, :integer
-    field :active?, :boolean
+    field :active?, :boolean, default: false
+    field :activated_at, :utc_datetime
     belongs_to :sms_relay, SMSRelay
     many_to_many :users, User, join_through: "conversations_users"
 
@@ -20,7 +21,7 @@ defmodule Storage.Conversation do
   def changeset(conversation, params \\ %{}) do
     users = fetch_users(params)
 
-    all_fields = [:iteration, :active?, :sms_relay_id]
+    all_fields = [:iteration, :active?, :activated_at, :sms_relay_id]
     conversation
     |> Storage.preload(:users)
     |> cast(params, all_fields)
@@ -28,14 +29,12 @@ defmodule Storage.Conversation do
     |> validate_number(:iteration, greater_than: 0)
     |> foreign_key_constraint(:sms_relay_id)
     |> put_assoc(:users, users)
-    |> validate_length(:users, min: 2)
   end
 
   defp fetch_users(params) do
     params = Map.merge(%{users: []}, params)
 
     params.users
-    |> Enum.map(&(Storage.get(User, &1)))
-    |> Enum.reject(&(&1 == nil))
+      |> Enum.map(&(Storage.get!(User, &1)))
   end
 end

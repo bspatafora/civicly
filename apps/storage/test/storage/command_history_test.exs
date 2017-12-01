@@ -52,14 +52,14 @@ defmodule Storage.CommandHistoryTest do
   end
 
   test "a command history is timestamped in UTC" do
-    {:ok, command_history} = Storage.insert(changeset())
+    command_history = Storage.insert!(changeset())
 
     assert command_history.inserted_at.time_zone == "Etc/UTC"
     assert command_history.updated_at.time_zone == "Etc/UTC"
   end
 
   test "a command history's timestamp is stored in UTC" do
-    {:ok, command_history} = Storage.insert(changeset())
+    command_history = Storage.insert!(changeset())
 
     assert command_history.timestamp.time_zone == "Etc/UTC"
   end

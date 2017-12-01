@@ -23,12 +23,36 @@ defmodule Storage.UserTest do
     assert changeset.valid?
   end
 
+  test "a user can optionally have its tutorial step set" do
+    step = 3
+    changeset = changeset(%{tutorial_step: step})
+    user = Storage.insert!(changeset)
+
+    assert user.tutorial_step == step
+  end
+
   test "a user's tutorial step defaults to 0" do
     params = %{name: "Test User", phone: "5555555555"}
     changeset = User.changeset(%User{}, params)
-    {:ok, user} = Storage.insert(changeset)
+    user = Storage.insert!(changeset)
 
     assert user.tutorial_step == 0
+  end
+
+  test "a user can optionally have its engagement level set" do
+    engagement_level = 3
+    changeset = changeset(%{engagement_level: engagement_level})
+    user = Storage.insert!(changeset)
+
+    assert user.engagement_level == engagement_level
+  end
+
+  test "a user's engagement level defaults to -1" do
+    params = %{name: "Test User", phone: "5555555555"}
+    changeset = User.changeset(%User{}, params)
+    user = Storage.insert!(changeset)
+
+    assert user.engagement_level == -1
   end
 
   test "a user with no name is invalid" do
@@ -81,7 +105,7 @@ defmodule Storage.UserTest do
   end
 
   test "a user is timestamped in UTC" do
-    {:ok, user} = Storage.insert(changeset())
+    user = Storage.insert!(changeset())
 
     assert user.inserted_at.time_zone == "Etc/UTC"
     assert user.updated_at.time_zone == "Etc/UTC"

@@ -104,4 +104,35 @@ defmodule Storage.Service.ConversationTest do
     conversation = Storage.get(Conversation, conversation.id)
     assert conversation.active? == false
   end
+
+  test "latest_by_user/2 returns the user's latest x conversations, ordered by recency" do
+    user = Helpers.insert_user()
+    Enum.each(1..15, fn iteration ->
+      Helpers.insert_conversation(
+        %{iteration: iteration,
+          users: [user.id, Helpers.insert_user().id]})
+    end)
+    Helpers.insert_conversation(
+      %{iteration: 16,
+        users: [Helpers.insert_user().id, Helpers.insert_user().id]})
+
+    latest_conversations = ConversationService.latest_by_user(user.id, 10)
+
+    iterations = Enum.map(latest_conversations, &(&1.iteration))
+    assert iterations == [15, 14, 13, 12, 11, 10, 9, 8, 7, 6]
+  end
+
+  test "latest_by_user/2 returns fewer conversations than the specified count when it is higher than the user's total number of conversations" do
+    user = Helpers.insert_user()
+    Enum.each(1..5, fn iteration ->
+      Helpers.insert_conversation(
+        %{iteration: iteration,
+          users: [user.id, Helpers.insert_user().id]})
+    end)
+
+    latest_conversations = ConversationService.latest_by_user(user.id, 10)
+
+    iterations = Enum.map(latest_conversations, &(&1.iteration))
+    assert iterations == [5, 4, 3, 2, 1]
+  end
 end

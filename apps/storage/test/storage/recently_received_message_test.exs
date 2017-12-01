@@ -69,14 +69,14 @@ defmodule Storage.RecentlyReceivedMessageTest do
   end
 
   test "a recently received message is timestamped in UTC" do
-    {:ok, recently_received_message} = Storage.insert(changeset())
+    recently_received_message = Storage.insert!(changeset())
 
     assert recently_received_message.inserted_at.time_zone == "Etc/UTC"
     assert recently_received_message.updated_at.time_zone == "Etc/UTC"
   end
 
   test "a recently received message's timestamp is stored in UTC" do
-    {:ok, recently_received_message} = Storage.insert(changeset())
+    recently_received_message = Storage.insert!(changeset())
 
     assert recently_received_message.timestamp.time_zone == "Etc/UTC"
   end
