@@ -60,6 +60,11 @@ defmodule StringsTest do
       |> Enum.each(&(assert String.contains?(&1, smart_quotes) == false))
   end
 
+  test "no message ends with a newline" do
+    messages()
+      |> Enum.each(&(assert !String.ends_with?(&1, "\n")))
+  end
+
   test "iteration_end/1 is shorter than 70 characters (the limit for SMS's with non-GSM-7 characters)" do
     assert String.length(S.iteration_end(-1)) <= 70
   end

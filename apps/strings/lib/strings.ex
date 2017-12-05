@@ -1,11 +1,13 @@
 defmodule Strings do
   @moduledoc false
 
+  import TrimNewlineSigil
+
   # Accepts multiple partners, but currently written for one
   def iteration_start(partners) do
     partners = Enum.join(partners, " and ")
 
-    """
+    ~n"""
     #{civicly()} Now connected to #{partners}, your compatriot for the next 4 days. Say hi!
 
     Remember, we're all here for civic, civil conversation.
@@ -13,7 +15,7 @@ defmodule Strings do
   end
 
   def question(question) do
-    """
+    ~n"""
     #{civicly()} Here's a question to get you started:
 
     #{question}
@@ -25,7 +27,7 @@ defmodule Strings do
   end
 
   def time_warning do
-    """
+    ~n"""
     #{civicly()} The round ends in 4 hours, at which point you will be disconnected from your partner.
 
     Text "Help" for info.
@@ -33,7 +35,7 @@ defmodule Strings do
   end
 
   def iteration_end(engagement_level) do
-    """
+    ~n"""
     #{civicly()} The round has ended.
 
     Your current engagement level is #{indicator_for(engagement_level)}
@@ -53,7 +55,7 @@ defmodule Strings do
   end
 
   def empty_room do
-    """
+    ~n"""
     #{civicly()} Sorry, but there's no one to send that message to right now! You'll be connected with someone when the next round begins.
 
     Text "Help" for info.
@@ -61,7 +63,7 @@ defmodule Strings do
   end
 
   def help do
-    """
+    ~n"""
     #{civicly()} Have a question? Visit http://civicly.us/faq or email me at ben@civicly.us
 
     Text "Stop" to immediately and permanently delete your account.
@@ -69,7 +71,7 @@ defmodule Strings do
   end
 
   def user_deletion do
-    """
+    ~n"""
     #{civicly()} Your account has been deleted. Visit http://civicly.us to rejoin.
 
     Please send one last text with your reason for leaving.
@@ -77,7 +79,7 @@ defmodule Strings do
   end
 
   def partner_deletion(name) do
-    """
+    ~n"""
     #{civicly()} #{name}'s account has been deleted.
 
     You'll be connected to someone new when the next round begins.

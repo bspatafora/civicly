@@ -1,10 +1,12 @@
 defmodule Strings.Tutorial do
   @moduledoc false
 
+  import TrimNewlineSigil
+
   alias Strings, as: S
 
   def step_1 do
-    """
+    ~n"""
     #{S.civicly()} Welcome to civicly! Please reply with the word "Go" to see how it works. This will only take a minute.
 
     Text "Help" at any time for help.
@@ -20,7 +22,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_2_part_1 do
-    """
+    ~n"""
     #{S.civicly()} civicly pairs Americans up for 1:1 conversations about our country.
 
     Each conversation lasts 4 days and happens right here.
@@ -40,7 +42,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_3_part_1 do
-    """
+    ~n"""
     #{S.civicly()} Now connected to Ben S, your compatriot for the next 4 days. Say hi!
 
     Here's a question to get you started: What is your favorite color?
@@ -52,7 +54,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_3_part_3 do
-    """
+    ~n"""
     #{S.civicly()} Note how your partner's message doesn't have [civicly] at the front, unlike system messages.
 
     Reply with your answer to continue the tutorial.
@@ -60,7 +62,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_4_part_1 do
-    """
+    ~n"""
     #{S.civicly()} Nice! Note: actual questions are more civic in nature ;)
 
     Once you're connected, texts you send to civicly will be delivered to your partner.
@@ -68,7 +70,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_4_part_2 do
-    """
+    ~n"""
     #{S.civicly()} Ok, just two more things!
 
     First: civicly only works if we listen to each other. Text "I will be civil" if you can commit to being civil.
@@ -84,7 +86,7 @@ defmodule Strings.Tutorial do
   end
 
   def step_5 do
-    """
+    ~n"""
     #{S.civicly()} Excellent. Finally, please have a look at these:
 
     http://civicly.us/terms
@@ -107,7 +109,7 @@ defmodule Strings.Tutorial do
   end
 
   def complete_part_2 do
-    """
+    ~n"""
     #{S.civicly()} In the meantime, http://civicly.us/tips will help you get the most out of civicly.
 
     We're happy you're here!
