@@ -42,7 +42,7 @@ defmodule Strings do
 
   defp indicator_for(engagement_level) do
     case engagement_level do
-      -1 -> "🥚"
+      -1 -> "🐣"
        0 -> "☁️"
        1 -> "🌥"
        2 -> "⛅️"
