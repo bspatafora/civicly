@@ -52,11 +52,18 @@ defmodule Storage.Service.Conversation do
   end
 
   def activate(conversation) do
-    set_status(conversation, true)
+    params =
+      %{activated_at: DateTime.utc_now(),
+        active?: true}
+
+    update_status(conversation, params)
   end
 
   def inactivate(conversation) do
-    set_status(conversation, false)
+    params =
+      %{active?: false}
+
+    update_status(conversation, params)
   end
 
   def latest_by_user(user_id, count) do
@@ -69,11 +76,9 @@ defmodule Storage.Service.Conversation do
     Storage.all(query)
   end
 
-  defp set_status(conversation, status) do
+  defp update_status(conversation, params) do
     conversation = Storage.preload(conversation, :users)
-    params =
-      %{active?: status,
-        users: Enum.map(conversation.users, &(&1.id))}
+    params = Map.merge(params, %{users: Enum.map(conversation.users, &(&1.id))})
 
     conversation
       |> Conversation.changeset(params)

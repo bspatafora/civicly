@@ -138,7 +138,11 @@ defmodule Iteration.NotifierTest do
 
     Notifier.notify("Test question?")
 
-    [conversation1, conversation2]
-      |> Enum.each(&(assert Storage.get(Conversation, &1.id).active? == true))
+    conversation1 = Storage.get(Conversation, conversation1.id)
+    conversation2 = Storage.get(Conversation, conversation2.id)
+    assert conversation1.active? == true
+    assert conversation2.active? == true
+    assert conversation1.activated_at != nil
+    assert conversation2.activated_at != nil
   end
 end

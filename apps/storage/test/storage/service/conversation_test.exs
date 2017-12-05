@@ -87,13 +87,16 @@ defmodule Storage.Service.ConversationTest do
       |> Enum.each(&(Storage.get(Conversation, &1.id).active? == false))
   end
 
-  test "activate/1 sets the conversation's status to active" do
-    conversation = Helpers.insert_conversation(%{active?: false})
+  test "activate/1 sets the conversation's status to active and its activation time to now" do
+    conversation = Helpers.insert_conversation(
+      %{activated_at: nil,
+        active?: false})
 
     ConversationService.activate(conversation)
 
     conversation = Storage.get(Conversation, conversation.id)
     assert conversation.active? == true
+    assert conversation.activated_at != nil
   end
 
   test "inactivate/1 sets the conversation's status to inactive" do
