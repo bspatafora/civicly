@@ -61,7 +61,7 @@ defmodule Core.Action.EndTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 2
-    text = S.iteration_end()
+    text = S.iteration_end(-1)
     assert Enum.member?(messages, %{recipient: user1.phone, text: text})
     assert Enum.member?(messages, %{recipient: user2.phone, text: text})
     assert !Enum.member?(messages, %{recipient: inactive.phone, text: text})

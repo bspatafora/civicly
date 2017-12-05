@@ -25,15 +25,31 @@ defmodule Strings do
   end
 
   def time_warning do
-    "#{civicly()} The round ends in 4 hours, at which point you will be disconnected from your partner."
-  end
-
-  def iteration_end do
     """
-    #{civicly()} The round has ended. You'll get a text when the next one begins.
+    #{civicly()} The round ends in 4 hours, at which point you will be disconnected from your partner.
 
     Text "Help" for info.
     """
+  end
+
+  def iteration_end(engagement_level) do
+    """
+    #{civicly()} The round has ended.
+
+    Your current engagement level is #{indicator_for(engagement_level)}
+    """
+  end
+
+  defp indicator_for(engagement_level) do
+    case engagement_level do
+      -1 -> "🥚"
+       0 -> "☁️"
+       1 -> "🌥"
+       2 -> "⛅️"
+       3 -> "🌤"
+       4 -> "☀️"
+       5 -> "🔥"
+    end
   end
 
   def empty_room do

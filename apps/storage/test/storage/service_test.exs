@@ -100,6 +100,31 @@ defmodule Storage.ServiceTest do
     assert Enum.member?(all_phones, user2.phone)
   end
 
+  test "active_users/0 returns every user with an active conversation" do
+    active1 = Helpers.insert_user()
+    active2 = Helpers.insert_user()
+    inactive1 = Helpers.insert_user()
+    inactive2 = Helpers.insert_user()
+    new = Helpers.insert_user()
+    Helpers.insert_conversation(
+      %{active?: true,
+        iteration: 1,
+        users: [active1.id, active2.id]})
+    Helpers.insert_conversation(
+      %{active?: false,
+        iteration: 1,
+        users: [inactive1.id, inactive2.id]})
+
+    active_users = Service.active_users()
+
+    assert length(active_users) == 2
+    assert Enum.member?(active_users, active1)
+    assert Enum.member?(active_users, active2)
+    assert !Enum.member?(active_users, inactive1)
+    assert !Enum.member?(active_users, inactive2)
+    assert !Enum.member?(active_users, new)
+  end
+
   test "active_phones/0 returns the phone of every user with an active conversation" do
     active1 = Helpers.insert_user()
     active2 = Helpers.insert_user()

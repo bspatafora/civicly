@@ -20,7 +20,6 @@ defmodule StringsTest do
        question,
        S.conversation_reminder,
        S.time_warning,
-       S.iteration_end,
        S.empty_room,
        S.help,
        S.user_deletion,
@@ -59,5 +58,9 @@ defmodule StringsTest do
 
     messages()
       |> Enum.each(&(assert String.contains?(&1, smart_quotes) == false))
+  end
+
+  test "iteration_end/1 is shorter than 70 characters (the limit for SMS's with non-GSM-7 characters)" do
+    assert String.length(S.iteration_end(-1)) <= 70
   end
 end

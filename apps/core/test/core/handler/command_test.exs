@@ -229,7 +229,7 @@ defmodule Core.Handler.CommandTest do
 
     messages = MessageSpy.get(messages)
     assert length(messages) == 2
-    assert Enum.member?(messages, %{recipient: user.phone, text: S.iteration_end()})
+    assert Enum.member?(messages, %{recipient: user.phone, text: S.iteration_end(-1)})
   end
 
   test "handle/1 forwards the message to all users when it receives an :all! command", %{bypass: bypass} do

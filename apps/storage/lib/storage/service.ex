@@ -37,10 +37,14 @@ defmodule Storage.Service do
       |> Enum.map(&(&1.phone))
   end
 
-  def active_phones do
+  def active_users do
     Conversation.all_active()
       |> Enum.map(&(&1.users))
       |> List.flatten
+  end
+
+  def active_phones do
+    active_users()
       |> Enum.map(&(&1.phone))
   end
 
