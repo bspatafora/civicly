@@ -42,8 +42,10 @@ defmodule Storage.EngagementLevelService do
   end
 
   defp limit_to_first_message(messages) do
+    datetime_comparison = fn (a, b) -> DateTime.compare(a.timestamp, b.timestamp) == :lt end
+
     messages
-      |> Enum.sort(&(&1.timestamp < &2.timestamp))
+      |> Enum.sort(&datetime_comparison.(&1, &2))
       |> Enum.take(1)
   end
 
