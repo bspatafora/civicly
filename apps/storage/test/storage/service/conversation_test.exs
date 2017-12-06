@@ -112,11 +112,13 @@ defmodule Storage.Service.ConversationTest do
     user = Helpers.insert_user()
     Enum.each(1..15, fn iteration ->
       Helpers.insert_conversation(
-        %{iteration: iteration,
+        %{activated_at: DateTime.utc_now(),
+          iteration: iteration,
           users: [user.id, Helpers.insert_user().id]})
     end)
     Helpers.insert_conversation(
-      %{iteration: 16,
+      %{activated_at: DateTime.utc_now(),
+        iteration: 16,
         users: [Helpers.insert_user().id, Helpers.insert_user().id]})
 
     latest_conversations = ConversationService.latest_by_user(user.id, 10)
@@ -129,11 +131,31 @@ defmodule Storage.Service.ConversationTest do
     user = Helpers.insert_user()
     Enum.each(1..5, fn iteration ->
       Helpers.insert_conversation(
-        %{iteration: iteration,
+        %{activated_at: DateTime.utc_now(),
+          iteration: iteration,
           users: [user.id, Helpers.insert_user().id]})
     end)
 
     latest_conversations = ConversationService.latest_by_user(user.id, 10)
+
+    iterations = Enum.map(latest_conversations, &(&1.iteration))
+    assert iterations == [5, 4, 3, 2, 1]
+  end
+
+  test "latest_by_user/2 excludes conversations that have not yet been activated" do
+    user = Helpers.insert_user()
+    Enum.each(1..5, fn iteration ->
+      Helpers.insert_conversation(
+        %{activated_at: DateTime.utc_now(),
+          iteration: iteration,
+          users: [user.id, Helpers.insert_user().id]})
+    end)
+    Helpers.insert_conversation(
+      %{activated_at: nil,
+        iteration: 6,
+        users: [user.id, Helpers.insert_user().id]})
+
+    latest_conversations = ConversationService.latest_by_user(user.id, 5)
 
     iterations = Enum.map(latest_conversations, &(&1.iteration))
     assert iterations == [5, 4, 3, 2, 1]

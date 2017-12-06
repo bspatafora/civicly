@@ -70,7 +70,8 @@ defmodule Storage.Service.Conversation do
     query = from c in Conversation,
               join: cu in "conversations_users",
               on: cu.conversation_id == c.id,
-              where: cu.user_id == ^user_id,
+              where: cu.user_id == ^user_id
+              and not(is_nil(c.activated_at)),
               order_by: [desc: c.iteration],
               limit: ^count
     Storage.all(query)

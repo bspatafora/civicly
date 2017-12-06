@@ -13,7 +13,6 @@ defmodule Storage.EngagementLevelService do
     conversations = Conversation.latest_by_user(user.id, 5)
 
     activation_timestamps = conversations
-      |> Enum.reject(&(&1.activated_at == nil))
       |> Enum.map(&(&1.activated_at))
 
     message_groups = conversations
