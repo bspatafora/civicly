@@ -100,6 +100,10 @@ defmodule Strings do
     "HELP"
   end
 
+  def prompt_request do
+    "PROMPT"
+  end
+
   def command_prefix do
     ":"
   end

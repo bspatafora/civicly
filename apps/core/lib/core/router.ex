@@ -3,7 +3,7 @@ defmodule Core.Router do
 
   require Logger
 
-  alias Core.Handler.{Command, HelpRequest, Missive, StopRequest, Tutorial}
+  alias Core.Handler.{Command, ConversationMessage, HelpRequest, StopRequest}
   alias Storage.Service.User
   alias Strings, as: S
 
@@ -18,7 +18,7 @@ defmodule Core.Router do
       help_request?(message) ->
         HelpRequest.handle(message)
       sender_is_user?(message) ->
-        handle_user(message)
+        ConversationMessage.handle(message)
       true ->
         log_unknown_sender(message)
     end
@@ -37,22 +37,14 @@ defmodule Core.Router do
     normalize(message.text) == S.help_request()
   end
 
-  defp normalize(string) do
-    string
-      |> String.trim
-      |> String.upcase
-  end
-
   defp sender_is_user?(message) do
     User.exists?(message.sender)
   end
 
-  defp handle_user(message) do
-    if User.in_tutorial?(message.sender) do
-      Tutorial.handle(message)
-    else
-      Missive.handle(message)
-    end
+  defp normalize(string) do
+    string
+      |> String.trim
+      |> String.upcase
   end
 
   defp log_unknown_sender(message) do
