@@ -20,7 +20,7 @@ defmodule Notifier.Mixfile do
 
   defp deps do
     [{:core, in_umbrella: true},
-     {:quantum, ">= 2.1.1"},
+     {:quantum, ">= 2.2.2"},
      {:timex, "~> 3.0"}]
   end
 end
