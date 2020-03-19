@@ -12,7 +12,8 @@ defmodule Civically.Mixfile do
   defp deps do
     [{:logger_json_file_backend, "~> 0.1.4"},
      {:distillery, "~> 1.0"},
-     {:credo, "~> 0.7", only: [:dev, :test]}]
+     {:credo, "~> 0.7", only: [:dev, :test]},
+     {:plug_cowboy, "~> 1.0"}]
   end
 
   defp aliases do
