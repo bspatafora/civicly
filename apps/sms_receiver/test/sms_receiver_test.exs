@@ -43,11 +43,11 @@ defmodule SMSReceiverTest do
         users: [user.id, partner.id]})
     text = "Test message"
     inbound_sms_data = %{
-      "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
-      "recipient": sms_relay.phone,
-      "sender": user.phone,
-      "text": text,
-      "timestamp": "2017-04-04T00:00:00.000Z"}
+      id: "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: text,
+      timestamp: "2017-04-04T00:00:00.000Z"}
     inbound_sms_conn = conn(:post, "/receive", inbound_sms_data)
     inbound_sms_conn = put_req_header(inbound_sms_conn, "content-type", "application/json")
 
@@ -71,11 +71,11 @@ defmodule SMSReceiverTest do
         users: [user.id, partner.id]})
     text = "Test message"
     inbound_sms_data = %{
-      "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
-      "recipient": sms_relay.phone,
-      "sender": "+1#{user.phone}",
-      "text": text,
-      "timestamp": "2017-04-04T00:00:00.000Z"}
+      id: "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
+      recipient: sms_relay.phone,
+      sender: "+1#{user.phone}",
+      text: text,
+      timestamp: "2017-04-04T00:00:00.000Z"}
     inbound_sms_conn = conn(:post, "/receive", inbound_sms_data)
     inbound_sms_conn = put_req_header(inbound_sms_conn, "content-type", "application/json")
 
@@ -92,11 +92,11 @@ defmodule SMSReceiverTest do
       sms_relay_id: sms_relay.id,
       users: [user.id, Helpers.insert_user().id]})
     data = %{
-      "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
-      "recipient": sms_relay.phone,
-      "sender": user.phone,
-      "text": "Test message",
-      "timestamp": "2017-06-14T00:00:00.000Z"}
+      id: "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: "Test message",
+      timestamp: "2017-06-14T00:00:00.000Z"}
     conn = conn(:post, "/receive", data)
     conn = put_req_header(conn, "content-type", "application/json")
     conn = %{conn | remote_ip: {0, 0, 0, 0}}
@@ -119,20 +119,20 @@ defmodule SMSReceiverTest do
     text = "Test message"
 
     inbound_sms_data1 = %{
-      "id": "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
-      "recipient": sms_relay.phone,
-      "sender": user.phone,
-      "text": text,
-      "timestamp": DateTime.to_iso8601(DateTime.utc_now())}
+      id: "3c4d2d9b-5ccb-4d47-9b85-ac723f334ba3",
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: text,
+      timestamp: DateTime.to_iso8601(DateTime.utc_now())}
     inbound_sms_conn1 = conn(:post, "/receive", inbound_sms_data1)
     inbound_sms_conn1 = put_req_header(inbound_sms_conn1, "content-type", "application/json")
 
     inbound_sms_data2 = %{
-      "id": "a7517efe-f74a-4b0e-a732-0d0e20b7a88f",
-      "recipient": sms_relay.phone,
-      "sender": user.phone,
-      "text": text,
-      "timestamp": DateTime.to_iso8601(DateTime.utc_now())}
+      id: "a7517efe-f74a-4b0e-a732-0d0e20b7a88f",
+      recipient: sms_relay.phone,
+      sender: user.phone,
+      text: text,
+      timestamp: DateTime.to_iso8601(DateTime.utc_now())}
     inbound_sms_conn2 = conn(:post, "/receive", inbound_sms_data2)
     inbound_sms_conn2 = put_req_header(inbound_sms_conn2, "content-type", "application/json")
 
