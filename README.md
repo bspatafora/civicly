@@ -4,7 +4,7 @@ A marketplace of ideas.
 
 ## Getting started
 
-1. Clone the repo: `https://accesstocivically@bitbucket.org/bspatafora/civically.git`
+1. Clone the repo
 2. Install Elixir (>= 1.6)
     - On MacOS with Homebrew: `brew update && brew install elixir`
 3. Install PostgreSQL (>= 10.2)
