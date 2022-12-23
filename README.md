@@ -1,6 +1,6 @@
 # civicly
 
-An SMS-based civic conversations app.
+An SMS-based [civic conversations](http://civicly.us) app.
 
 ## Getting started
 
